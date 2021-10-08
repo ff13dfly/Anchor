@@ -1,0 +1,10 @@
+.DS_Store
+Cargo.lock
+/test-utils/
+/bin/
+/client/
+/primitives/
+/docs/
+/simnet_tests/
+/utils/
+/target/
