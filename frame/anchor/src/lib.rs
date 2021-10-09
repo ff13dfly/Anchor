@@ -126,48 +126,51 @@ pub mod pallet {
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
-		pub fn set_anchor(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>,protocol:Vec<u8>,way:u16) -> DispatchResult {
+		pub fn set_anchor(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>,protocol:Vec<u8>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			//1.判断各个值的尺寸大小
 			//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(key.len() < 40 || key.len()==64, Error::<T>::LenghtOverload);
+			ensure!(key.len() < 40 || key.len()==64, Error::<T>::LenghtMaxLimited);
 
 			//1.2.限制raw的长度，必须小于10M
-			ensure!(raw.len() < 10000000, Error::<T>::LenghtOverload);
+			ensure!(raw.len() < 10000000, Error::<T>::LenghtMaxLimited);
 			
 			//1.3.限制protocal的长度，必须小于256字节
-			ensure!(protocol.len() < 256, Error::<T>::LenghtOverload);
-			// let plen=ensure!(raw.len() < 10000000, Error::<T>::LenghtOverload);.len();
-			// if(plen>256){
+			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);
 
-			// }
 
-			//2.根据是否为公有进行数据处理
-			if way==1 {
-				Self::deposit_event(Event::AnchorSet(1));		//这个值也会被保存到链上
-			}else{
-				Self::deposit_event(Event::AnchorSet(0));		//这个值也会被保存到链上
-			}
+			Self::deposit_event(Event::AnchorSet(1));		//这个值也会被保存到链上
+			
 
 			//3.判断_data的长度，并根据长度计算费用
 			Ok(())
 		}
 
-		//anchor的管理操作，可以考虑用托管的方式，压coin在里面
-		// #[pallet::weight(
-		// 	<T as pallet::Config>::WeightInfo::block_anchor()
-		// )]
-		// pub fn block_anchor(origin: OriginFor<T>, _key:Vec<u8>){
-		// 	let _sender = ensure_signed(origin)?;
+		#[pallet::weight(
+			<T as pallet::Config>::WeightInfo::set_storage((raw.len()).saturated_into())
+		)]
+		pub fn set_storage(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>) -> DispatchResult {
+			let _sender = ensure_signed(origin)?;
 
-		// 	Ok(())
-		// }
+			//1.判断各个值的尺寸大小
+			
+			//1.1.判断key的长度，<40 或者为 64（私有的状态）
+			ensure!(key.len()==64, Error::<T>::LenghtMaxLimited);
+
+			//1.2.限制raw的长度，必须小于1M
+			ensure!(raw.len() < 1000000, Error::<T>::LenghtMaxLimited);
+
+			Self::deposit_event(Event::StorageSet(1));
+
+			Ok(())
+		}
+
 	}
 
 	#[pallet::error]
 	pub enum Error<T> {
 		/// Anchor key length over load.
-		LenghtOverload,
+		LenghtMaxLimited,
 	}
 
 	//回调时间，不知道怎么调用的～～
@@ -175,6 +178,7 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		AnchorSet(u32),
+		StorageSet(u32),
 	}
 
 	// The genesis config type.

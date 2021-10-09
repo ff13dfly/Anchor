@@ -55,6 +55,7 @@ use sp_std::marker::PhantomData;
 /// Weight functions needed for pallet_example.
 pub trait WeightInfo {
 	fn set_anchor(x: u32, ) -> Weight;
+	fn set_storage(x: u32, ) -> Weight;
 }
 
 /// Weights for pallet_example using the Substrate node and recommended hardware.
@@ -65,11 +66,22 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 		(2_569_000 as Weight)
 			.saturating_add((4_000 as Weight).saturating_mul(x as Weight))
 	}
+
+	fn set_storage(x: u32, ) -> Weight {
+		(2_569_000 as Weight)
+			.saturating_add((4_000 as Weight).saturating_mul(x as Weight))
+	}
 }
 
 // For backwards compatibility and tests
 impl WeightInfo for () {
 	fn set_anchor(x: u32, ) -> Weight {
+		(2_569_000 as Weight)
+			// Standard Error: 0
+			.saturating_add((4_000 as Weight).saturating_mul(x as Weight))
+	}
+
+	fn set_storage(x: u32, ) -> Weight {
 		(2_569_000 as Weight)
 			// Standard Error: 0
 			.saturating_add((4_000 as Weight).saturating_mul(x as Weight))
