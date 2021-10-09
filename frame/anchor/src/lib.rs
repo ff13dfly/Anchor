@@ -18,7 +18,6 @@
 //#[pallet::getter(fn get_anchor)]
 //pub(super) type GetAnchor<T: Config> = StorageValue<_, T::Balance>;
 
-//引用区域，调用外部的包，如果有没有使用的，编译器会提示
 use frame_support::{
 	dispatch::DispatchResult,
 	weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
@@ -27,22 +26,6 @@ use frame_system::ensure_signed;
 use sp_runtime::traits::{SaturatedConversion};
 use sp_std::prelude::*;
 pub use pallet::*;
-
-// use codec::{Decode, Encode};
-// use frame_support::{
-// 	dispatch::DispatchResult,
-// 	traits::IsSubType,
-// 	weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
-// };
-// use frame_system::ensure_signed;
-// use log::info;
-// use sp_runtime::{
-// 	traits::{Bounded, DispatchInfoOf, SaturatedConversion, Saturating, SignedExtension},
-// 	transaction_validity::{
-// 		InvalidTransaction, TransactionValidity, TransactionValidityError, ValidTransaction,
-// 	},
-// };
-// use sp_std::{marker::PhantomData, prelude::*};
 
 #[cfg(test)]
 
@@ -130,7 +113,7 @@ pub mod pallet {
 			let _sender = ensure_signed(origin)?;
 			//1.判断各个值的尺寸大小
 			//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(key.len() < 40 || key.len()==64, Error::<T>::LenghtMaxLimited);
+			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
 
 			//1.2.限制raw的长度，必须小于10M
 			ensure!(raw.len() < 10000000, Error::<T>::LenghtMaxLimited);
@@ -145,6 +128,7 @@ pub mod pallet {
 			//3.判断_data的长度，并根据长度计算费用
 			Ok(())
 		}
+
 
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_storage((raw.len()).saturated_into())
@@ -165,6 +149,31 @@ pub mod pallet {
 			Ok(())
 		}
 
+
+
+		#[pallet::weight(
+			<T as pallet::Config>::WeightInfo::set_sell()
+		)]
+		pub fn anchor_to_sell(origin: OriginFor<T>, key:Vec<u8>,cost:u32) -> DispatchResult {
+			let _sender = ensure_signed(origin)?;
+
+			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
+			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited);
+
+			Ok(())
+		}
+
+
+		#[pallet::weight(
+			<T as pallet::Config>::WeightInfo::buy_anchor((123).saturated_into())
+		)]
+		pub fn anchor_buy(origin: OriginFor<T>, key:Vec<u8>) -> DispatchResult {
+			let _sender = ensure_signed(origin)?;
+
+			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
+
+			Ok(())
+		}
 	}
 
 	#[pallet::error]
