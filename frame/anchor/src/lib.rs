@@ -190,13 +190,17 @@ pub mod pallet {
 		StorageSet(u32),
 	}
 
+	#[pallet::storage]
+	#[pallet::getter(fn bar)]
+	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, T::AccountId>;
+
 	// The genesis config type.
 	#[pallet::genesis_config]
 	pub struct GenesisConfig<T: Config> {
 		pub fee: T::Balance,
-		//pub bar: Vec<(T::AccountId, T::Balance)>,
-		//pub foo: T::Balance,
+		//pub bar: AnchorOwner<(Vec<u8>, T::AccountId)>,
 	}
+
 
 	// The default value for the genesis config type.
 	#[cfg(feature = "std")]
