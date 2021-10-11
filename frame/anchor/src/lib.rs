@@ -95,41 +95,47 @@ pub mod pallet {
 		fn offchain_worker(_n: T::BlockNumber){}
 	}
 
-	//这里是可以执行的交易，数据放到了链上
-	//可以通过RPC进行调用的，就能把数据存到链上了，需要返回blocknumber，供缓存用
-	//最终的请求逻辑为： vExplorer --> vCache --> vChain
+	#[pallet::error]
+	pub enum Error<T> {
+		/// Anchor key length over load.
+		LenghtMaxLimited,
+
+		///Anchor exists already, can not be created.
+		AnchorExistsAlready,
+	}
+
+	#[pallet::event]
+	#[pallet::generate_deposit(pub(super) fn deposit_event)]
+	pub enum Event<T: Config> {
+		AnchorSet(T::AccountId),
+		StorageSet(u32),
+	}
+
+	#[pallet::storage]
+	#[pallet::getter(fn anchor)]
+	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, T::AccountId>;
+
 	#[pallet::call]
 	impl<T: Config> Pallet<T>{
-		//anchor的设定，type为1的时候，可以直接用key进行访问
-		//@param key		string		//正常值为sha256,vbw通过前缀加密获得sha256(prefix_x_y_world),x,y,world存入到metadata里
-		//@param raw		Vec<u8>		//数据值，cache需要进行缓存，根据type进行，1和2存到redis，其他的存为文件
-		//@param protocol	Vec<u8>	 	//json格式数据，用于支持各种应用 {md5:0xaaa...bbb}
-		//@param way		u16			//数据类型，[1.anchor类型;2.string类型；3.其他的类型，文件类型等]
-
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
 		pub fn set_anchor(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>,protocol:Vec<u8>) -> DispatchResult {
-			let _sender = ensure_signed(origin)?;
+			let sender = ensure_signed(origin)?;
+
 			//1.判断各个值的尺寸大小
-			//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
+			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);	//1.1.判断key的长度，<40 或者为 64（私有的状态）
+			ensure!(raw.len() < 10000000, Error::<T>::LenghtMaxLimited);//1.2.限制raw的长度，必须小于10M
+			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);//1.3.限制protocal的长度，必须小于256字节
 
-			//1.2.限制raw的长度，必须小于10M
-			ensure!(raw.len() < 10000000, Error::<T>::LenghtMaxLimited);
-			
-			//1.3.限制protocal的长度，必须小于256字节
-			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);
+			//let owner=<AnchorOwner<T>>::get(&sender);	//判断
 
-
-			Self::deposit_event(Event::AnchorSet(1));		//这个值也会被保存到链上
-			
-
-			//3.判断_data的长度，并根据长度计算费用
+			<AnchorOwner<T>>::insert(key,&sender);		//创建所有者
+			Self::deposit_event(Event::AnchorSet(sender));		//这个值也会被保存到链上
 			Ok(())
 		}
 
-
+		//#[pallet::weight(50_000_000)]
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_storage((raw.len()).saturated_into())
 		)]
@@ -148,8 +154,6 @@ pub mod pallet {
 
 			Ok(())
 		}
-
-
 
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_sell()
@@ -176,29 +180,10 @@ pub mod pallet {
 		}
 	}
 
-	#[pallet::error]
-	pub enum Error<T> {
-		/// Anchor key length over load.
-		LenghtMaxLimited,
-	}
-
-	//回调时间，不知道怎么调用的～～
-	#[pallet::event]
-	#[pallet::generate_deposit(pub(super) fn deposit_event)]
-	pub enum Event<T: Config> {
-		AnchorSet(u32),
-		StorageSet(u32),
-	}
-
-	#[pallet::storage]
-	#[pallet::getter(fn bar)]
-	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, T::AccountId>;
-
 	// The genesis config type.
 	#[pallet::genesis_config]
 	pub struct GenesisConfig<T: Config> {
 		pub fee: T::Balance,
-		//pub bar: AnchorOwner<(Vec<u8>, T::AccountId)>,
 	}
 
 
@@ -214,11 +199,6 @@ pub mod pallet {
 	#[pallet::genesis_build]
 	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
 		fn build(&self) {
-			//<Dummy<T>>::put(&self.dummy);
-			//for (a, b) in &self.bar {
-			//	<Bar<T>>::insert(a, b);
-			//}
-			//<Foo<T>>::put(&self.foo);
 		}
 	}
 
