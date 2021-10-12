@@ -10,13 +10,6 @@
 //调试方法
 //1.在anchor目录下运行cargo test，可以进行单元测试，保障代码没有问题
 //2.到根目录下运行 cargo run --bin substrate  --  --dev  -d ~/Desktop/www/sub3 --offchain-worker --execution=NativeElseWasm
-//进行完整的测试，有可能会报错
-
-//方法暴露的实现
-//1.使用预定义的宏来实现
-//#[pallet::storage]
-//#[pallet::getter(fn get_anchor)]
-//pub(super) type GetAnchor<T: Config> = StorageValue<_, T::Balance>;
 
 use frame_support::{
 	dispatch::DispatchResult,
@@ -102,6 +95,12 @@ pub mod pallet {
 
 		///Anchor exists already, can not be created.
 		AnchorExistsAlready,
+
+		///Anchor do not exist, can not change status.
+		AnchorNotExists,
+
+		///Anchor is not in the sell list.
+		AnchorNotInSellList,
 	}
 
 	#[pallet::event]
@@ -114,6 +113,10 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn anchor)]
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, T::AccountId>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn sale)]
+	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, (T::AccountId,u32)>;
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T>{
@@ -128,10 +131,12 @@ pub mod pallet {
 			ensure!(raw.len() < 10000000, Error::<T>::LenghtMaxLimited);//1.2.限制raw的长度，必须小于10M
 			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);//1.3.限制protocal的长度，必须小于256字节
 
-			//let owner=<AnchorOwner<T>>::get(&sender);	//判断
+			let owner=<AnchorOwner<T>>::get(&key);	//判断是否已经存在anchor
+			ensure!(owner.is_none(), Error::<T>::AnchorExistsAlready);
 
 			<AnchorOwner<T>>::insert(key,&sender);		//创建所有者
 			Self::deposit_event(Event::AnchorSet(sender));		//这个值也会被保存到链上
+			
 			Ok(())
 		}
 
@@ -141,14 +146,8 @@ pub mod pallet {
 		)]
 		pub fn set_storage(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-
-			//1.判断各个值的尺寸大小
-			
-			//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(key.len()==64, Error::<T>::LenghtMaxLimited);
-
-			//1.2.限制raw的长度，必须小于1M
-			ensure!(raw.len() < 1000000, Error::<T>::LenghtMaxLimited);
+			ensure!(key.len()==64, Error::<T>::LenghtMaxLimited);		//1.1.判断key的长度，<40 或者为 64（私有的状态）
+			ensure!(raw.len() < 1000000, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于1M
 
 			Self::deposit_event(Event::StorageSet(1));
 
@@ -159,10 +158,15 @@ pub mod pallet {
 			<T as pallet::Config>::WeightInfo::set_sell()
 		)]
 		pub fn anchor_to_sell(origin: OriginFor<T>, key:Vec<u8>,cost:u32) -> DispatchResult {
-			let _sender = ensure_signed(origin)?;
+			let sender = ensure_signed(origin)?;
 
-			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
-			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited);
+			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);				//anchor的字段长度
+			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited);		//转让费用不能为负数
+
+			let owner=<AnchorOwner<T>>::get(&key);	//判断是否已经存在anchor
+			ensure!(!owner.is_none(), Error::<T>::AnchorNotExists);
+
+			<SellList<T>>::insert(key,(&sender,cost));		//创建待售列表，可供交易的anchor
 
 			Ok(())
 		}
@@ -171,10 +175,15 @@ pub mod pallet {
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::buy_anchor((123).saturated_into())
 		)]
-		pub fn anchor_buy(origin: OriginFor<T>, key:Vec<u8>) -> DispatchResult {
+		pub fn anchor_to_buy(origin: OriginFor<T>, key:Vec<u8>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 
 			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
+
+			let anchor=<SellList<T>>::get(&key);	//判断是否已经存在anchor
+			ensure!(!anchor.is_none(), Error::<T>::AnchorNotInSellList);
+
+			//准备转账交易
 
 			Ok(())
 		}
