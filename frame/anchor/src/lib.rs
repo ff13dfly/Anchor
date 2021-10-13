@@ -114,6 +114,9 @@ pub mod pallet {
 	#[pallet::getter(fn anchor)]
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, T::AccountId>;
 
+	//写入时增加最后写入的block number，前端调用的时候，就可以判断是否为最新的数据了
+	//pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, (T::AccountId,blocknumber)>;
+
 	#[pallet::storage]
 	#[pallet::getter(fn sale)]
 	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, (T::AccountId,u32)>;
@@ -132,7 +135,19 @@ pub mod pallet {
 			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);//1.3.限制protocal的长度，必须小于256字节
 
 			let owner=<AnchorOwner<T>>::get(&key);	//判断是否已经存在anchor
-			ensure!(owner.is_none(), Error::<T>::AnchorExistsAlready);
+
+			if owner.is_none(){
+				// match (origin.into(),owner.1) {
+				// 	Some() => AnchorExistsAlready,
+				// 	None => AnchorExistsAlready,
+				// }
+				// if &owner.1 != origin {
+				// 	Error::<T>::AnchorExistsAlready;
+				// }
+
+				assert_eq!(&owner.1,&origin);
+			}
+			//ensure!(owner.is_none(), Error::<T>::AnchorExistsAlready);
 
 			<AnchorOwner<T>>::insert(key,&sender);		//创建所有者
 			Self::deposit_event(Event::AnchorSet(sender));		//这个值也会被保存到链上
