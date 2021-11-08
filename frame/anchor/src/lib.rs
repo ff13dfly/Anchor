@@ -6,7 +6,6 @@
 //2.外部cache程序调用 chain.getBlockHash 和 chain.getBlock进行数据获取
 //3.外部cache程序分析数据，形成可调用的缓存数据
 
-
 //调试方法
 //1.在anchor目录下运行cargo test，可以进行单元测试，保障代码没有问题
 //2.到根目录下运行 cargo run --bin substrate  --  --dev  -d ~/Desktop/www/sub3 --offchain-worker --execution=NativeElseWasm
@@ -16,14 +15,13 @@ use frame_support::{
 	weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
 };
 use frame_system::ensure_signed;
-use sp_runtime::traits::{SaturatedConversion};
-use sp_std::prelude::*;
 pub use pallet::*;
+use sp_runtime::traits::SaturatedConversion;
+use sp_std::prelude::*;
 
-#[cfg(test)]
-
-mod tests;
 mod benchmarking;
+#[cfg(test)]
+mod tests;
 
 pub mod weights;
 pub use weights::*;
@@ -67,13 +65,11 @@ pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
-
 	#[pallet::config]
 	pub trait Config: pallet_balances::Config + frame_system::Config {
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 		type WeightInfo: WeightInfo;
 	}
-
 
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
@@ -84,8 +80,8 @@ pub mod pallet {
 		fn on_initialize(_n: T::BlockNumber) -> Weight {
 			0
 		}
-		fn on_finalize(_n: T::BlockNumber){}
-		fn offchain_worker(_n: T::BlockNumber){}
+		fn on_finalize(_n: T::BlockNumber) {}
+		fn offchain_worker(_n: T::BlockNumber) {}
 	}
 
 	#[pallet::error]
@@ -107,64 +103,47 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		AnchorSet(T::AccountId),
-		StorageSet(u32),
+		AnchorToSell(T::AccountId),
 	}
 
 	#[pallet::storage]
 	#[pallet::getter(fn anchor)]
-	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, T::AccountId>;
+	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, T::AccountId>;
 
 	//写入时增加最后写入的block number，前端调用的时候，就可以判断是否为最新的数据了
 	//pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, (T::AccountId,blocknumber)>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn sale)]
-	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, (T::AccountId,u32)>;
+	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32)>;
 
 	#[pallet::call]
-	impl<T: Config> Pallet<T>{
+	impl<T: Config> Pallet<T> {
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
-		pub fn set_anchor(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>,protocol:Vec<u8>) -> DispatchResult {
+		pub fn set_anchor(
+			origin: OriginFor<T>,
+			key: Vec<u8>,
+			raw: Vec<u8>,
+			protocol: Vec<u8>,
+		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 
 			//1.判断各个值的尺寸大小
-			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);	//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(raw.len() < 10000000, Error::<T>::LenghtMaxLimited);//1.2.限制raw的长度，必须小于10M
-			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);//1.3.限制protocal的长度，必须小于256字节
+			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);			//1.1.判断key的长度，<40 或者为 64（私有的状态）
+			ensure!(raw.len() < 104857600, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于10M
+			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);	//1.3.限制protocal的长度，必须小于256字节
 
-			let owner=<AnchorOwner<T>>::get(&key);	//判断是否已经存在anchor
+			let owner = <AnchorOwner<T>>::get(&key); 		//判断是否已经存在anchor
 
-			if owner.is_none(){
-				// match (origin.into(),owner.1) {
-				// 	Some() => AnchorExistsAlready,
-				// 	None => AnchorExistsAlready,
-				// }
-				// if &owner.1 != origin {
-				// 	Error::<T>::AnchorExistsAlready;
-				// }
+			if owner.is_none() {
 
-				assert_eq!(&owner.1,&origin);
 			}
 			//ensure!(owner.is_none(), Error::<T>::AnchorExistsAlready);
 
-			<AnchorOwner<T>>::insert(key,&sender);		//创建所有者
-			Self::deposit_event(Event::AnchorSet(sender));		//这个值也会被保存到链上
-			
-			Ok(())
-		}
-
-		//#[pallet::weight(50_000_000)]
-		#[pallet::weight(
-			<T as pallet::Config>::WeightInfo::set_storage((raw.len()).saturated_into())
-		)]
-		pub fn set_storage(origin: OriginFor<T>, key:Vec<u8>,raw:Vec<u8>) -> DispatchResult {
-			let _sender = ensure_signed(origin)?;
-			ensure!(key.len()==64, Error::<T>::LenghtMaxLimited);		//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(raw.len() < 1000000, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于1M
-
-			Self::deposit_event(Event::StorageSet(1));
+			<AnchorOwner<T>>::insert(key, &sender); //创建所有者
+			Self::deposit_event(Event::AnchorSet(sender)); //这个值也会被保存到链上
 
 			Ok(())
 		}
@@ -172,31 +151,32 @@ pub mod pallet {
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_sell()
 		)]
-		pub fn anchor_to_sell(origin: OriginFor<T>, key:Vec<u8>,cost:u32) -> DispatchResult {
+		pub fn sell_anchor(origin: OriginFor<T>, key: Vec<u8>, cost: u32) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 
-			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);				//anchor的字段长度
-			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited);		//转让费用不能为负数
+			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited); //anchor的字段长度
+			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited); //转让费用不能为负数
 
-			let owner=<AnchorOwner<T>>::get(&key);	//判断是否已经存在anchor
+			let owner = <AnchorOwner<T>>::get(&key); //判断是否已经存在anchor
 			ensure!(!owner.is_none(), Error::<T>::AnchorNotExists);
 
-			<SellList<T>>::insert(key,(&sender,cost));		//创建待售列表，可供交易的anchor
-
+			<SellList<T>>::insert(key, (&sender, cost)); //创建待售列表，可供交易的anchor
+			Self::deposit_event(Event::AnchorToSell(sender)); //这个值也会被保存到链上
 			Ok(())
 		}
-
 
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::buy_anchor((123).saturated_into())
 		)]
-		pub fn anchor_to_buy(origin: OriginFor<T>, key:Vec<u8>) -> DispatchResult {
+		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 
-			ensure!(key.len() < 40 , Error::<T>::LenghtMaxLimited);
+			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);
 
-			let anchor=<SellList<T>>::get(&key);	//判断是否已经存在anchor
+			let anchor = <SellList<T>>::get(&key); //判断是否已经存在anchor
 			ensure!(!anchor.is_none(), Error::<T>::AnchorNotInSellList);
+
+			//let cost=anchor.1;		//获取anchor的价格
 
 			//准备转账交易
 
@@ -210,7 +190,6 @@ pub mod pallet {
 		pub fee: T::Balance,
 	}
 
-
 	// The default value for the genesis config type.
 	#[cfg(feature = "std")]
 	impl<T: Config> Default for GenesisConfig<T> {
@@ -222,8 +201,6 @@ pub mod pallet {
 	// The build of genesis for the pallet.
 	#[pallet::genesis_build]
 	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
-		fn build(&self) {
-		}
+		fn build(&self) {}
 	}
-
 }
