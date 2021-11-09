@@ -13,6 +13,7 @@
 use frame_support::{
 	dispatch::DispatchResult,
 	weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
+	//traits::{Currency,ExistenceRequirement},
 };
 use frame_system::ensure_signed;
 pub use pallet::*;
@@ -104,6 +105,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		AnchorSet(T::AccountId),
 		AnchorToSell(T::AccountId),
+		AnchorSold(u32),
 	}
 
 	#[pallet::storage]
@@ -118,6 +120,7 @@ pub mod pallet {
 	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32)>;
 
 	#[pallet::call]
+	//impl<T: Config<I>, I: 'static> Pallet<T, I>{
 	impl<T: Config> Pallet<T> {
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
@@ -165,21 +168,24 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(
-			<T as pallet::Config>::WeightInfo::buy_anchor((123).saturated_into())
-		)]
+		#[pallet::weight(70_000_000)]
 		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-
 			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);
+			
+			//let anchor=<SellList<T>>::get(&key);
+			//ensure!(!anchor.is_none(), Error::<T>::AnchorNotInSellList);
+			let _anchor=<SellList<T>>::take(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
-			let anchor = <SellList<T>>::get(&key); //判断是否已经存在anchor
-			ensure!(!anchor.is_none(), Error::<T>::AnchorNotInSellList);
+			//T::Currency::transfer(&sender,&anchor.0,anchor.1,ExistenceRequirement::AllowDeath);
 
-			//let cost=anchor.1;		//获取anchor的价格
-
-			//准备转账交易
-
+			// <Self as Currency<_>>::transfer(
+			// 	&sender,
+			// 	&anchor.0,
+			// 	anchor.1,
+			// 	ExistenceRequirement::AllowDeath,
+			// )?;
+			Self::deposit_event(Event::AnchorSold(_anchor.1));
 			Ok(())
 		}
 	}
