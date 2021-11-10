@@ -1,19 +1,10 @@
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 
-//Anchor的实现逻辑
-//1.用个人账号存储到，是可以通过stat.call进行访问的
-//2.外部cache程序调用 chain.getBlockHash 和 chain.getBlock进行数据获取
-//3.外部cache程序分析数据，形成可调用的缓存数据
-
-//调试方法
-//1.在anchor目录下运行cargo test，可以进行单元测试，保障代码没有问题
-//2.到根目录下运行 cargo run --bin substrate  --  --dev  -d ~/Desktop/www/sub3 --offchain-worker --execution=NativeElseWasm
-
 use frame_support::{
 	dispatch::DispatchResult,
 	weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
-	//traits::{Currency,ExistenceRequirement},
+	traits::{Currency,ExistenceRequirement},
 };
 use frame_system::ensure_signed;
 pub use pallet::*;
@@ -29,8 +20,9 @@ pub use weights::*;
 
 /// A type alias for the balance type from this pallet's point of view.
 type BalanceOf<T> = <T as pallet_balances::Config>::Balance;
+//type BalanceOf<T> =
+//	<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 const MILLICENTS: u32 = 1_000_000_000;
-//let BkNumber:u64;
 
 struct WeightForSetDummy<T: pallet_balances::Config>(BalanceOf<T>);
 
@@ -66,10 +58,12 @@ pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
+	
 	#[pallet::config]
 	pub trait Config: pallet_balances::Config + frame_system::Config {
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 		type WeightInfo: WeightInfo;
+		type Currency: Currency<Self::AccountId>;
 	}
 
 	#[pallet::pallet]
@@ -112,16 +106,34 @@ pub mod pallet {
 	#[pallet::getter(fn anchor)]
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, T::AccountId>;
 
-	//写入时增加最后写入的block number，前端调用的时候，就可以判断是否为最新的数据了
-	//pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat,Vec<u8>, (T::AccountId,blocknumber)>;
-
 	#[pallet::storage]
 	#[pallet::getter(fn sale)]
 	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32)>;
 
+	//The genesis config type.
+	#[pallet::genesis_config]
+	pub struct GenesisConfig<T: Config> {
+		pub fee: T::Balance,
+	}
+
+	//The default value for the genesis config type.
+	#[cfg(feature = "std")]
+	impl<T: Config> Default for GenesisConfig<T> {
+		fn default() -> Self {
+			Self { fee: Default::default() }
+		}
+	}
+
+	// The build of genesis for the pallet.
+	#[pallet::genesis_build]
+	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+		fn build(&self) {}
+	}
+
+	
 	#[pallet::call]
-	//impl<T: Config<I>, I: 'static> Pallet<T, I>{
 	impl<T: Config> Pallet<T> {
+
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
@@ -138,15 +150,15 @@ pub mod pallet {
 			ensure!(raw.len() < 104857600, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于10M
 			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);	//1.3.限制protocal的长度，必须小于256字节
 
-			let owner = <AnchorOwner<T>>::get(&key); 		//判断是否已经存在anchor
+			let owner = <AnchorOwner<T>>::get(&key); 		//check anchor status
 
 			if owner.is_none() {
 
 			}
 			//ensure!(owner.is_none(), Error::<T>::AnchorExistsAlready);
 
-			<AnchorOwner<T>>::insert(key, &sender); //创建所有者
-			Self::deposit_event(Event::AnchorSet(sender)); //这个值也会被保存到链上
+			<AnchorOwner<T>>::insert(key, &sender); 		//create anchor owner
+			Self::deposit_event(Event::AnchorSet(sender));	//deposit the owner
 
 			Ok(())
 		}
@@ -170,43 +182,26 @@ pub mod pallet {
 
 		#[pallet::weight(70_000_000)]
 		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
-			let _sender = ensure_signed(origin)?;
+			let sender = ensure_signed(origin)?;
 			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);
 			
-			//let anchor=<SellList<T>>::get(&key);
-			//ensure!(!anchor.is_none(), Error::<T>::AnchorNotInSellList);
-			let _anchor=<SellList<T>>::take(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
+			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
+			//let amount = 6_000_000 as Weight;
+			let amount = &anchor.1.into();
 
-			//T::Currency::transfer(&sender,&anchor.0,anchor.1,ExistenceRequirement::AllowDeath);
+			//1.transfer specail amout to seller
+			let _res=T::Currency::transfer(&sender,&anchor.0,*amount,ExistenceRequirement::AllowDeath);
 
-			// <Self as Currency<_>>::transfer(
-			// 	&sender,
-			// 	&anchor.0,
-			// 	anchor.1,
-			// 	ExistenceRequirement::AllowDeath,
-			// )?;
-			Self::deposit_event(Event::AnchorSold(_anchor.1));
+			//2.change the owner of anchor 
+			<AnchorOwner<T>>::remove(&key);
+			<AnchorOwner<T>>::insert(&key, &sender);
+
+			//3.remove the anchor from sell list
+			<SellList<T>>::remove(&key);
+
+			Self::deposit_event(Event::AnchorSold(anchor.1));
 			Ok(())
 		}
 	}
 
-	// The genesis config type.
-	#[pallet::genesis_config]
-	pub struct GenesisConfig<T: Config> {
-		pub fee: T::Balance,
-	}
-
-	// The default value for the genesis config type.
-	#[cfg(feature = "std")]
-	impl<T: Config> Default for GenesisConfig<T> {
-		fn default() -> Self {
-			Self { fee: Default::default() }
-		}
-	}
-
-	// The build of genesis for the pallet.
-	#[pallet::genesis_build]
-	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
-		fn build(&self) {}
-	}
 }
