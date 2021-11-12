@@ -107,7 +107,8 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn anchor)]
-	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, T::AccountId>;
+	//pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, T::AccountId>;
+	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId,T::BlockNumber)>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn sale)]
@@ -153,15 +154,21 @@ pub mod pallet {
 			ensure!(raw.len() < 104857600, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于10M
 			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);	//1.3.限制protocal的长度，必须小于256字节
 
-			let owner = <AnchorOwner<T>>::get(&key); 		//check anchor status
+			let data = <AnchorOwner<T>>::get(&key); 		//check anchor status
+			let current_block_number = <frame_system::Pallet<T>>::block_number();
 
 			//2.check anchor to determine add or update
-			if owner.is_none() {
-				<AnchorOwner<T>>::insert(key, &sender); 		//create anchor owner
-				Self::deposit_event(Event::AnchorSet(sender));	//deposit the owner
+			//let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
+			if data.is_none() {
+				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 		//create anchor owner
+				
 			}else{
-
+				let owner=data.ok_or(Error::<T>::AnchorNotExists)?;
+				ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
+				<AnchorOwner<T>>::remove(&key);
+				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 		//create anchor owner
 			}
+			Self::deposit_event(Event::AnchorSet(sender));	//deposit the owner
 			Ok(())
 		}
 
@@ -174,10 +181,8 @@ pub mod pallet {
 			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited); //anchor的字段长度
 			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited); //转让费用不能为负数
 
-			let owner = <AnchorOwner<T>>::get(&key); //判断是否已经存在anchor
-			ensure!(!owner.is_none(), Error::<T>::AnchorNotExists);
-			let oaccount=owner.ok_or(Error::<T>::AnchorNotBelogToAccount)?;
-			ensure!(sender==oaccount, <Error<T>>::AnchorNotBelogToAccount);
+			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
+			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
 			<SellList<T>>::insert(key, (&sender, cost)); //创建待售列表，可供交易的anchor
 			Self::deposit_event(Event::AnchorToSell(sender,cost)); //这个值也会被保存到链上
@@ -196,8 +201,9 @@ pub mod pallet {
 			let _res=T::Currency::transfer(&sender,&anchor.0,*amount,ExistenceRequirement::AllowDeath);
 
 			//2.change the owner of anchor 
+			let current_block_number = <frame_system::Pallet<T>>::block_number();
 			<AnchorOwner<T>>::remove(&key);
-			<AnchorOwner<T>>::insert(&key, &sender);
+			<AnchorOwner<T>>::insert(&key, (&sender,current_block_number));
 
 			//3.remove the anchor from sell list
 			<SellList<T>>::remove(&key);
