@@ -82,7 +82,16 @@ pub mod pallet {
 	#[pallet::error]
 	pub enum Error<T> {
 		/// Anchor key length over load.
-		LenghtMaxLimited,
+		LengthMaxLimited,
+
+		///Anchor name max length.
+		KeyMaxLimited,
+
+		///Anchor raw data max limit.
+		Base64MaxLimited,
+
+		///Anchor sell value error.
+		CostValueLimited,
 
 		///Anchor exists already, can not be created.
 		AnchorExistsAlready,
@@ -137,7 +146,7 @@ pub mod pallet {
 	
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-
+		//set a new anchor or update an exist anchor
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
@@ -150,15 +159,14 @@ pub mod pallet {
 			let sender = ensure_signed(origin)?;
 
 			//1.param check
-			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);			//1.1.判断key的长度，<40 或者为 64（私有的状态）
-			ensure!(raw.len() < 104857600, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于10M
-			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);	//1.3.限制protocal的长度，必须小于256字节
+			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);				//1.1.check key length, <40
+			ensure!(raw.len() < 104857600, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<10M
+			ensure!(protocol.len() < 256, Error::<T>::LengthMaxLimited);	//1.3.check protocal length, <256
 
 			let data = <AnchorOwner<T>>::get(&key); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
 
 			//2.check anchor to determine add or update
-			//let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
 			if data.is_none() {
 				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 		//create anchor owner
 				
@@ -172,27 +180,31 @@ pub mod pallet {
 			Ok(())
 		}
 
+		//put an anchor to sell list
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_sell()
 		)]
 		pub fn sell_anchor(origin: OriginFor<T>, key: Vec<u8>, cost: u32) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
-
-			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited); //anchor的字段长度
-			ensure!(cost > 0 || cost == 0, Error::<T>::LenghtMaxLimited); //转让费用不能为负数
-
+			//1.param check		
+			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
+			ensure!(cost > 0 || cost == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
+			
+			//2.check owner
 			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
-			<SellList<T>>::insert(key, (&sender, cost)); //创建待售列表，可供交易的anchor
-			Self::deposit_event(Event::AnchorToSell(sender,cost)); //这个值也会被保存到链上
+			//3.put in sell list
+			<SellList<T>>::insert(key, (&sender, cost)); 			
+			Self::deposit_event(Event::AnchorToSell(sender,cost));
 			Ok(())
 		}
 
+		//buy an anchor from sell list.
 		#[pallet::weight(70_000_000)]
 		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
-			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);
+			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 			let amount = &anchor.1.into();
