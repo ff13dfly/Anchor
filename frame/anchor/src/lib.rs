@@ -90,6 +90,9 @@ pub mod pallet {
 		///Anchor do not exist, can not change status.
 		AnchorNotExists,
 
+		///Anchor do not belong to the account
+		AnchorNotBelogToAccount,
+
 		///Anchor is not in the sell list.
 		AnchorNotInSellList,
 	}
@@ -98,7 +101,7 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		AnchorSet(T::AccountId),
-		AnchorToSell(T::AccountId),
+		AnchorToSell(T::AccountId,u32),
 		AnchorSold(u32),
 	}
 
@@ -145,21 +148,20 @@ pub mod pallet {
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 
-			//1.判断各个值的尺寸大小
+			//1.param check
 			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);			//1.1.判断key的长度，<40 或者为 64（私有的状态）
 			ensure!(raw.len() < 104857600, Error::<T>::LenghtMaxLimited);	//1.2.限制raw的长度，必须小于10M
 			ensure!(protocol.len() < 256, Error::<T>::LenghtMaxLimited);	//1.3.限制protocal的长度，必须小于256字节
 
 			let owner = <AnchorOwner<T>>::get(&key); 		//check anchor status
 
+			//2.check anchor to determine add or update
 			if owner.is_none() {
+				<AnchorOwner<T>>::insert(key, &sender); 		//create anchor owner
+				Self::deposit_event(Event::AnchorSet(sender));	//deposit the owner
+			}else{
 
 			}
-			//ensure!(owner.is_none(), Error::<T>::AnchorExistsAlready);
-
-			<AnchorOwner<T>>::insert(key, &sender); 		//create anchor owner
-			Self::deposit_event(Event::AnchorSet(sender));	//deposit the owner
-
 			Ok(())
 		}
 
@@ -174,9 +176,11 @@ pub mod pallet {
 
 			let owner = <AnchorOwner<T>>::get(&key); //判断是否已经存在anchor
 			ensure!(!owner.is_none(), Error::<T>::AnchorNotExists);
+			let oaccount=owner.ok_or(Error::<T>::AnchorNotBelogToAccount)?;
+			ensure!(sender==oaccount, <Error<T>>::AnchorNotBelogToAccount);
 
 			<SellList<T>>::insert(key, (&sender, cost)); //创建待售列表，可供交易的anchor
-			Self::deposit_event(Event::AnchorToSell(sender)); //这个值也会被保存到链上
+			Self::deposit_event(Event::AnchorToSell(sender,cost)); //这个值也会被保存到链上
 			Ok(())
 		}
 
@@ -186,7 +190,6 @@ pub mod pallet {
 			ensure!(key.len() < 40, Error::<T>::LenghtMaxLimited);
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
-			//let amount = 6_000_000 as Weight;
 			let amount = &anchor.1.into();
 
 			//1.transfer specail amout to seller
