@@ -201,7 +201,10 @@ pub mod pallet {
 		}
 
 		//buy an anchor from sell list.
-		#[pallet::weight(70_000_000)]
+		//#[pallet::weight(70_000_000)]
+		#[pallet::weight(
+			<T as pallet::Config>::WeightInfo::buy_anchor()
+		)]
 		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
