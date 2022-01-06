@@ -3,7 +3,8 @@
 
 use frame_support::{
 	dispatch::DispatchResult,
-	weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
+	//weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
+	weights::{Weight},
 	traits::{Currency,ExistenceRequirement},
 };
 use frame_system::ensure_signed;
@@ -19,37 +20,39 @@ pub mod weights;
 pub use weights::*;
 
 /// A type alias for the balance type from this pallet's point of view.
-type BalanceOf<T> = <T as pallet_balances::Config>::Balance;
+//type BalanceOf<T> = <T as pallet_balances::Config>::Balance;
+//type BalanceOf<T> = <T as frame_support::traits::Currency>::Balance;
+
 //type BalanceOf<T> =
 //	<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
-const MILLICENTS: u32 = 1_000_000_000;
+// const MILLICENTS: u32 = 1_000_000_000;
 
-struct WeightForSetDummy<T: pallet_balances::Config>(BalanceOf<T>);
+// struct WeightForSetDummy<T: pallet_balances::Config>(BalanceOf<T>);
 
-impl<T: pallet_balances::Config> WeighData<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
-	fn weigh_data(&self, target: (&BalanceOf<T>,)) -> Weight {
-		let multiplier = self.0;
-		// *target.0 is the amount passed into the extrinsic
-		let cents = *target.0 / <BalanceOf<T>>::from(MILLICENTS);
-		(cents * multiplier).saturated_into::<Weight>()
-	}
-}
+// impl<T: pallet_balances::Config> WeighData<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
+// 	fn weigh_data(&self, target: (&BalanceOf<T>,)) -> Weight {
+// 		let multiplier = self.0;
+// 		// *target.0 is the amount passed into the extrinsic
+// 		let cents = *target.0 / <BalanceOf<T>>::from(MILLICENTS);
+// 		(cents * multiplier).saturated_into::<Weight>()
+// 	}
+// }
 
-impl<T: pallet_balances::Config> ClassifyDispatch<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
-	fn classify_dispatch(&self, target: (&BalanceOf<T>,)) -> DispatchClass {
-		if *target.0 > <BalanceOf<T>>::from(1000u32) {
-			DispatchClass::Operational
-		} else {
-			DispatchClass::Normal
-		}
-	}
-}
+// impl<T: pallet_balances::Config> ClassifyDispatch<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
+// 	fn classify_dispatch(&self, target: (&BalanceOf<T>,)) -> DispatchClass {
+// 		if *target.0 > <BalanceOf<T>>::from(1000u32) {
+// 			DispatchClass::Operational
+// 		} else {
+// 			DispatchClass::Normal
+// 		}
+// 	}
+// }
 
-impl<T: pallet_balances::Config> PaysFee<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
-	fn pays_fee(&self, _target: (&BalanceOf<T>,)) -> Pays {
-		Pays::Yes
-	}
-}
+// impl<T: pallet_balances::Config> PaysFee<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
+// 	fn pays_fee(&self, _target: (&BalanceOf<T>,)) -> Pays {
+// 		Pays::Yes
+// 	}
+// }
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -145,6 +148,7 @@ pub mod pallet {
 
 	
 	#[pallet::call]
+	//impl<T: Config<I>, I: 'static> Pallet<T, I>{
 	impl<T: Config> Pallet<T> {
 		//set a new anchor or update an exist anchor
 		#[pallet::weight(
@@ -203,17 +207,22 @@ pub mod pallet {
 		//buy an anchor from sell list.
 		//#[pallet::weight(70_000_000)]
 		#[pallet::weight(
-			<T as pallet::Config>::WeightInfo::buy_anchor()
+			<T as pallet::Config >::WeightInfo::buy_anchor()
 		)]
 		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
-			let amount = &anchor.1.into();
 
+			//let amount= anchor.1.into();
+			//let _res=T::Currency::transfer(&sender,&anchor.0,amount,ExistenceRequirement::AllowDeath);
+
+			let amount= anchor.1;
+			let tx=(1_000_000_000_000 as Weight).saturating_mul(amount.into());
 			//1.transfer specail amout to seller
-			let _res=T::Currency::transfer(&sender,&anchor.0,*amount,ExistenceRequirement::AllowDeath);
+			//let _res=T::Currency::transfer(&sender,&anchor.0,<BalanceOf<T>>::from(amount),ExistenceRequirement::AllowDeath);
+			let _res=T::Currency::transfer(&sender,&anchor.0,tx.saturated_into(),ExistenceRequirement::AllowDeath);
 
 			//2.change the owner of anchor 
 			let current_block_number = <frame_system::Pallet<T>>::block_number();

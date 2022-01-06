@@ -64,31 +64,31 @@ pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 
 	fn set_anchor(x: u32, ) -> Weight {
-		(2_569_000 as Weight)
-			.saturating_add((4_000 as Weight).saturating_mul(x as Weight))
+		(1_000_000_000_000 as Weight)
+			.saturating_add((4_000_000 as Weight).saturating_mul(x as Weight))
 	}
 
 	fn set_sell() -> Weight {
-		(6_000_000 as Weight)
+		(1_000_000_000 as Weight)
 	}
 
 	fn buy_anchor() -> Weight {
-		(6_000_000 as Weight)
+		(1_000_000_000 as Weight)
 	}
 }
 
 // For backwards compatibility and tests
 impl WeightInfo for () {
 	fn set_anchor(x: u32, ) -> Weight {
-		(10_000_000_000_000_000 as Weight)
+		(1_000_000_000_000 as Weight)
 			.saturating_add((4_000_000 as Weight).saturating_mul(x as Weight))
 	}
 
 	fn set_sell() -> Weight {
-		(6_000_000 as Weight)
+		(1_000_000_000 as Weight)
 	}
 
 	fn buy_anchor() -> Weight {
-		(6_000_000 as Weight)
+		(1_000_000_000 as Weight)
 	}
 }
