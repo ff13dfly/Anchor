@@ -62,10 +62,13 @@ pub trait WeightInfo {
 /// Weights for pallet_example using the Substrate node and recommended hardware.
 pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
-
+	// fn set_anchor(x: u32, ) -> Weight {
+	// 	(1_000_000_000_000 as Weight)
+	// 		.saturating_add((100_000 as Weight).saturating_mul(x as Weight))
+	// }
 	fn set_anchor(x: u32, ) -> Weight {
-		(1_000_000_000_000 as Weight)
-			.saturating_add((4_000_000 as Weight).saturating_mul(x as Weight))
+		(1_000_000_000 as Weight)
+			.saturating_add((10_000 as Weight).saturating_mul(x as Weight))
 	}
 
 	fn set_sell() -> Weight {
@@ -81,7 +84,7 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 impl WeightInfo for () {
 	fn set_anchor(x: u32, ) -> Weight {
 		(1_000_000_000_000 as Weight)
-			.saturating_add((4_000_000 as Weight).saturating_mul(x as Weight))
+			.saturating_add((100_000 as Weight).saturating_mul(x as Weight))
 	}
 
 	fn set_sell() -> Weight {
