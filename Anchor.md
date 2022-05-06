@@ -40,26 +40,39 @@
 
 #### Components
 
-* Anchor pallet的功能
-1. setAnchor 
+* Anchor pallet的功能，使用3个RPC方法实现了完整的key-value逻辑
+1. setAnchor
    设置和更新Anchor的方法，实现逻辑如下图：
-   原来的参数   (key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
-   现在的参数   (key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
+   原来的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
+   现在的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
 
 2. sellAnchor
     设置和更新Anchor为销售的状态，实现逻辑如下图：
-    原来的参数  (key: Vec<u8>, cost: u32 )
-    现在的参数  (key: Vec<u8>, cost: u32 ,target : Account )
+    原来的参数  ( key: Vec<u8>, cost: u32 )
+    现在的参数  ( key: Vec<u8>, cost: u32 ,target : T::AccountId )
     增加的参数 : target
 
 3. buyAnchor
     购买Anchor为销售的状态，实现逻辑如下图：
-    原来的参数
-    现在的参数
-    增加的参数 : pre
 
-* Anchor启动方式
-1. 传递给cApp的内容
+    原来的参数  ( key: Vec<u8> )
+    现在的参数  ( key: Vec<u8> )
+
+* 2个以anchor为key的StorageMap来维持所有Anchor的状态. 本次升级主要是通过增加数据的方式，来解决两个问题：
+
+1. AnchorOwner StorageMap, 增加第3个数据，用于记录上一次修改的区块高度
+v1的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber)
+v2的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber,T::BlockNumber)
+
+2. SellList StorageMap，增加第3个数据，用于将anchor销售给指定账号
+v1的数据结构： Vec<u8> -> (T::AccountId, u32)
+v2的数据结构： Vec<u8> -> (T::AccountId, u32, T::AccountId)
+
+* Anchor上的cApp情况介绍
+  
+1. blog程序，实现全链上启动，可以正常的进行blog的发布、浏览功能
+   
+2. twitter程序，实现全链上启动，可以正常进行twitter的发布、浏览功能
 
 ### Ecosystem Fit
 
@@ -94,7 +107,7 @@
 
 * Jeditor ( https://github.com/ff13dfly/Jeditor )，简单易用的json编辑器。只需一个引用，就可以快速的编辑json数据，该编辑器也用于simPolk的UI开发中。
 
-* simPolk ( https://github.com/ff13dfly/simPolk )，波卡区块链模拟器。基于php，可以单机模拟区块链行为的辅助开发工具。
+* Anchor ( https://github.com/ff13dfly/anchor )，基于substrate的key-value系统。
 
  
 ### Team Code Repos
