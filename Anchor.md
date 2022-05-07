@@ -10,30 +10,33 @@
 
 ### Overview
 
-* 基于substrate的key-value链上存储系统，便于方便的开发链上应用（cApp）。在开发实际的应用时，目前智能合约遇到了一定的困难。以blog为例，可以方便的借助substrate的扩展交易来实现。
-* 可以看成是一个域名系统，类似于以太坊的ENS，在便于开发链上应用的同时，让简单易记的key（链名）资产化，可以进行交易。交易链名的同时，也是在交易key的所有历史。
-* 可扩展的用户自定义的链上数据存储。通过自定义的协议，可以对链上数据进行筛选，方便建立复杂的链上程序。基于Javascript启动的cApp可以完全运行在链上，无论是程序还是数据。
-
-* 从应用角度来看，dApp就可以让没有拥有Coin或者Token的用户参与进来。即使不参与交易，也可以收益。现在的情况是，如果你不买入基于区块链的产品，你是没有办法从这项技术中获益的。
-* 
+* 基于substrate的key-value链上存储系统，便于方便的开发链上应用（cApp）。使用这种方式，可以使用纯JS的开发，实现全链上的应用程序。相比较Pallet和智能合约的方式，技术门槛降低了很多，效率提升很多，可以让开发者更关注应用本身。
+* Anchor也可以看成是一种域名服务，类似于以太坊的ENS，可以让简单易记的key（链名）资产化，在自由交易的情况下，逐步具备价值。这种价值还不仅仅是静态的数据，还可以是应用程序。这种可信任的链上数据，也可以接入到未来的元宇宙中。
+* Anchor的链上数据可以自定义，开发者就可以使用自定义的协议，来开发复杂的应用，而不需要进行Pallet或者智能合约的开发。也就是说，Anchor pallet只需要进行有限的升级，不断提升安全性，就可以支持复杂的cApp的开发。也就是说，cApp的开发不会产生更多的coin或者token，也区分出写入者和读取者，读取者并不需要支付费用，这就可以让更多的用户使用Polkadot。
 * Anchor版本的说明，目前已经开发出了 "1.0.0-dev"（补充github链接），部署了在线测试网络（补充polkadot链接），可以实现基于Anchor的blog和twitter演示程序。
 
 * 演示视频
 1. 创建和更新Anchor
 2. 销售和购买Anchor
 3. 启动cApp的演示
-4. 3节点的Anchor网络
 ### Project Details
 
 #### Architecture
 ![](https://storage.googleapis.com/hugobyte-2.appspot.com/Aurras%20Architecture.png)
 
-* 使用了3个API就完整实现了key-value系统
+* 仅使用3个API就完整实现了key-value系统，简单的系统更容易写强壮，更好的支持创建的cApp。3个API的功能如下：
 
+| API |  Specification |
+| ------------- | ------------- |
+|  setAnchor | 设置anchor的数据，并将anchor的历史连接起来的功能 |
+|  sellAnchor| 设置anchor为销售状态的功能，可以指定销售账号 |  
+|  buyAnchor | 购买指定的anchor功能 |  
+
+* 使用substrate内置的storage map维持基础的Anchor信息，实现Anchor的查询，销售列表的查询。
 #### Technologies
 
 1. React,构建操作Anchor网络的前端程序.
-2. Polkadot.js
+2. Polkadot.js,和Anchor节点进行交互的JS库.
 3. Docker 
 4. Substrate
 5. Rust  
@@ -44,12 +47,12 @@
 1. setAnchor
    设置和更新Anchor的方法，实现逻辑如下图：
    原来的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
-   现在的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
+   现在的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8> ,last : T::BlockNumber) , 输出
 
 2. sellAnchor
     设置和更新Anchor为销售的状态，实现逻辑如下图：
     原来的参数  ( key: Vec<u8>, cost: u32 )
-    现在的参数  ( key: Vec<u8>, cost: u32 ,target : T::AccountId )
+    现在的参数  ( key: Vec<u8>, cost: u32 ,last : T::BlockNumber ,target : T::AccountId )
     增加的参数 : target
 
 3. buyAnchor
@@ -60,11 +63,11 @@
 
 * 2个以anchor为key的StorageMap来维持所有Anchor的状态. 本次升级主要是通过增加数据的方式，来解决两个问题：
 
-1. AnchorOwner StorageMap, 增加第3个数据，用于记录上一次修改的区块高度
+1. AnchorOwner StorageMap, 使用现有的数据结构
 v1的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber)
-v2的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber,T::BlockNumber)
+v2的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber)
 
-2. SellList StorageMap，增加第3个数据，用于将anchor销售给指定账号
+1. SellList StorageMap，增加第3个数据，用于将anchor销售给指定账号
 v1的数据结构： Vec<u8> -> (T::AccountId, u32)
 v2的数据结构： Vec<u8> -> (T::AccountId, u32, T::AccountId)
 
@@ -79,8 +82,8 @@ v2的数据结构： Vec<u8> -> (T::AccountId, u32, T::AccountId)
 * 这个项目的与众不同之处在于，引入了纯链上应用（cApp），简化的经济模型。
 1. 脱离资产关联的链上APP开发简化了区块链数据的访问，
 2. 自由的二次开发
-3. 让数据变成了资产
-
+3. 
+* 简单的NS服务，可以快速标定链上内容
 ## Team :busts_in_silhouette:
 
 ### Team members
@@ -120,18 +123,13 @@ Repos for further reference
 * https://github.com/ff13dfly/simPolk
   
 ### Team Profiles
-* Dr. C. Pethuru Raj Ph.D - https://sweetypeterdarren.wixsite.com/pethuru-raj-books  
-* Muhammed Irfan K - https://www.linkedin.com/in/muhammed-irfan-k  
-* Hanumantappa Budihal - https://www.linkedin.com/in/hanumantappa-budihal/  
-
-* Zhongqiang Fu 
+* Zhongqiang Fu , individual developer.
 
 ## Development Roadmap :nut_and_bolt: 
 
-
 ### Overview
-* **Description** Development of Anchor
-* **Total Estimated Duration:** 210 Person Days
+* **Description** Development of Anchor Pallet
+* **Total Estimated Duration:** 20 Person Days
 * **Full-time equivalent (FTE):**  Milestone 1 - 1.5; Milestone 2 and 3 - 3
 * **Total Costs:** 1.16 BTC
 
@@ -146,9 +144,9 @@ Repos for further reference
 | 0a. | License | Apache 2.0  |
 | 0b. | Documentation | Documentation includes Inline Code Documentation, Configuration Documentation, Event Post Action Deployment guide, Docker and Docker compose setup documentation, Openwhisk Setup Documentation, Readme file |
 | 0c. | Testing Guide | The code will have unit-test coverage (min. 50%) to ensure functionality and robustness. In the guide we will describe how to run these tests | 
-| 1a. | Pallet Anchor: setAnchor | Reading Configuration based on Environment, Override Configuration if Environment Variables provided, Configrations for Chain endpoint Sections and Methods from extrinsic to Exclude, types, Openwhisk Endpoint, Openwhisk Auth Key, Trigger Endpoint, Kafka Topic and Brokers |
-| 1b. | Pallet Anchor: sellAnchor: Chain Module | Connects to the chain, Add custom type to chain intialization if provided, Subscribes to system.events |  
-| 1c. | Pallet Anchor: buyAnchor: Event Module | Filters Events based on excludes provided, Post Events to trigger Endpoint |  
+| 1a. | Pallet Anchor: setAnchor | 设置anchor的数据，并将anchor的历史连接起来的功能 |
+| 1b. | Pallet Anchor: sellAnchor| 设置anchor为销售状态的功能，可以指定销售账号 |  
+| 1c. | Pallet Anchor: buyAnchor | 购买指定的anchor功能 |  
 
 
 ### Milestone 2 — Anchor Chain Application ( cApp ) Demo
@@ -161,13 +159,13 @@ Repos for further reference
 | 0a. | License | Apache 2.0  |
 | 0b. | Documentation | Documentation includes Inline Code Documentation, Configuration Documentation, Kafka and Zookeeper Deployment guide, wskdeploy guide, Readme file |
 | 0c. | Testing Guide | The code will have unit-test coverage (min. 50%) to ensure functionality and robustness. In the guide we will describe how to run these tests |  
-| 1a. | cApp : blog | Fork Existing [openwhisk-package-kafka](https://github.com/apache/openwhisk-package-kafka/) |
-| 1b. | cApp : twitter | Helm Chart Configuration for Kafka Provider for Kubernetes |
+| 1a. | cApp : blog | 基于anchor实现的blog的cApp，可以免费的浏览，付费的写入 |
+| 1b. | cApp : twitter | 基于anchor实现的twitter，借助polkadot的subscribe的功能实现 |
 
 ## Future Plans
 
 * 组建Anchor网络，支持cApp开发；
-* 基于Anchor开发Blog和twitter程序；
+* 深入开发基于Anchor开发Blog和twitter程序，进行商用；
 * 基于Anchor开发元宇宙产品VBW；
 
 ## Additional Information :heavy_plus_sign: 
@@ -175,7 +173,8 @@ Any additional information that you think is relevant to this application that h
 
 Possible additional information to include:
 * What work has been done so far?  
-Anchor的第一版本已经可以部署
+Anchor v1 已经可以正常部署，测试网络的链接如下：
+
 * Are there are any teams who have already contributed (financially) to the project?  
 No
 * Have you applied for other grants so far?  
