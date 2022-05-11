@@ -17,8 +17,13 @@
 
 * 演示视频
 1. 创建和更新Anchor
+https://www.youtube.com/watch?v=28nxOI-nDuA
+
 2. 销售和购买Anchor
+https://www.youtube.com/watch?v=i5eIPOM9ZAk
+
 3. 启动cApp的演示
+https://www.youtube.com/watch?v=3SP7NNzzcH8
 ### Project Details
 
 #### Architecture
@@ -55,7 +60,7 @@
     设置和更新Anchor为销售的状态，实现逻辑如下图：
     ![](sell_anchor.png)
     原来的参数  ( key: Vec<u8>, cost: u32 )
-    现在的参数  ( key: Vec<u8>, cost: u32 ,last : T::BlockNumber ,target : T::AccountId )
+    现在的参数  ( key: Vec<u8>, cost: u32 ,last : T::BlockNumber , target : T::AccountId )
     增加的参数 : target
 
 3. buyAnchor
@@ -74,19 +79,14 @@ v2的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber)
 v1的数据结构： Vec<u8> -> (T::AccountId, u32)
 v2的数据结构： Vec<u8> -> (T::AccountId, u32, T::AccountId)
 
-* Anchor上的cApp情况介绍
-  
-1. blog程序，实现全链上启动，可以正常的进行blog的发布、浏览功能
-   
-2. twitter程序，实现全链上启动，可以正常进行twitter的发布、浏览功能
+* Anchor上的blog程序，实现全链上启动，可以正常的进行blog的发布、浏览功能。
 
 ### Ecosystem Fit
 
 * 这个项目的与众不同之处在于，引入了纯链上应用（cApp），简化的经济模型。
 1. 脱离资产关联的链上APP开发简化了区块链数据的访问，
 2. 自由的二次开发
-3. 
-* 简单的NS服务，可以快速标定链上内容
+3. 简单的NS服务，可以快速标定链上内容
 ## Team :busts_in_silhouette:
 
 ### Team members
@@ -123,7 +123,6 @@ Source codes will reside in
 Repos for further reference
 * https://github.com/ff13dfly/VirtualBlockWorld
 * https://github.com/ff13dfly/Jeditor
-* https://github.com/ff13dfly/simPolk
   
 ### Team Profiles
 * Zhongqiang Fu , individual developer.
@@ -132,15 +131,15 @@ Repos for further reference
 
 ### Overview
 * **Description** Development of Anchor Pallet
-* **Total Estimated Duration:** 20 Person Days
-* **Full-time equivalent (FTE):**  Milestone 1 - 1.5; Milestone 2 and 3 - 3
-* **Total Costs:** 1.16 BTC
+* **Total Estimated Duration:** 30 Person Days
+* **Full-time equivalent (FTE):**  Milestone 1;
+* **Total Costs:** 5000 USDT
 
 
 ### Milestone 1 — Anchor Pallet Develop
 * **Estimated Duration:** 30 Working Days
 * **FTE:**  1.5
-* **Costs:** 0.25 BTC
+* **Costs:** 5000 USDT
 
 | Number | Deliverable | Specification |
 | ------------- | ------------- | ------------- |
@@ -153,9 +152,9 @@ Repos for further reference
 
 
 ### Milestone 2 — Anchor Chain Application ( cApp ) Demo
-* **Estimated Duration:** 35 Working Days
-* **FTE:**  3
-* **Costs:** 0.58 BTC
+* **Estimated Duration:** 30 Working Days
+* **FTE:**  1.5
+* **Costs:** 5000 USDT
 
 | Number | Deliverable | Specification |
 | ------------- | ------------- | ------------- |
@@ -163,7 +162,6 @@ Repos for further reference
 | 0b. | Documentation | Documentation includes Inline Code Documentation, Configuration Documentation, Kafka and Zookeeper Deployment guide, wskdeploy guide, Readme file |
 | 0c. | Testing Guide | The code will have unit-test coverage (min. 50%) to ensure functionality and robustness. In the guide we will describe how to run these tests |  
 | 1a. | cApp : blog | 基于anchor实现的blog的cApp，可以免费的浏览，付费的写入 |
-| 1b. | cApp : twitter | 基于anchor实现的twitter，借助polkadot的subscribe的功能实现 |
 
 ## Future Plans
 
@@ -176,7 +174,9 @@ Any additional information that you think is relevant to this application that h
 
 Possible additional information to include:
 * What work has been done so far?  
-Anchor v1 已经可以正常部署，测试网络的链接如下：
+Anchor v1 deployed. 
+Network entry : [wss://network.metanchor.net](wss://network.metanchor.net).
+Demo link : [http://demo.metanchor.net](http://demo.metanchor.net/).
 
 * Are there are any teams who have already contributed (financially) to the project?  
 No
