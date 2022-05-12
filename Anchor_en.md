@@ -27,7 +27,7 @@ https://www.youtube.com/watch?v=3SP7NNzzcH8
 ### Project Details
 
 #### Architecture
-![Anchor_Pallet.png](http://android.im/anchor/Anchor_Pallet.png)
+![](Anchor_Pallet.png)
 
 * 仅使用3个API就完整实现了key-value系统，简单的系统更容易写强壮，更好的支持创建的cApp。3个API的功能如下：
 
@@ -52,20 +52,20 @@ https://www.youtube.com/watch?v=3SP7NNzzcH8
   
 1. setAnchor
    设置和更新Anchor的方法，实现逻辑如下图：
-   ![set_anchor.png](http://android.im/anchor/set_anchor.png)
+   ![](set_anchor.png)
    原来的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
    现在的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8> ,last : T::BlockNumber) , 输出
 
 2. sellAnchor
     设置和更新Anchor为销售的状态，实现逻辑如下图：
-    ![sell_anchor.png](http://android.im/anchor/sell_anchor.png)
+    ![](sell_anchor.png)
     原来的参数  ( key: Vec<u8>, cost: u32 )
     现在的参数  ( key: Vec<u8>, cost: u32 ,last : T::BlockNumber , target : T::AccountId )
     增加的参数 : target
 
 3. buyAnchor
     购买Anchor为销售的状态，实现逻辑如下图：
-    ![buy_anchor.png](http://android.im/anchor/buy_anchor.png)
+    ![](buy_anchor.png)
     原来的参数  ( key: Vec<u8> )
     现在的参数  ( key: Vec<u8> )
 
