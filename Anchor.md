@@ -13,17 +13,14 @@
 * 基于substrate的key-value链上存储系统，便于方便的开发链上应用（cApp）。使用这种方式，可以使用纯JS的开发，实现全链上的应用程序。相比较Pallet和智能合约的方式，技术门槛降低了很多，效率提升很多，可以让开发者更关注应用本身。
 * Anchor也可以看成是一种域名服务，类似于以太坊的ENS，可以让简单易记的key（链名）资产化，在自由交易的情况下，逐步具备价值。这种价值还不仅仅是静态的数据，还可以是应用程序。这种可信任的链上数据，也可以接入到未来的元宇宙中。
 * Anchor的链上数据可以自定义，开发者就可以使用自定义的协议，来开发复杂的应用，而不需要进行Pallet或者智能合约的开发。也就是说，Anchor pallet只需要进行有限的升级，不断提升安全性，就可以支持复杂的cApp的开发。也就是说，cApp的开发不会产生更多的coin或者token，也区分出写入者和读取者，读取者并不需要支付费用，这就可以让更多的用户使用Polkadot。
-* Anchor版本的说明，目前已经开发出了 "1.0.0-dev"（补充github链接），部署了在线测试网络（补充polkadot链接），可以实现基于Anchor的blog和twitter演示程序。
+* Anchor版本的说明，目前已经开发出了 "1.0.0-dev"（[github](https://github.com/ff13dfly/Anchor)），部署了在线测试网络(wss://network.metanchor.net)，可以实现基于Anchor的blog和twitter演示程序。
 
 * 演示视频
-1. 创建和更新Anchor
-https://www.youtube.com/watch?v=28nxOI-nDuA
+1. 创建和更新Anchor https://www.youtube.com/watch?v=28nxOI-nDuA
 
-2. 销售和购买Anchor
-https://www.youtube.com/watch?v=i5eIPOM9ZAk
+2. 销售和购买Anchor https://www.youtube.com/watch?v=i5eIPOM9ZAk
 
-3. 启动cApp的演示
-https://www.youtube.com/watch?v=3SP7NNzzcH8
+3. 启动cApp的演示 https://www.youtube.com/watch?v=3SP7NNzzcH8
 ### Project Details
 
 #### Architecture
@@ -52,20 +49,20 @@ https://www.youtube.com/watch?v=3SP7NNzzcH8
   
 1. setAnchor
    设置和更新Anchor的方法，实现逻辑如下图：
-   ![set_anchor.png](http://android.im/anchor/set_anchor.png =375*400)
+   ![set_anchor.png](http://android.im/anchor/set_anchor.png)
    原来的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
    现在的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8> ,last : T::BlockNumber) , 输出
 
 2. sellAnchor
     设置和更新Anchor为销售的状态，实现逻辑如下图：
-    ![sell_anchor.png](http://android.im/anchor/sell_anchor.png =375*400)
+    ![sell_anchor.png](http://android.im/anchor/sell_anchor.png)
     原来的参数  ( key: Vec<u8>, cost: u32 )
     现在的参数  ( key: Vec<u8>, cost: u32 ,last : T::BlockNumber , target : T::AccountId )
     增加的参数 : target
 
 3. buyAnchor
     购买Anchor为销售的状态，实现逻辑如下图：
-    ![buy_anchor.png](http://android.im/anchor/buy_anchor.png =375*400)
+    ![buy_anchor.png](http://android.im/anchor/buy_anchor.png)
     原来的参数  ( key: Vec<u8> )
     现在的参数  ( key: Vec<u8> )
 
