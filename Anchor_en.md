@@ -10,38 +10,46 @@
 
 ### Overview
 
-* 基于substrate的key-value链上存储系统，便于方便的开发链上应用（cApp）。使用这种方式，可以使用纯JS的开发，实现全链上的应用程序。相比较Pallet和智能合约的方式，技术门槛降低了很多，效率提升很多，可以让开发者更关注应用本身。
+* Anchor是基于substrate的key-value链上存储系统，便于方便的开发链上应用（cApp）。使用这种方式，可以使用纯JS的开发，实现全链上的应用程序。相比较Pallet和智能合约的方式，技术门槛降低了很多，效率提升很多，可以让开发者更关注应用本身。
+* Anchor is a key-value on-chain storage system based on substrate, which is convenient for developing on-chain applications (cApp). By this way, you can develop blockchain app totally on Javascript. Compared with Pallet and smart contracts, the technical threshold is much lower, and the efficiency is much improved, allowing developers to pay more attention to the application itself.
+
 * Anchor也可以看成是一种域名服务，类似于以太坊的ENS，可以让简单易记的key（链名）资产化，在自由交易的情况下，逐步具备价值。这种价值还不仅仅是静态的数据，还可以是应用程序。这种可信任的链上数据，也可以接入到未来的元宇宙中。
+* Anchor can also be regarded as a domain name service, similar to ENS (Name service of Ethereum) , which can capitalize the simple and easy-to-remember key (chain name), and gradually become valuable in the case of free transactions. This value is not just static data, but also applications. This trusted on-chain data can also be accessed into the future metaverse.
+  
 * Anchor的链上数据可以自定义，开发者就可以使用自定义的协议，来开发复杂的应用，而不需要进行Pallet或者智能合约的开发。也就是说，Anchor pallet只需要进行有限的升级，不断提升安全性，就可以支持复杂的cApp的开发。也就是说，cApp的开发不会产生更多的coin或者token，也区分出写入者和读取者，读取者并不需要支付费用，这就可以让更多的用户使用Polkadot。
-* Anchor版本的说明，目前已经开发出了 "1.0.0-dev"（补充github链接），部署了在线测试网络（补充polkadot链接），可以实现基于Anchor的blog和twitter演示程序。
+* Anchor on-chain data can be customized, and developers can use customized protocol to develop complex applications without the need to develop Pallets or smart contracts. That is to say, the Anchor pallet only needs limited upgrades and continuous improvement of security to support the development of complex cApps. That is to say, the development of cApp does not generate more coins or tokens, and also distinguishes writers and readers, and readers do not need to pay fees, which allows more users to use Polkadot.  
 
-* 演示视频
-1. 创建和更新Anchor
-https://www.youtube.com/watch?v=28nxOI-nDuA
+* Anchor目前已经开发出了 "1.0.0-dev"（[github](https://github.com/ff13dfly/Anchor)），部署了在线测试网络(wss://network.metanchor.net)，可以实现基于Anchor的blog和twitter演示程序。
+* Anchor has currently developed to version "1.0.0-dev" ([Anchor github](https://github.com/ff13dfly/Anchor)). Dev network is deployed, the websocket link is wss://network.metanchor.net. 
 
-2. 销售和购买Anchor
-https://www.youtube.com/watch?v=i5eIPOM9ZAk
+* Video
+  
+1. Creating and Updating Anchor https://www.youtube.com/watch?v=28nxOI-nDuA
 
-3. 启动cApp的演示
-https://www.youtube.com/watch?v=3SP7NNzzcH8
+2. Selling and Buying Anchor https://www.youtube.com/watch?v=i5eIPOM9ZAk
+
+3. Loading cApp https://www.youtube.com/watch?v=3SP7NNzzcH8
 ### Project Details
 
 #### Architecture
-![](Anchor_Pallet.png)
+![Anchor_Pallet.png](http://android.im/anchor/Anchor_Pallet.png)
 
 * 仅使用3个API就完整实现了key-value系统，简单的系统更容易写强壮，更好的支持创建的cApp。3个API的功能如下：
-
+* Anchor key-value system is completely implemented using only 3 APIs, and the simple system is easier to write and stronger, and better supports the created cApp. The functions of the 3 APIs are as follows:
+* 
 | API |  Specification |
 | ------------- | ------------- |
-|  setAnchor | 设置anchor的数据，并将anchor的历史连接起来的功能 |
-|  sellAnchor| 设置anchor为销售状态的功能，可以指定销售账号 |  
-|  buyAnchor | 购买指定的anchor功能 |  
+|  setAnchor | A function to set the data of the anchor and connect the history of the anchor |
+|  sellAnchor| Set the anchor to the function of sales status, you can specify the sales account |  
+|  buyAnchor | Purchase the specified anchor function |  
 
 * 使用substrate内置的storage map维持基础的Anchor信息，实现Anchor的查询，销售列表的查询。
+  
+* Use the built-in storage map of substrate to maintain the basic Anchor information, and realize the query of Anchor and the query of sales list.
 #### Technologies
 
-1. React,构建操作Anchor网络的前端程序.
-2. Polkadot.js,和Anchor节点进行交互的JS库.
+1. React,Build a front-end program that operates the Anchor network.
+2. Polkadot.js,JS library for interacting with Anchor nodes.
 3. Docker 
 4. Substrate
 5. Rust  
@@ -49,44 +57,47 @@ https://www.youtube.com/watch?v=3SP7NNzzcH8
 #### Components
 
 * Anchor pallet的功能，使用3个RPC方法实现了完整的key-value逻辑
+* The functionality of the Anchor pallet, which implements complete key-value logic using 3 RPC methods
   
 1. setAnchor
-   设置和更新Anchor的方法，实现逻辑如下图：
-   ![](set_anchor.png)
-   原来的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8>) , 输出
-   现在的参数   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8> ,last : T::BlockNumber) , 输出
+   The method of setting and updating Anchor, the implementation logic is as follows:
+   ![set_anchor.png](http://android.im/anchor/set_anchor_2.png)
+   Parameters of 1.0.0-dev   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8> ) 
+   Parameters of 2.0.0-dev   ( key: Vec<u8>,raw: Vec<u8>,protocol: Vec<u8> ,last : T::BlockNumber ) 
 
 2. sellAnchor
-    设置和更新Anchor为销售的状态，实现逻辑如下图：
-    ![](sell_anchor.png)
-    原来的参数  ( key: Vec<u8>, cost: u32 )
-    现在的参数  ( key: Vec<u8>, cost: u32 ,last : T::BlockNumber , target : T::AccountId )
-    增加的参数 : target
+    Set and update Anchor to the state of sale, the implementation logic is as follows:
+    ![sell_anchor.png](http://android.im/anchor/sell_anchor_2.png)
+    Parameters of 1.0.0-dev   ( key: Vec<u8>, cost: u32 )
+    Parameters of 2.0.0-dev   ( key: Vec<u8>, cost: u32 , target : T::AccountId )
 
 3. buyAnchor
-    购买Anchor为销售的状态，实现逻辑如下图：
-    ![](buy_anchor.png)
-    原来的参数  ( key: Vec<u8> )
-    现在的参数  ( key: Vec<u8> )
+    The purchase of Anchor is in the state of sale, and the implementation logic is as follows:
+    ![buy_anchor.png](http://android.im/anchor/buy_anchor_2.png)
+    Parameters of 1.0.0-dev  ( key: Vec<u8> )
+    Parameters of 2.0.0-dev  ( key: Vec<u8> )
 
 * 2个以anchor为key的StorageMap来维持所有Anchor的状态. 本次升级主要是通过增加数据的方式，来解决两个问题：
+* Two StorageMaps to maintain the state of all Anchor. This upgrade mainly link the Anchor history by adding data:
+  
+1. AnchorOwner StorageMap, Add a third value to save the last updated block.
+Data struct of 1.0.0-dev : Vec<u8> -> (T::AccountId,T::BlockNumber)
+Data struct of 2.0.0-dev : Vec<u8> -> (T::AccountId,T::BlockNumber,T::BlockNumber)
 
-1. AnchorOwner StorageMap, 使用现有的数据结构
-v1的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber)
-v2的数据结构： Vec<u8> -> (T::AccountId,T::BlockNumber)
-
-1. SellList StorageMap，增加第3个数据，用于将anchor销售给指定账号
-v1的数据结构： Vec<u8> -> (T::AccountId, u32)
-v2的数据结构： Vec<u8> -> (T::AccountId, u32, T::AccountId)
+1. SellList StorageMap，Add a third value to sell Anchor to the specified account.
+Data struct of 1.0.0-dev : Vec<u8> -> (T::AccountId, u32)
+Data struct of 2.0.0-dev : Vec<u8> -> (T::AccountId, u32, T::AccountId)
 
 * Anchor上的blog程序，实现全链上启动，可以正常的进行blog的发布、浏览功能。
-
+* The blog program on Anchor realizes the startup of cApp, and can normally perform blog publishing and browsing functions.
 ### Ecosystem Fit
 
 * 这个项目的与众不同之处在于，引入了纯链上应用（cApp），简化的经济模型。
-1. 脱离资产关联的链上APP开发简化了区块链数据的访问，
-2. 自由的二次开发
-3. 简单的NS服务，可以快速标定链上内容
+What sets this project apart is the introduction of a pure on-chain application (cApp), a simplified economic model.
+1. Simple NS service that can quickly calibrate the content on the chain.
+2. On-chain APP development decoupled from assets simplifies access to blockchain data.
+3. Free customized cApp development
+
 ## Team :busts_in_silhouette:
 
 ### Team members
@@ -108,14 +119,15 @@ v2的数据结构： Vec<u8> -> (T::AccountId, u32, T::AccountId)
 ### Team's experience
 
 个人的开发经验主要集中在非区块链开发部分，一直想进入区块链开发，但难度很大，和传统开发差异很大。再不断学习，发现了Anchor这条路径，既能利用substrate实现web3，又通过传统的key-value方式，更方便的开发。
+Personal development experience is mainly concentrated in the non-blockchain , but I have always wanted to join the blockchain development. Block chain development  is a bit difficult for traditional development. After continuing to study, I tested the way of Anchor, which treats substrate as a key-value system.  It is much convenient for traditional development.
 
-* Anchor ( https://github.com/ff13dfly/Anchor ),基于substrate的key-value系统。
+* Anchor, Substrate-based key-value system.
   
-* vExplorer ( https://github.com/ff13dfly/vExplorer ),Anchor网络的浏览器。
+* vExplorer, Anchor web explorer.
 
-* cApp ( https://github.com/ff13dfly/cApp ), 线上App的demo。
+* cApp, cApp demos。
 
-* Jeditor ( https://github.com/ff13dfly/Jeditor ),简单易用的json编辑器。只需一个引用，就可以快速的编辑json数据.
+* Jeditor, simple and easy to use JSON editor. Quickly edit json data with just one reference.
  
 ### Team Code Repos
 Source codes will reside in
@@ -124,7 +136,8 @@ Source codes will reside in
 Repos for further reference
 * https://github.com/ff13dfly/VirtualBlockWorld
 * https://github.com/ff13dfly/vExplorer
-* https://github.com/ff13dfly/cApp  
+* https://github.com/ff13dfly/cApp
+* https://github.com/ff13dfly/jEditor  
 ### Team Profiles
 * Zhongqiang Fu , individual developer.
 
@@ -139,7 +152,7 @@ Repos for further reference
 
 ### Milestone 1 — Anchor Pallet Develop
 * **Estimated Duration:** 30 Working Days
-* **FTE:**  1.5
+* **FTE:**  1
 * **Costs:** 5000 USDT
 
 | Number | Deliverable | Specification |
@@ -147,14 +160,14 @@ Repos for further reference
 | 0a. | License | Apache 2.0  |
 | 0b. | Documentation | Documentation includes Inline Code Documentation, Configuration Documentation, Event Post Action Deployment guide, Docker and Docker compose setup documentation, Openwhisk Setup Documentation, Readme file |
 | 0c. | Testing Guide | The code will have unit-test coverage (min. 50%) to ensure functionality and robustness. In the guide we will describe how to run these tests | 
-| 1a. | Pallet Anchor: setAnchor | 设置anchor的数据，并将anchor的历史连接起来的功能 |
-| 1b. | Pallet Anchor: sellAnchor| 设置anchor为销售状态的功能，可以指定销售账号 |  
-| 1c. | Pallet Anchor: buyAnchor | 购买指定的anchor功能 |  
+| 1a. | Pallet Anchor: setAnchor | A function to set the data of the anchor and connect the history of the anchor |
+| 1b. | Pallet Anchor: sellAnchor| Set the anchor to the function of sales status, you can specify the sales account |  
+| 1c. | Pallet Anchor: buyAnchor | Purchase the specified anchor function |  
 
 
 ### Milestone 2 — Anchor Chain Application ( cApp ) Demo
 * **Estimated Duration:** 30 Working Days
-* **FTE:**  1.5
+* **FTE:**  1
 * **Costs:** 5000 USDT
 
 | Number | Deliverable | Specification |
@@ -162,13 +175,13 @@ Repos for further reference
 | 0a. | License | Apache 2.0  |
 | 0b. | Documentation | Documentation includes Inline Code Documentation, Configuration Documentation, Kafka and Zookeeper Deployment guide, wskdeploy guide, Readme file |
 | 0c. | Testing Guide | The code will have unit-test coverage (min. 50%) to ensure functionality and robustness. In the guide we will describe how to run these tests |  
-| 1a. | cApp : blog | 基于anchor实现的blog的cApp，可以免费的浏览，付费的写入 |
+| 1a. | cApp : blog | The cApp of blog based on anchor can be browsed for free and written for a fee |
 
 ## Future Plans
 
-* 组建Anchor网络，支持cApp开发；
-* 深入开发基于Anchor开发Blog和twitter程序，进行商用；
-* 基于Anchor开发元宇宙产品VBW；
+* Set up Anchor network to support cApp development;
+* In-depth development of blog and twitter programs based on Anchor for commercial use;
+* Develop Metaverse product VBW based on Anchor;
 
 ## Additional Information :heavy_plus_sign: 
 Any additional information that you think is relevant to this application that hasn't already been included.
