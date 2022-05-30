@@ -4,7 +4,7 @@
   
 * Substrate提供了快速的区块链开发框架，Anchor就是基于Substrate，使用其扩展交易的功能，实现了链上的域名系统，用方便人们记忆的简短字符串来标定链上资源。我们也用“链名”来称呼一个Anchor，这类似于“域名”之于互联网，“链名”也提供了一种让普通人快速进入区块链世界的方法，也是未来连接到元宇宙的一个锚点。
 
-* Anchor目前已经上线双节点的测试网络[http://sub.android.im],可以通过波卡官方的工具进行连接。您也可以通过访问[http://demo.metanchor.net]访问指定的“链名内容”。
+* Anchor目前已经上线双节点的测试网络[wss://network.metanchor.net],可以通过波卡官方的工具进行连接。您也可以通过访问[http://demo.metanchor.net]访问指定的“链名内容”。
 
 # Anchor的实现
 
