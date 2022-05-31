@@ -10,6 +10,7 @@ use frame_support::{
 use frame_system::ensure_signed;
 pub use pallet::*;
 use sp_runtime::traits::SaturatedConversion;
+use sp_runtime::traits::StaticLookup;
 use sp_std::prelude::*;
 
 mod benchmarking;
@@ -83,8 +84,8 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		AnchorSet(T::AccountId,T::BlockNumber),		//( account, last block number )
-		AnchorToSell(T::AccountId,u32),
-		AnchorSold(u32),
+		AnchorToSell(T::AccountId,u32,T::AccountId),
+		AnchorSold(T::AccountId,u32),
 	}
 
 	#[pallet::storage]
@@ -95,7 +96,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn sale)]
-	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32)>;
+	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32,T::AccountId)>;
 
 	//The genesis config type.
 	#[pallet::genesis_config]
@@ -132,7 +133,9 @@ pub mod pallet {
 			protocol: Vec<u8>,
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
+			//0.check is on sell
 
+			
 			//1.param check
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);				//1.1.check key length, <40
 			ensure!(raw.len() < 104857600, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<10M
@@ -143,10 +146,12 @@ pub mod pallet {
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
+				//2.1.create new anchor
 				<AnchorOwner<T>>::insert(key, (&sender,current_block_number));
 				let block_zero: u32 = 0;
 				Self::deposit_event(Event::AnchorSet(sender,block_zero.into()));
 			}else{
+				//2.2.update exists anchor
 				let owner=data.ok_or(Error::<T>::AnchorNotExists)?;
 				ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 				<AnchorOwner<T>>::remove(&key);
@@ -161,8 +166,16 @@ pub mod pallet {
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_sell()
 		)]
-		pub fn sell_anchor(origin: OriginFor<T>, key: Vec<u8>, cost: u32) -> DispatchResult {
+		pub fn sell_anchor(
+			origin: OriginFor<T>, 
+			key: Vec<u8>, 
+			cost: u32, 
+			//target:T::AccountId
+			target:<T::Lookup as StaticLookup>::Source		//select from exist accounts.
+		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
+			let target = T::Lookup::lookup(target)?;
+
 			//1.param check		
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
 			ensure!(cost > 0 || cost == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
@@ -172,8 +185,8 @@ pub mod pallet {
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
 			//3.put in sell list
-			<SellList<T>>::insert(key, (&sender, cost)); 			
-			Self::deposit_event(Event::AnchorToSell(sender,cost));
+			<SellList<T>>::insert(key, (&sender, cost, &target)); 			
+			Self::deposit_event(Event::AnchorToSell(sender,cost,target));
 			Ok(())
 		}
 
@@ -202,7 +215,7 @@ pub mod pallet {
 			//3.remove the anchor from sell list
 			<SellList<T>>::remove(&key);
 
-			Self::deposit_event(Event::AnchorSold(anchor.1));
+			Self::deposit_event(Event::AnchorSold(anchor.0,anchor.1));
 			Ok(())
 		}
 	}
