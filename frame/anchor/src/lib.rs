@@ -19,41 +19,6 @@ mod tests;
 pub mod weights;
 pub use weights::*;
 
-/// A type alias for the balance type from this pallet's point of view.
-//type BalanceOf<T> = <T as pallet_balances::Config>::Balance;
-//type BalanceOf<T> = <T as frame_support::traits::Currency>::Balance;
-
-//type BalanceOf<T> =
-//	<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
-// const MILLICENTS: u32 = 1_000_000_000;
-
-// struct WeightForSetDummy<T: pallet_balances::Config>(BalanceOf<T>);
-
-// impl<T: pallet_balances::Config> WeighData<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
-// 	fn weigh_data(&self, target: (&BalanceOf<T>,)) -> Weight {
-// 		let multiplier = self.0;
-// 		// *target.0 is the amount passed into the extrinsic
-// 		let cents = *target.0 / <BalanceOf<T>>::from(MILLICENTS);
-// 		(cents * multiplier).saturated_into::<Weight>()
-// 	}
-// }
-
-// impl<T: pallet_balances::Config> ClassifyDispatch<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
-// 	fn classify_dispatch(&self, target: (&BalanceOf<T>,)) -> DispatchClass {
-// 		if *target.0 > <BalanceOf<T>>::from(1000u32) {
-// 			DispatchClass::Operational
-// 		} else {
-// 			DispatchClass::Normal
-// 		}
-// 	}
-// }
-
-// impl<T: pallet_balances::Config> PaysFee<(&BalanceOf<T>,)> for WeightForSetDummy<T> {
-// 	fn pays_fee(&self, _target: (&BalanceOf<T>,)) -> Pays {
-// 		Pays::Yes
-// 	}
-// }
-
 #[frame_support::pallet]
 pub mod pallet {
 	// Import various types used to declare pallet in scope.
@@ -112,10 +77,12 @@ pub mod pallet {
 		TransferFailed,
 	}
 
+	//这里的数据将写到chain上
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		AnchorSet(T::AccountId),
+		AnchorSet(T::AccountId,T::BlockNumber),		//( account, last block number )
 		AnchorToSell(T::AccountId,u32),
 		AnchorSold(u32),
 	}
@@ -123,6 +90,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn anchor)]
 	//pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, T::AccountId>;
+
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId,T::BlockNumber)>;
 
 	#[pallet::storage]
@@ -175,15 +143,17 @@ pub mod pallet {
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
-				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 		//create anchor owner
-				
+				<AnchorOwner<T>>::insert(key, (&sender,current_block_number));
+				let block_zero: u32 = 0;
+				Self::deposit_event(Event::AnchorSet(sender,block_zero.into()));
 			}else{
 				let owner=data.ok_or(Error::<T>::AnchorNotExists)?;
 				ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 				<AnchorOwner<T>>::remove(&key);
-				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 		//create anchor owner
+				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 
+				Self::deposit_event(Event::AnchorSet(sender,owner.1.into()));	
 			}
-			Self::deposit_event(Event::AnchorSet(sender));	//deposit the owner
+			
 			Ok(())
 		}
 
