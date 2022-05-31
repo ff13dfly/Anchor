@@ -107,6 +107,9 @@ pub mod pallet {
 
 		///Anchor is not in the sell list.
 		AnchorNotInSellList,
+
+		///Transfer error.
+		TransferFailed,
 	}
 
 	#[pallet::event]
@@ -205,7 +208,6 @@ pub mod pallet {
 		}
 
 		//buy an anchor from sell list.
-		//#[pallet::weight(70_000_000)]
 		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
 		)]
@@ -215,14 +217,12 @@ pub mod pallet {
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
-			//let amount= anchor.1.into();
-			//let _res=T::Currency::transfer(&sender,&anchor.0,amount,ExistenceRequirement::AllowDeath);
-
 			let amount= anchor.1;
 			let tx=(1_000_000_000_000 as Weight).saturating_mul(amount.into());
+			
 			//1.transfer specail amout to seller
-			//let _res=T::Currency::transfer(&sender,&anchor.0,<BalanceOf<T>>::from(amount),ExistenceRequirement::AllowDeath);
-			let _res=T::Currency::transfer(&sender,&anchor.0,tx.saturated_into(),ExistenceRequirement::AllowDeath);
+			let res=T::Currency::transfer(&sender,&anchor.0,tx.saturated_into(),ExistenceRequirement::AllowDeath);
+			ensure!(res.is_ok(), Error::<T>::TransferFailed);
 
 			//2.change the owner of anchor 
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
