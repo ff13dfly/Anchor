@@ -76,6 +76,12 @@ pub mod pallet {
 
 		///Transfer error.
 		TransferFailed,
+
+		///User can not buy the anchor owned by himself
+		CanNotBuyYourOwnAnchor,
+
+		///Anchor was set to sell to target buyer
+		OnlySellToTargetBuyer,
 	}
 
 	//这里的数据将写到chain上
@@ -135,7 +141,7 @@ pub mod pallet {
 			let sender = ensure_signed(origin)?;
 			//0.check is on sell
 
-			
+
 			//1.param check
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);				//1.1.check key length, <40
 			ensure!(raw.len() < 104857600, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<10M
@@ -194,16 +200,27 @@ pub mod pallet {
 		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
 		)]
-		pub fn buy_anchor(origin: OriginFor<T>, key: Vec<u8>) -> DispatchResult {
+		pub fn buy_anchor(
+			origin: OriginFor<T>, 
+			key: Vec<u8>
+		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
-			let amount= anchor.1;
-			let tx=(1_000_000_000_000 as Weight).saturating_mul(amount.into());
+			//0.check anchor sell status
+			//0.1.confirm the anchor is not owned by sender
+			ensure!(sender != anchor.0, <Error<T>>::CanNotBuyYourOwnAnchor);
+
+			//0.2.check the anchor sell target
+			if anchor.0 != anchor.2 {
+				ensure!(sender == anchor.2, <Error<T>>::OnlySellToTargetBuyer);
+			}
 			
 			//1.transfer specail amout to seller
+			let amount= anchor.1;
+			let tx=(1_000_000_000_000 as Weight).saturating_mul(amount.into());
 			let res=T::Currency::transfer(&sender,&anchor.0,tx.saturated_into(),ExistenceRequirement::AllowDeath);
 			ensure!(res.is_ok(), Error::<T>::TransferFailed);
 
