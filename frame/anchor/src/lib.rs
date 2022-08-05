@@ -89,9 +89,10 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		AnchorSet(T::AccountId,T::BlockNumber),		//( account, last block number )
-		AnchorToSell(T::AccountId,u32,T::AccountId,T::BlockNumber),
-		AnchorSold(T::AccountId,T::AccountId,u32,T::BlockNumber),
+		AnchorSet(T::AccountId,T::BlockNumber),						//( owner, preview block )
+		AnchorToSell(T::AccountId,u32,T::AccountId,T::BlockNumber),	//( owner, cost , target account , preview block )
+		AnchorUnSell(T::AccountId,T::BlockNumber),					//( owner, preview block )
+		AnchorSold(T::AccountId,T::AccountId,u32,T::BlockNumber),	//( owner, from account, cost, preview block )
 	}
 
 	#[pallet::storage]
@@ -201,29 +202,6 @@ pub mod pallet {
 			Ok(())
 		}
 
-		//remove anchor from sell list
-		// #[pallet::weight(
-		// 	<T as pallet::Config>::WeightInfo::set_sell()
-		// )]
-		// pub fn callback_anchor(
-		// 	origin: OriginFor<T>, 
-		// 	key: Vec<u8>, 
-		// ) -> DispatchResult {
-		// 	let sender = ensure_signed(origin)?;
-			
-		// 	//1.param check		
-		// 	ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
-			
-		// 	//2.check owner
-		// 	let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
-		// 	ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
-
-		// 	//3.put in sell list
-		// 	<SellList<T>>::insert(key, (&sender, cost, &target)); 			
-		// 	Self::deposit_event(Event::AnchorToSell(sender,cost,target));
-		// 	Ok(())
-		// }
-
 		//buy an anchor from sell list.
 		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
@@ -264,6 +242,35 @@ pub mod pallet {
 			<SellList<T>>::remove(&key);
 
 			Self::deposit_event(Event::AnchorSold(sender,anchor.0,anchor.1,owner.1.into()));
+			Ok(())
+		}
+
+		//remove anchor from sell list
+		#[pallet::weight(
+			<T as pallet::Config>::WeightInfo::set_unsell()
+		)]
+		pub fn unsell_anchor(
+			origin: OriginFor<T>, 
+			key: Vec<u8>, 
+		) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+			
+			//1.param check		
+			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
+			
+			//2.check owner
+			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
+			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
+
+			//3.remove from sell list		
+			<SellList<T>>::remove(&key);
+
+			//4.update anchor owner status
+			let current_block_number = <frame_system::Pallet<T>>::block_number();
+			<AnchorOwner<T>>::remove(&key);
+			<AnchorOwner<T>>::insert(&key, (&sender,current_block_number)); 
+
+			Self::deposit_event(Event::AnchorUnSell(sender,owner.1.into()));
 			Ok(())
 		}
 	}

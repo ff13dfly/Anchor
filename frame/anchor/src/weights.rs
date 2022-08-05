@@ -56,6 +56,7 @@ use sp_std::marker::PhantomData;
 pub trait WeightInfo {
 	fn set_anchor(x: u32,) -> Weight;
 	fn set_sell() -> Weight;
+	fn set_unsell() -> Weight;
 	fn buy_anchor() -> Weight;
 }
 
@@ -66,12 +67,17 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	// 	(1_000_000_000_000 as Weight)
 	// 		.saturating_add((100_000 as Weight).saturating_mul(x as Weight))
 	// }
+
 	fn set_anchor(x: u32, ) -> Weight {
 		(1_000_000_000 as Weight)
 			.saturating_add((10_000 as Weight).saturating_mul(x as Weight))
 	}
 
 	fn set_sell() -> Weight {
+		(1_000_000_000 as Weight)
+	}
+
+	fn set_unsell() -> Weight {
 		(1_000_000_000 as Weight)
 	}
 
@@ -88,6 +94,10 @@ impl WeightInfo for () {
 	}
 
 	fn set_sell() -> Weight {
+		(1_000_000_000 as Weight)
+	}
+
+	fn set_unsell() -> Weight {
 		(1_000_000_000 as Weight)
 	}
 
