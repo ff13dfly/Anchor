@@ -91,8 +91,8 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		AnchorSet(T::AccountId,T::BlockNumber),						//( owner, preview block )
 		AnchorToSell(T::AccountId,u32,T::AccountId,T::BlockNumber),	//( owner, cost , target account , preview block )
-		AnchorUnSell(T::AccountId,T::BlockNumber),					//( owner, preview block )
 		AnchorSold(T::AccountId,T::AccountId,u32,T::BlockNumber),	//( owner, from account, cost, preview block )
+		AnchorUnSell(T::AccountId,T::BlockNumber),					//( owner, preview block )
 	}
 
 	#[pallet::storage]
