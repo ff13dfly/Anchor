@@ -192,18 +192,21 @@ pub mod pallet {
 			ensure!(cost > 0 || cost == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
 
 			//1.1.lowercase fix
-			
+			let mut nkey:Vec<u8>;
+			nkey=key.clone().as_mut_slice().to_vec();
+			nkey.make_ascii_lowercase();
+
 			//2.check owner
-			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
+			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
 			//3.update last modify
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
-			<AnchorOwner<T>>::remove(&key);
-			<AnchorOwner<T>>::insert(&key, (&sender,current_block_number)); 
+			<AnchorOwner<T>>::remove(&nkey);
+			<AnchorOwner<T>>::insert(&nkey, (&sender,current_block_number)); 
 
 			//4.put in sell list
-			<SellList<T>>::insert(key, (&sender, cost, &target)); 			
+			<SellList<T>>::insert(nkey, (&sender, cost, &target)); 			
 			Self::deposit_event(Event::AnchorToSell(sender,cost,target,owner.1.into()));
 			Ok(())
 		}
@@ -220,6 +223,9 @@ pub mod pallet {
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
 
 			//lowercase check
+			let mut nkey:Vec<u8>;
+			nkey=key.clone().as_mut_slice().to_vec();
+			nkey.make_ascii_lowercase();
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
@@ -232,7 +238,7 @@ pub mod pallet {
 				ensure!(sender == anchor.2, <Error<T>>::OnlySellToTargetBuyer);
 			}
 			
-			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
+			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 			//ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 			
 			//1.transfer specail amout to seller
@@ -243,11 +249,11 @@ pub mod pallet {
 
 			//2.change the owner of anchor 
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
-			<AnchorOwner<T>>::remove(&key);
-			<AnchorOwner<T>>::insert(&key, (&sender,current_block_number));
+			<AnchorOwner<T>>::remove(&nkey);
+			<AnchorOwner<T>>::insert(&nkey, (&sender,current_block_number));
 
 			//3.remove the anchor from sell list
-			<SellList<T>>::remove(&key);
+			<SellList<T>>::remove(nkey);
 
 			Self::deposit_event(Event::AnchorSold(sender,anchor.0,anchor.1,owner.1.into()));
 			Ok(())
@@ -267,18 +273,21 @@ pub mod pallet {
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
 
 			//1.1.lowercase check
-			
+			let mut nkey:Vec<u8>;
+			nkey=key.clone().as_mut_slice().to_vec();
+			nkey.make_ascii_lowercase();
+
 			//2.check owner
-			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
+			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
 			//3.remove from sell list		
-			<SellList<T>>::remove(&key);
+			<SellList<T>>::remove(&nkey);
 
 			//4.update anchor owner status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
-			<AnchorOwner<T>>::remove(&key);
-			<AnchorOwner<T>>::insert(&key, (&sender,current_block_number)); 
+			<AnchorOwner<T>>::remove(&nkey);
+			<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number)); 
 
 			Self::deposit_event(Event::AnchorUnSell(sender,owner.1.into()));
 			Ok(())
