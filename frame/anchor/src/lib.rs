@@ -142,27 +142,31 @@ pub mod pallet {
 			let sender = ensure_signed(origin)?;
 			//0.check is on sell
 
-
 			//1.param check
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);				//1.1.check key length, <40
 			ensure!(raw.len() < 104857600, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<10M
 			ensure!(protocol.len() < 256, Error::<T>::LengthMaxLimited);	//1.3.check protocal length, <256
 
-			let data = <AnchorOwner<T>>::get(&key); 		//check anchor status
+			//1.1.convert key to lowcase
+			let mut nkey:Vec<u8>;
+			nkey=key.clone().as_mut_slice().to_vec();
+			nkey.make_ascii_lowercase();
+
+			let data = <AnchorOwner<T>>::get(&nkey); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
 				//2.1.create new anchor
-				<AnchorOwner<T>>::insert(key, (&sender,current_block_number));
+				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
 				let block_zero: u32 = 0;
 				Self::deposit_event(Event::AnchorSet(sender,block_zero.into()));
 			}else{
 				//2.2.update exists anchor
 				let owner=data.ok_or(Error::<T>::AnchorNotExists)?;
 				ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
-				<AnchorOwner<T>>::remove(&key);
-				<AnchorOwner<T>>::insert(key, (&sender,current_block_number)); 
+				<AnchorOwner<T>>::remove(&nkey);
+				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number)); 
 				Self::deposit_event(Event::AnchorSet(sender,owner.1.into()));	
 			}
 			
@@ -186,6 +190,8 @@ pub mod pallet {
 			//1.param check		
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
 			ensure!(cost > 0 || cost == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
+
+			//1.1.lowercase fix
 			
 			//2.check owner
 			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
@@ -212,6 +218,8 @@ pub mod pallet {
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
+
+			//lowercase check
 			
 			let anchor=<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
@@ -257,6 +265,8 @@ pub mod pallet {
 			
 			//1.param check		
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
+
+			//1.1.lowercase check
 			
 			//2.check owner
 			let owner=<AnchorOwner<T>>::get(&key).ok_or(Error::<T>::AnchorNotExists)?;
