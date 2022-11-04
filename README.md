@@ -6,6 +6,23 @@
 
 - Anchor目前已经上线双节点的测试网络[wss://network.metanchor.net],可以通过波卡官方的工具进行连接。
 
+## Anchor的目标
+
+- 简单易用，通过Anchor的方式写入和读出数据，您可以将Anchor网络当作一个可信任的数据库进行使用，无需再学习和掌握复杂繁多的区块链知识。
+- 兼容并续，和vGateway结合使用，可以让您的App快速具备访问区块链网络的能力。
+- 成本低廉，无需掌握难度颇高的RUST，只需JS，您就可以开始链上应用的开发啦。
+
+## Anchor的使用
+
+下载对应操作系统的版本[ Mac Linux64 ],运行节点，使用Polkadot的连接工具，即可使用
+
+```SHELL
+# 本地运行Anchor网络，默认监听9944端口
+./anchor --dev
+
+# 清理anchor本地运行产生的数据，不清理的话会出现不能出块的情况
+./anchor purge-chain --chain dev
+```
 
 ## Anchor的实现
 

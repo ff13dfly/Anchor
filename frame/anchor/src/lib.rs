@@ -3,7 +3,6 @@
 
 use frame_support::{
 	dispatch::DispatchResult,
-	//weights::{ClassifyDispatch, DispatchClass, Pays, PaysFee, WeighData, Weight},
 	weights::{Weight},
 	traits::{Currency,ExistenceRequirement},
 };
@@ -59,6 +58,12 @@ pub mod pallet {
 		///Anchor raw data max limit.
 		Base64MaxLimited,
 
+		///Anchor protocola max length
+		ProtocolMaxLimited,
+
+		///Pre number errror
+		PreAnchorFailed,
+
 		///Anchor sell value error.
 		CostValueLimited,
 
@@ -89,15 +94,11 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		AnchorSet(T::AccountId,T::BlockNumber),						//( owner, preview block )
 		AnchorToSell(T::AccountId,u32,T::AccountId,T::BlockNumber),	//( owner, cost , target account , preview block )
-		AnchorSold(T::AccountId,T::AccountId,u32,T::BlockNumber),	//( owner, from account, cost, preview block )
-		AnchorUnSell(T::AccountId,T::BlockNumber),					//( owner, preview block )
 	}
 
 	#[pallet::storage]
 	#[pallet::getter(fn anchor)]
-	//pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, T::AccountId>;
 
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId,T::BlockNumber)>;
 
@@ -125,9 +126,7 @@ pub mod pallet {
 		fn build(&self) {}
 	}
 
-	
 	#[pallet::call]
-	//impl<T: Config<I>, I: 'static> Pallet<T, I>{
 	impl<T: Config> Pallet<T> {
 		//set a new anchor or update an exist anchor
 		#[pallet::weight(
@@ -138,6 +137,7 @@ pub mod pallet {
 			key: Vec<u8>,
 			raw: Vec<u8>,
 			protocol: Vec<u8>,
+			pre:T::BlockNumber
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			//0.check is on sell
@@ -145,7 +145,7 @@ pub mod pallet {
 			//1.param check
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);				//1.1.check key length, <40
 			ensure!(raw.len() < 104857600, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<10M
-			ensure!(protocol.len() < 256, Error::<T>::LengthMaxLimited);	//1.3.check protocal length, <256
+			ensure!(protocol.len() < 256, Error::<T>::ProtocolMaxLimited);	//1.3.check protocal length, <256
 
 			//1.1.convert key to lowcase
 			let mut nkey:Vec<u8>;
@@ -157,17 +157,21 @@ pub mod pallet {
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
+				let val:u64=0;
+				let zero :T::BlockNumber = val.saturated_into();
+				ensure!(pre == zero, Error::<T>::PreAnchorFailed);
+
 				//2.1.create new anchor
 				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
-				let block_zero: u32 = 0;
-				Self::deposit_event(Event::AnchorSet(sender,block_zero.into()));
+
 			}else{
 				//2.2.update exists anchor
 				let owner=data.ok_or(Error::<T>::AnchorNotExists)?;
-				ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
+				ensure!(sender == owner.0, Error::<T>::AnchorNotBelogToAccount);
+				ensure!(pre == owner.1, Error::<T>::PreAnchorFailed);
+
 				<AnchorOwner<T>>::remove(&nkey);
-				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number)); 
-				Self::deposit_event(Event::AnchorSet(sender,owner.1.into()));	
+				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
 			}
 			
 			Ok(())
@@ -181,7 +185,6 @@ pub mod pallet {
 			origin: OriginFor<T>, 
 			key: Vec<u8>, 
 			cost: u32, 
-			//target:T::AccountId		//account input
 			target:<T::Lookup as StaticLookup>::Source		//select from exist accounts.
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
@@ -199,11 +202,6 @@ pub mod pallet {
 			//2.check owner
 			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
-
-			//3.update last modify
-			let current_block_number = <frame_system::Pallet<T>>::block_number();
-			<AnchorOwner<T>>::remove(&nkey);
-			<AnchorOwner<T>>::insert(&nkey, (&sender,current_block_number)); 
 
 			//4.put in sell list
 			<SellList<T>>::insert(nkey, (&sender, cost, &target)); 			
@@ -238,9 +236,6 @@ pub mod pallet {
 				ensure!(sender == anchor.2, <Error<T>>::OnlySellToTargetBuyer);
 			}
 			
-			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
-			//ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
-			
 			//1.transfer specail amout to seller
 			let amount= anchor.1;
 			let tx=(1_000_000_000_000 as Weight).saturating_mul(amount.into());
@@ -255,7 +250,6 @@ pub mod pallet {
 			//3.remove the anchor from sell list
 			<SellList<T>>::remove(nkey);
 
-			Self::deposit_event(Event::AnchorSold(sender,anchor.0,anchor.1,owner.1.into()));
 			Ok(())
 		}
 
@@ -282,14 +276,7 @@ pub mod pallet {
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
 			//3.remove from sell list		
-			<SellList<T>>::remove(&nkey);
-
-			//4.update anchor owner status
-			let current_block_number = <frame_system::Pallet<T>>::block_number();
-			<AnchorOwner<T>>::remove(&nkey);
-			<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number)); 
-
-			Self::deposit_event(Event::AnchorUnSell(sender,owner.1.into()));
+			<SellList<T>>::remove(nkey);
 			Ok(())
 		}
 	}
