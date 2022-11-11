@@ -1,16 +1,22 @@
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 
+//use codec::{Encode};
 use frame_support::{
-	dispatch::DispatchResult,
-	weights::{Weight},
+	dispatch::{DispatchResult},
 	traits::{Currency,ExistenceRequirement},
+	weights::Weight,
 };
 use frame_system::ensure_signed;
+//use scale_info::TypeInfo;
+use sp_runtime::{
+	traits::{SaturatedConversion,StaticLookup},
+	// transaction_validity::{
+	// 	InvalidTransaction, TransactionValidity, TransactionValidityError, ValidTransaction,
+	// },
+};
+use sp_std::{convert::TryInto, prelude::*};
 pub use pallet::*;
-use sp_runtime::traits::SaturatedConversion;
-use sp_runtime::traits::StaticLookup;
-use sp_std::prelude::*;
 
 mod benchmarking;
 #[cfg(test)]
@@ -19,29 +25,29 @@ mod tests;
 pub mod weights;
 pub use weights::*;
 
+
 #[frame_support::pallet]
 pub mod pallet {
-	// Import various types used to declare pallet in scope.
 	use super::*;
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
-	
 	#[pallet::config]
 	pub trait Config: pallet_balances::Config + frame_system::Config {
-		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		type WeightInfo: WeightInfo;
 		type Currency: Currency<Self::AccountId>;
 	}
 
 	#[pallet::pallet]
+	#[pallet::without_storage_info]
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
-
+	
 	#[pallet::hooks]
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 		fn on_initialize(_n: T::BlockNumber) -> Weight {
-			0
+			Weight::zero()
 		}
 		fn on_finalize(_n: T::BlockNumber) {}
 		fn offchain_worker(_n: T::BlockNumber) {}
@@ -94,7 +100,7 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		AnchorToSell(T::AccountId,u32,T::AccountId,T::BlockNumber),	//( owner, cost , target account , preview block )
+		AnchorToSell(T::AccountId,u32,T::AccountId),	//( owner, cost , target account , preview block )
 	}
 
 	#[pallet::storage]
@@ -205,7 +211,7 @@ pub mod pallet {
 
 			//4.put in sell list
 			<SellList<T>>::insert(nkey, (&sender, cost, &target)); 			
-			Self::deposit_event(Event::AnchorToSell(sender,cost,target,owner.1.into()));
+			Self::deposit_event(Event::AnchorToSell(sender,cost,target));
 			Ok(())
 		}
 
@@ -235,17 +241,30 @@ pub mod pallet {
 			if anchor.0 != anchor.2 {
 				ensure!(sender == anchor.2, <Error<T>>::OnlySellToTargetBuyer);
 			}
-			
+
+			//0.3.check anchor owner
+			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
+
 			//1.transfer specail amout to seller
 			let amount= anchor.1;
-			let tx=(1_000_000_000_000 as Weight).saturating_mul(amount.into());
-			let res=T::Currency::transfer(&sender,&anchor.0,tx.saturated_into(),ExistenceRequirement::AllowDeath);
+
+			//测试是否可以进行扣款
+			//can_withdraw( who: &T::AccountId, amount: Self::Balance, )
+			//T::Currency::can_withdraw();
+
+			let basic:u128=1000000000000;
+			let tx=basic.saturating_mul(amount.into());
+			let res=T::Currency::transfer(
+				&sender,		//transfer from
+				&anchor.0,		//transfer to
+				tx.saturated_into(),		//transfer amount
+				ExistenceRequirement::AllowDeath
+			);
 			ensure!(res.is_ok(), Error::<T>::TransferFailed);
 
 			//2.change the owner of anchor 
-			let current_block_number = <frame_system::Pallet<T>>::block_number();
 			<AnchorOwner<T>>::remove(&nkey);
-			<AnchorOwner<T>>::insert(&nkey, (&sender,current_block_number));
+			<AnchorOwner<T>>::insert(&nkey, (&sender,owner.1));
 
 			//3.remove the anchor from sell list
 			<SellList<T>>::remove(nkey);
