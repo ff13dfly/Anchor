@@ -150,7 +150,7 @@ pub mod pallet {
 
 			//1.param check
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);				//1.1.check key length, <40
-			ensure!(raw.len() < 104857600, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<10M
+			ensure!(raw.len() < 4*1024*1024, Error::<T>::Base64MaxLimited);	//1.2.check raw(base64) length，<4M
 			ensure!(protocol.len() < 256, Error::<T>::ProtocolMaxLimited);	//1.3.check protocal length, <256
 
 			//1.1.convert key to lowcase
@@ -247,10 +247,6 @@ pub mod pallet {
 
 			//1.transfer specail amout to seller
 			let amount= anchor.1;
-
-			//测试是否可以进行扣款
-			//can_withdraw( who: &T::AccountId, amount: Self::Balance, )
-			//T::Currency::can_withdraw();
 
 			let basic:u128=1000000000000;
 			let tx=basic.saturating_mul(amount.into());

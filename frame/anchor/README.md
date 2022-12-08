@@ -80,3 +80,20 @@ Anchor通过protocol字段来对数据的调用进行约定，实现通过键值
 
 结论：上午的anchor的owner更新正常
 待处理：sell的target可以自行设置的问题
+
+
+### 2022-11-13 上午的测试
+
+结论：目前看来基本正常了，切入到saying的测试里
+
+- Bob写入test，数据在 blcok 41 上，anchorOwner正常
+- Alice写入test，数据在 blcok 61 上，anchorOwner仍然指向 block 41;正常报错了
+
+## 升级记录事项
+
+发生的变化
+- Extrinsic部分增加了好多的记录，详细记录了每笔的支出
+- 默认启动的dev网络，block数据会被清理，只保留256块，需要使用参数处理 --dev --state-pruning archive
+- Error又触发正常了，需要配合对应版本的polkadot版本
+- Extrinsic写入数据大小受到了限制。是因为weight的原因，估计是超出了Extrinsic的支付上限，降低1000倍后，表现正常
+- #[pallet::pallet]后面加了一行#[pallet::without_storage_info]，解决Vec<u8>作为储存的Key带来的编译错误
