@@ -11,6 +11,7 @@ shell.nix
 /target/
 /docker/
 /scripts/
+.vscode
 
 /frame/alliance
 /frame/assets
