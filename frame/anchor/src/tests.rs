@@ -19,10 +19,13 @@
 
 use crate::*;
 use frame_support::{
-	//assert_ok,
+	assert_ok,
+	assert_noop,
 	//dispatch::{DispatchInfo},
 	parameter_types,
 	traits::{ConstU64},
+	//assert_noop, 
+	//error::BadOrigin
 };
 use sp_core::H256;
 // The testing primitives are very useful for avoiding having to work with signatures
@@ -35,7 +38,7 @@ use sp_runtime::{
 use sp_std::convert::{TryFrom, TryInto};
 
 // Reexport crate as its pallet name for construct_runtime.
-use crate as pallet_example_basic;
+use crate as pallet_anchor;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -49,7 +52,7 @@ frame_support::construct_runtime!(
 	{
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
-		Example: pallet_example_basic::{Pallet, Call, Storage, Config<T>, Event<T>},
+		Anchor: pallet_anchor::{Pallet, Call, Storage, Config<T>, Event<T>},
 	}
 );
 
@@ -119,6 +122,15 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 fn set_new_anchor() {
     new_test_ext().execute_with(|| {
         assert_eq!(100, 100);
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(2),vec![13,23],vec![13,23],vec![13,23],0));
+		assert_noop!(
+			Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
+			Error::<Test>::AnchorNotBelogToAccount,
+		);
+		assert_noop!(
+			Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
+			Error::<Test>::PreAnchorFailed,
+		);
     });
 }
 
