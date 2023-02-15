@@ -1,16 +1,125 @@
-use frame_support::{assert_noop, assert_ok, error::BadOrigin};
-use frame_system::{EventRecord, Phase};
+// This file is part of Substrate.
 
-use super::*;
-//use crate::mock::*;
+// Copyright (C) 2019-2022 Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! Tests for pallet-example-basic.
+
+use crate::*;
+use frame_support::{
+	//assert_ok,
+	//dispatch::{DispatchInfo},
+	parameter_types,
+	traits::{ConstU64},
+};
+use sp_core::H256;
+// The testing primitives are very useful for avoiding having to work with signatures
+// or public keys. `u64` is used as the `AccountId` and no `Signature`s are required.
+use sp_runtime::{
+	testing::Header,
+	traits::{BlakeTwo256, IdentityLookup},
+	//BuildStorage,
+};
+use sp_std::convert::{TryFrom, TryInto};
+
+// Reexport crate as its pallet name for construct_runtime.
+use crate as pallet_example_basic;
+
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
+type Block = frame_system::mocking::MockBlock<Test>;
+
+// For testing the pallet, we construct a mock runtime.
+frame_support::construct_runtime!(
+	pub enum Test where
+		Block = Block,
+		NodeBlock = Block,
+		UncheckedExtrinsic = UncheckedExtrinsic,
+	{
+		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+		Example: pallet_example_basic::{Pallet, Call, Storage, Config<T>, Event<T>},
+	}
+);
+
+parameter_types! {
+	pub BlockWeights: frame_system::limits::BlockWeights =
+		frame_system::limits::BlockWeights::simple_max(frame_support::weights::Weight::from_ref_time(1024));
+}
+impl frame_system::Config for Test {
+	type BaseCallFilter = frame_support::traits::Everything;
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
+	type RuntimeOrigin = RuntimeOrigin;
+	type Index = u64;
+	type BlockNumber = u64;
+	type Hash = H256;
+	type RuntimeCall = RuntimeCall;
+	type Hashing = BlakeTwo256;
+	type AccountId = u64;
+	type Lookup = IdentityLookup<Self::AccountId>;
+	type Header = Header;
+	type RuntimeEvent = RuntimeEvent;
+	type BlockHashCount = ConstU64<250>;
+	type Version = ();
+	type PalletInfo = PalletInfo;
+	type AccountData = pallet_balances::AccountData<u64>;
+	type OnNewAccount = ();
+	type OnKilledAccount = ();
+	type SystemWeightInfo = ();
+	type SS58Prefix = ();
+	type OnSetCode = ();
+	type MaxConsumers = frame_support::traits::ConstU32<16>;
+}
+
+impl pallet_balances::Config for Test {
+	type MaxLocks = ();
+	type MaxReserves = ();
+	type ReserveIdentifier = [u8; 8];
+	type Balance = u64;
+	type DustRemoval = ();
+	type RuntimeEvent = RuntimeEvent;
+	type ExistentialDeposit = ConstU64<1>;
+	type AccountStore = System;
+	type WeightInfo = ();
+}
+
+impl Config for Test {
+	//type MagicNumber = ConstU64<1_000_000_000>;
+	type Currency = Balances;
+	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = ();
+}
+
+// This function basically just builds a genesis storage key/value store according to
+// our desired mockup.
+pub fn new_test_ext() -> sp_io::TestExternalities {
+	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	let ext = sp_io::TestExternalities::new(t);
+	ext
+}
 
 /****************************************/
 /***************setAnchor****************/
 /****************************************/
+
 #[test]
 fn set_new_anchor() {
-    assert_eq!(100, 100);
-
+    new_test_ext().execute_with(|| {
+        assert_eq!(100, 100);
+    });
 }
 
 #[test]
@@ -22,6 +131,7 @@ fn set_owned_anchor() {
 /****************************************/
 /***************sellAnchor***************/
 /****************************************/
+
 #[test]
 fn sell_owned_anchor() {
     assert_eq!(100, 100);
