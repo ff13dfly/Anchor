@@ -2,6 +2,8 @@
 
 This anchor.js is a library to access Anchor pallet.
 
-## requirment
+## playground
+
+* React
 
 ## testing
