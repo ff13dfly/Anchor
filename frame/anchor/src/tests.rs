@@ -36,7 +36,7 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	//BuildStorage,
 };
-use sp_runtime::print;
+//use sp_runtime::print;
 
 use sp_std::convert::{TryFrom, TryInto};
 
@@ -113,7 +113,8 @@ impl Config for Test {
 // our desired mockup.
 pub fn new_test_ext() -> sp_io::TestExternalities {
 	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
-	let ext = sp_io::TestExternalities::new(t);
+	let mut ext = sp_io::TestExternalities::new(t);
+	ext.execute_with(|| System::set_block_number(1));	//need to start 
 	ext
 }
 
@@ -125,39 +126,28 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 /****************************************/
 
 #[test]
-fn set_new_anchor() {
+fn set_anchor() {
     new_test_ext().execute_with(|| {
-        assert_eq!(100, 100);
-		let key=vec![13,23];
-		let raw=vec![13,23];
-		let protocol=vec![13,23];
-		let pre=0;
-		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(1),key,raw,protocol,pre));
-		//Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0);
-		//log::info!("called by {:?}", Anchor::anchor(vec![13,23]));
-		print!("My Test Message {:?}",Anchor::anchor(vec![13,23]));
-		//Some(25);
-		// assert_noop!(
-		// 	Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
-		// 	Error::<Test>::AnchorNotBelogToAccount,
-		// );
+		//1.set a new anchor
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0));
+
+		//2.set anchor with wrong pre block
 		assert_noop!(
 			Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
 			Error::<Test>::PreAnchorFailed,
 		);
+		
+		//3.set anchor with right pre block number
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],1));
+
+		//4.set anchor by another account who do not own the anchor
+		assert_noop!(
+			Anchor::set_anchor(RuntimeOrigin::signed(2),vec![13,23],vec![13,23],vec![13,23],0),
+			Error::<Test>::AnchorNotBelogToAccount,
+		);
+
+		System::set_block_number(System::block_number() + 1);
     });
-}
-
-#[test]
-fn set_owned_anchor() {
-    assert_eq!(100, 100);
-
-}
-
-#[test]
-fn set_unowned_anchor() {
-    assert_eq!(100, 100);
-
 }
 
 /****************************************/
