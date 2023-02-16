@@ -1,21 +1,28 @@
-import { Container,Row, Col } from 'react-bootstrap';
-
+import { Container,Row, Col,Nav,Navbar } from 'react-bootstrap';
 import { useEffect } from 'react';
 
 function Header(props) {
 
   useEffect(() => {
     
-    
   },[]);
 
-  
   return (
-    <Container> 
-    <Row className = "pt-2" >
-      <Col lg = { 12 } xs = { 12 } className = "pt-2" >This header</Col>
-    </Row>
-    </Container>
+    <Navbar bg="light" expand="lg">
+      <Container>
+        <Navbar.Brand href="#home">Anchor.js Playground</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="#home">Search</Nav.Link>
+            <Nav.Link href="#write">Write</Nav.Link>
+            <Nav.Link href="#account">Account</Nav.Link>
+            <Nav.Link href="#nodes">Nodes</Nav.Link>
+            <Nav.Link href="#document">Document</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }
 export default Header;

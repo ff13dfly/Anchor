@@ -105,7 +105,6 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn anchor)]
-
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId,T::BlockNumber)>;
 
 	#[pallet::storage]

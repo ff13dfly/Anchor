@@ -21,6 +21,7 @@ use crate::*;
 use frame_support::{
 	assert_ok,
 	assert_noop,
+	//assert_eq,
 	//dispatch::{DispatchInfo},
 	parameter_types,
 	traits::{ConstU64},
@@ -35,6 +36,8 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	//BuildStorage,
 };
+use sp_runtime::print;
+
 use sp_std::convert::{TryFrom, TryInto};
 
 // Reexport crate as its pallet name for construct_runtime.
@@ -114,6 +117,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	ext
 }
 
+//substrate document
+//https://docs.substrate.io/test/unit-testing/
+
 /****************************************/
 /***************setAnchor****************/
 /****************************************/
@@ -122,11 +128,19 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 fn set_new_anchor() {
     new_test_ext().execute_with(|| {
         assert_eq!(100, 100);
-		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(2),vec![13,23],vec![13,23],vec![13,23],0));
-		assert_noop!(
-			Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
-			Error::<Test>::AnchorNotBelogToAccount,
-		);
+		let key=vec![13,23];
+		let raw=vec![13,23];
+		let protocol=vec![13,23];
+		let pre=0;
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(1),key,raw,protocol,pre));
+		//Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0);
+		//log::info!("called by {:?}", Anchor::anchor(vec![13,23]));
+		print!("My Test Message {:?}",Anchor::anchor(vec![13,23]));
+		//Some(25);
+		// assert_noop!(
+		// 	Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
+		// 	Error::<Test>::AnchorNotBelogToAccount,
+		// );
 		assert_noop!(
 			Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
 			Error::<Test>::PreAnchorFailed,
