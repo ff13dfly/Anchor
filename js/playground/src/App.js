@@ -4,8 +4,8 @@ import { useState,useEffect,useCallback} from 'react';
 import Header from './components/header';
 import Search from './components/search';
 import Write from './components/write';
+import Market from './components/market';
 import Account from './components/account';
-import Nodes from './components/nodes';
 import Summary from './components/summary';
 
 function App() {
@@ -23,11 +23,11 @@ function App() {
         case '#write':
           setView(<Write />);
           break;
+        case '#market':
+          setView(<Market />);
+          break;
         case '#account':
           setView(<Account />);
-          break;
-        case '#nodes':
-          setView(<Nodes />);
           break;
         case '#document':
           setView(<Summary />);

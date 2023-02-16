@@ -16,8 +16,8 @@ function Header(props) {
           <Nav className="me-auto">
             <Nav.Link href="#home">Search</Nav.Link>
             <Nav.Link href="#write">Write</Nav.Link>
-            <Nav.Link href="#account">Account</Nav.Link>
-            <Nav.Link href="#nodes">Nodes</Nav.Link>
+            <Nav.Link href="#market">Market</Nav.Link>
+            <Nav.Link href="#account">Setting</Nav.Link>
             <Nav.Link href="#document">Document</Nav.Link>
           </Nav>
         </Navbar.Collapse>

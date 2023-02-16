@@ -2,10 +2,10 @@ let wsAPI = null;
 let unlistening = null;
 
 const limits={
-    key:40,
-    protocol:256,
-    raw:4*1024*1024,
-	account:48,
+    key:40,					//Max length of anchor name ( ASCII character )
+    protocol:256,			//Max length of protocol	
+    raw:4*1024*1024,		//Max length of raw data
+	account:48,				//SS58 address length
 };
 
 const self = {
