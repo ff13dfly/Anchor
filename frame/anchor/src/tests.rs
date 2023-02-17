@@ -113,8 +113,7 @@ impl Config for Test {
 // our desired mockup.
 pub fn new_test_ext() -> sp_io::TestExternalities {
 	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
-	let mut ext = sp_io::TestExternalities::new(t);
-	ext.execute_with(|| System::set_block_number(1));	//need to start 
+	let ext = sp_io::TestExternalities::new(t);
 	ext
 }
 
@@ -122,78 +121,124 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 //https://docs.substrate.io/test/unit-testing/
 
 /****************************************/
-/***************setAnchor****************/
+/***********basic function test**********/
 /****************************************/
 
 #[test]
 fn set_anchor() {
     new_test_ext().execute_with(|| {
+		// set start block to start_block
+		let start_block = 100;		//set the start block number
+		let step = 20;				//the step for the block number
+		System::set_block_number(start_block.clone()); 	//need to start
+
+		// set_anchor data.
+		let key=vec![72,105];						//anchor name : Hi
+		let raw=vec![84,101,115,116,46,46,46];		//raw data : Test...
+		let protocol=vec![78,111,110,101];			//protocol data : None
+		let account_a=RuntimeOrigin::signed(11);	//test account A
+		let account_b=RuntimeOrigin::signed(22);	//test account B
+
 		//1.set a new anchor
-		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0));
+		assert_ok!(
+			Anchor::set_anchor( account_a.clone(),key.clone(),raw.clone(),protocol.clone(),0)
+		);
 
 		//2.set anchor with wrong pre block
 		assert_noop!(
-			Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],0),
+			Anchor::set_anchor( account_a.clone(),key.clone(),raw.clone(),protocol.clone(),0),
 			Error::<Test>::PreAnchorFailed,
 		);
-		
+
 		//3.set anchor with right pre block number
-		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(1),vec![13,23],vec![13,23],vec![13,23],1));
+		assert_ok!(
+			Anchor::set_anchor(account_a.clone(),key.clone(),raw.clone(),protocol.clone(),start_block.clone()),
+		);
 
 		//4.set anchor by another account who do not own the anchor
 		assert_noop!(
-			Anchor::set_anchor(RuntimeOrigin::signed(2),vec![13,23],vec![13,23],vec![13,23],0),
+			Anchor::set_anchor(account_b.clone(),key.clone(),raw.clone(),protocol.clone(),start_block.clone()),
 			Error::<Test>::AnchorNotBelogToAccount,
 		);
 
-		System::set_block_number(System::block_number() + 1);
+		System::set_block_number(System::block_number() + step.clone());
     });
 }
 
-/****************************************/
-/***************sellAnchor***************/
-/****************************************/
-
 #[test]
-fn sell_owned_anchor() {
-    assert_eq!(100, 100);
+fn sell_anchor() {
+    new_test_ext().execute_with(|| {
+		// set start block to start_block
+		let start_block = 100;
+		let price = 399;
+		let account_a=12;
+		let account_b=34;
+		System::set_block_number(start_block); //need to start
+
+		//1.set a new anchor
+		assert_ok!(
+			Anchor::set_anchor(
+				RuntimeOrigin::signed(account_a.clone()),
+				vec![48,69],
+				vec![23,23,23,33,33,33],
+				vec![12,23,34,45],
+				0
+			)
+		);
+
+		//2.sell it by another account
+		assert_noop!(
+			Anchor::sell_anchor(RuntimeOrigin::signed(account_b.clone()),vec![48,69],price.clone(),account_b.clone()),
+			Error::<Test>::AnchorNotBelogToAccount,
+		);
+	});
 }
 
 #[test]
-fn sell_unowned_anchor() {
-    assert_eq!(100, 100);
-    
+fn unsell_anchor() {
+    new_test_ext().execute_with(|| {
+		let start_block = 100;
+		//let price = 399;
+		let account_a=11;
+		let account_b=33;
+		System::set_block_number(start_block); //need to start
+
+		//1.set a new anchor
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(account_a.clone()),vec![48,69],vec![23,23,23,33,33,33],vec![12,23,34,45],0));
+
+	});
+}
+
+#[test]
+fn buy_anchor() {
+    new_test_ext().execute_with(|| {
+		let start_block = 100;
+		//let price = 399;
+		let account_a=11;
+		let account_b=33;
+		System::set_block_number(start_block); //need to start
+		
+		//1.set a new anchor
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(account_a.clone()),vec![48,69],vec![23,23,23,33,33,33],vec![12,23,34,45],0));
+
+	});
 }
 
 /****************************************/
-/**************unsellAnchor**************/
+/**********complex logical test**********/
 /****************************************/
 
 #[test]
-fn unsell_owned_anchor() {
-    assert_eq!(100, 100);
-}
+fn complex() {
+    new_test_ext().execute_with(|| {
+		let start_block = 100;
+		//let price = 399;
+		let account_a=11;
+		let account_b=33;
+		System::set_block_number(start_block); //need to start
+		
+		//1.set a new anchor
+		assert_ok!(Anchor::set_anchor(RuntimeOrigin::signed(account_a.clone()),vec![48,69],vec![23,23,23,33,33,33],vec![12,23,34,45],0));
 
-#[test]
-fn unsell_unowned_anchor() {
-    assert_eq!(100, 100);
-}
-
-/****************************************/
-/****************buyAnchor***************/
-/****************************************/
-
-#[test]
-fn buy_target_anchor() {
-    assert_eq!(100, 100);
-}
-
-#[test]
-fn buy_free_anchor() {
-    assert_eq!(100, 100);
-}
-
-#[test]
-fn buy_unselling_anchor() {
-    assert_eq!(100, 100);
+	});
 }
