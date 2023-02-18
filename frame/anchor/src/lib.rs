@@ -214,8 +214,9 @@ pub mod pallet {
 			Ok(())
 		}
 
+		//TODO: check balance before buying.
 		//buy an anchor from sell list.
-		#[pallet::weight(
+ 		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
 		)]
 		pub fn buy_anchor(

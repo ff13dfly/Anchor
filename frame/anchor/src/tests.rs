@@ -111,7 +111,19 @@ impl Config for Test {
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
+
+	//set account balance
+	pallet_balances::GenesisConfig::<Test> {
+		balances: vec![
+			(11, 2000),
+			(22, 2000),
+			(33, 2000),
+		],
+	}
+	.assimilate_storage(&mut t)
+	.unwrap();
+
 	let mut ext = sp_io::TestExternalities::new(t);
 	ext.execute_with(|| System::set_block_number(1));
 	ext
@@ -119,6 +131,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 
 //substrate document
 //https://docs.substrate.io/test/unit-testing/
+
+//Grant program details
+//https://github.com/w3f/Grants-Program/pull/1528 
 
 /****************************************/
 /***********basic function test**********/
@@ -145,6 +160,7 @@ fn set_anchor() {
 		assert_ok!(
 			Anchor::set_anchor( account_a.clone(),key.clone(),raw.clone(),protocol.clone(),0)
 		);
+		//TODO: left result "None", feeling the test runtime storage not start.
 		assert_eq!(Anchor::owner(key.clone()), Some((11,start_block.clone())));
 
 		//2.set anchor with wrong pre block
