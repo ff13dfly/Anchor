@@ -104,11 +104,11 @@ pub mod pallet {
 	}
 
 	#[pallet::storage]
-	#[pallet::getter(fn anchor)]
+	#[pallet::getter(fn owner)]
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId,T::BlockNumber)>;
 
 	#[pallet::storage]
-	#[pallet::getter(fn sale)]
+	#[pallet::getter(fn selling)]
 	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32,T::AccountId)>;
 
 	//The genesis config type.
@@ -284,6 +284,9 @@ pub mod pallet {
 			let mut nkey:Vec<u8>;
 			nkey=key.clone().as_mut_slice().to_vec();
 			nkey.make_ascii_lowercase();
+
+			//1.2.check sell list
+			<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
 			//2.check owner
 			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
