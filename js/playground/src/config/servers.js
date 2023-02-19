@@ -1,0 +1,8 @@
+exports.servers = {
+    nodes:[
+        
+    ],
+    gateway:[
+
+    ],
+};

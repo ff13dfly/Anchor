@@ -1,5 +1,6 @@
 
 import { useState,useEffect,useCallback} from 'react';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 
 import Header from './components/header';
 import Search from './components/search';
@@ -9,11 +10,19 @@ import Account from './components/account';
 import Summary from './components/summary';
 
 function App() {
-  //let [page, setPage] = useState('#');
-
   let [view,setView]=useState('');
 
   const self={
+    link:(node,ck) => {
+        try {
+          const provider = new WsProvider(node);
+          ApiPromise.create({ provider: provider }).then((api) => {
+            ck && ck(api);
+          });
+        } catch (error) {
+          ck && ck(false);
+        }
+    },
     router:(page)=>{
       switch (page) {
         case '#home':
@@ -42,6 +51,7 @@ function App() {
 
   const handleChangeEvent = useCallback(() => {
       self.router(window.location.hash);
+      
   }, []);
 
   
