@@ -14,7 +14,7 @@ Anchor pallet have tested for the substrate which released on 2022.12.Before int
 
 * Download the [Anchor pallet](https://github.com/ff13dfly/Anchor) code.
 
-After copy the "Anchor pallet" to Substrate, the following 5 files need to modify. You will find that it is petty easy to finish this base on the great job of Substrate.
+After copy the "Anchor pallet" to Substrate, the following 5 files need minor modifications. You will find that it is petty easy to finish this base on the great job of Substrate.
 
 ### 1. Cargo.toml
 
@@ -44,7 +44,7 @@ impl pallet_anchor::Config for Runtime {
 }
 ```
 
-Paset the follow code to "construct_runtime!()", you can locate it to "Vesting: pallet_vesting,".
+Paste the follow code to "construct_runtime!()", you can locate it to "Vesting: pallet_vesting,".
 
 ```RUST
 Anchor: pallet_anchor,
@@ -65,6 +65,23 @@ Just locate it to "alliance: Default::default()", paste the code there, done.
 ```RUST
 anchor:Default::default(),
 ```
+
+### Issues about Rust & Substrate
+
+* Set up Rust environment
+
+```SHELL
+cargo test
+cargo build --release
+```
+
+* Run Substrate
+
+```SHELL
+target/substrate --dev --state-pruning archive
+```
+
+* Explorer Substrate
 
 ## Docker testing
 
