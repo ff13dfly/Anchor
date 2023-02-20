@@ -95,6 +95,9 @@ pub mod pallet {
 		///Anchor is not in the sell list.
 		AnchorNotInSellList,
 
+		///Not enough balance
+		InsufficientBalance,
+
 		///Transfer error.
 		TransferFailed,
 
@@ -263,11 +266,16 @@ pub mod pallet {
 			//0.3.check anchor owner
 			let _owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 
+			
+
 			//1.transfer specail amout to seller
 			let amount= anchor.1;
-
 			let basic:u128=1000000000000;
 			let tx=basic.saturating_mul(amount.into());
+
+			//1.1.check balance
+			ensure!(T::Currency::free_balance(&sender) >= tx.saturated_into(), Error::<T>::InsufficientBalance);
+
 			let res=T::Currency::transfer(
 				&sender,		//transfer from
 				&anchor.0,		//transfer to

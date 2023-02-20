@@ -37,10 +37,10 @@ fn sample() {
 
 		System::set_block_number(System::block_number() + step);
 
-		assert_eq!(Balances::free_balance(11), 1000);
-		assert_eq!(Balances::free_balance(22), 2000);
-		assert_eq!(Balances::free_balance(33), 3000);
-		assert_eq!(Balances::free_balance(44), 199);
+		assert_eq!(Balances::free_balance(11), 1999000000000000);
+		assert_eq!(Balances::free_balance(22), 2999000000000000);
+		assert_eq!(Balances::free_balance(33), 3999000000000000);
+		assert_eq!(Balances::free_balance(44), 199000000000000);
     });
 }
 
@@ -251,21 +251,47 @@ fn buy_anchor() {
 		assert_eq!(Anchor::owner(&key), Some((id_a,start_block)));
 
 		//4. buy anchor without enought balance
+		assert_eq!(Balances::free_balance(id_d), 199000000000000);
 		assert_noop!(
 			Anchor::buy_anchor(account_d.clone(),key.clone()),
-			Error::<Test>::TransferFailed,
+			Error::<Test>::InsufficientBalance,
 		);
 		assert_eq!(Anchor::selling(&key), Some((id_a,price,id_a)));
 		assert_eq!(Anchor::owner(&key), Some((id_a,start_block)));
 
-		//5. buy by a free account
-		// FIXME: got TransferFailed
+		//5. buy the anchor yourself
+		assert_noop!(
+			Anchor::buy_anchor(account_a.clone(),key.clone()),
+			Error::<Test>::CanNotBuyYourOwnAnchor,
+		);
+
+		//6. buy by a free account
+		assert_eq!(Balances::free_balance(id_c), 3999000000000000);
 		assert_ok!(
 			Anchor::buy_anchor(account_c.clone(),key.clone())
 		);
+		assert_eq!(Balances::free_balance(id_c), 3700000000000000);
 		assert_eq!(Anchor::selling(&key), None);
 		assert_eq!(Anchor::owner(&key), Some((id_c,start_block)));
 
-		//6. buy a target anchor
+		//7. buy a target anchor
+		assert_ok!(
+			Anchor::sell_anchor(account_c.clone(),key.clone(),price,id_b),
+		);
+		assert_eq!(Anchor::selling(&key), Some((id_c,price,id_b)));
+		assert_eq!(Anchor::owner(&key), Some((id_c,start_block)));
+
+		assert_noop!(
+			Anchor::buy_anchor(account_a.clone(),key.clone()),
+			Error::<Test>::OnlySellToTargetBuyer,
+		);
+		assert_eq!(Anchor::selling(&key), Some((id_c,price,id_b)));
+		assert_eq!(Anchor::owner(&key), Some((id_c,start_block)));
+
+		assert_ok!(
+			Anchor::buy_anchor(account_b.clone(),key.clone())
+		);
+		assert_eq!(Anchor::selling(&key), None);
+		assert_eq!(Anchor::owner(&key), Some((id_b,start_block)));
 	});
 }
