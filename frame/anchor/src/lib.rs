@@ -192,6 +192,9 @@ pub mod pallet {
 					d.1 = current_block_number;
 					Ok(())
 				})?;
+
+				//<AnchorOwner<T>>::remove(&nkey);
+				//<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
 			}
 
 			Ok(())
@@ -204,7 +207,7 @@ pub mod pallet {
 		pub fn sell_anchor(
 			origin: OriginFor<T>, 
 			key: Vec<u8>, 
-			cost: u32, 
+			price: u32, 
 			target:<T::Lookup as StaticLookup>::Source		//select from exist accounts.
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
@@ -212,7 +215,7 @@ pub mod pallet {
 
 			//1.param check		
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
-			ensure!(cost > 0 || cost == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
+			ensure!(price > 0 || price == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
 
 			//1.1.lowercase fix
 			let mut nkey:Vec<u8>;
@@ -224,8 +227,8 @@ pub mod pallet {
 			ensure!(sender==owner.0, <Error<T>>::AnchorNotBelogToAccount);
 
 			//4.put in sell list
-			<SellList<T>>::insert(nkey, (&sender, cost, &target)); 			
-			Self::deposit_event(Event::AnchorToSell(sender,cost,target));
+			<SellList<T>>::insert(nkey, (&sender, price, &target)); 			
+			Self::deposit_event(Event::AnchorToSell(sender,price,target));
 			Ok(())
 		}
 
@@ -274,8 +277,6 @@ pub mod pallet {
 			ensure!(res.is_ok(), Error::<T>::TransferFailed);
 
 			//2.change the owner of anchor 
-			
-			//FIXME: the same issue need to modify.
 			<AnchorOwner<T>>::try_mutate(&nkey, |status| -> DispatchResult {
 				let d = status.as_mut().ok_or(Error::<T>::UnexceptDataError)?;
 				d.0 = sender;
@@ -287,7 +288,6 @@ pub mod pallet {
 
 			//<AnchorOwner<T>>::remove(&nkey);
 			//<AnchorOwner<T>>::insert(&nkey, (&sender,owner.1));
-
 			Ok(())
 		}
 

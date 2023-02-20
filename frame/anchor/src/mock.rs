@@ -89,9 +89,10 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	//set account balance
 	pallet_balances::GenesisConfig::<Test> {
 		balances: vec![
-			(11, 2000),
+			(11, 1000),
 			(22, 2000),
-			(33, 2000),
+			(33, 3000),
+			(44, 199),
 		],
 	}
 	.assimilate_storage(&mut t)
