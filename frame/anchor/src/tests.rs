@@ -281,6 +281,7 @@ fn buy_anchor() {
 		assert_eq!(Anchor::selling(&key), Some((id_c,price,id_b)));
 		assert_eq!(Anchor::owner(&key), Some((id_c,start_block)));
 
+		//8. try to buy targeted anchor
 		assert_noop!(
 			Anchor::buy_anchor(account_a.clone(),key.clone()),
 			Error::<Test>::OnlySellToTargetBuyer,
@@ -288,6 +289,7 @@ fn buy_anchor() {
 		assert_eq!(Anchor::selling(&key), Some((id_c,price,id_b)));
 		assert_eq!(Anchor::owner(&key), Some((id_c,start_block)));
 
+		//9. done!
 		assert_ok!(
 			Anchor::buy_anchor(account_b.clone(),key.clone())
 		);

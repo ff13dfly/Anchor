@@ -1,19 +1,14 @@
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 
-//use codec::{Encode};
 use frame_support::{
 	dispatch::{DispatchResult},
 	traits::{Currency,ExistenceRequirement},
 	weights::Weight,
 };
 use frame_system::ensure_signed;
-//use scale_info::TypeInfo;
 use sp_runtime::{
 	traits::{SaturatedConversion,StaticLookup},
-	// transaction_validity::{
-	// 	InvalidTransaction, TransactionValidity, TransactionValidityError, ValidTransaction,
-	// },
 };
 use sp_std::{convert::TryInto, prelude::*};
 pub use pallet::*;
@@ -23,11 +18,6 @@ mod benchmarking;
 mod mock;
 #[cfg(test)]
 mod tests;
-
-// #[cfg(std)]
-// mod mock;
-// #[cfg(std)]
-// mod tests;
 
 pub mod weights;
 pub use weights::*;
@@ -107,8 +97,6 @@ pub mod pallet {
 		///Anchor was set to sell to target buyer
 		OnlySellToTargetBuyer,
 	}
-
-	//这里的数据将写到chain上
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -235,7 +223,6 @@ pub mod pallet {
 			Ok(())
 		}
 
-		//TODO: check balance before buying.
 		//buy an anchor from sell list.
  		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
@@ -266,8 +253,6 @@ pub mod pallet {
 			//0.3.check anchor owner
 			let _owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 
-			
-
 			//1.transfer specail amout to seller
 			let amount= anchor.1;
 			let basic:u128=1000000000000;
@@ -276,6 +261,7 @@ pub mod pallet {
 			//1.1.check balance
 			ensure!(T::Currency::free_balance(&sender) >= tx.saturated_into(), Error::<T>::InsufficientBalance);
 
+			//1.2.do transfer
 			let res=T::Currency::transfer(
 				&sender,		//transfer from
 				&anchor.0,		//transfer to
@@ -293,9 +279,6 @@ pub mod pallet {
 				<SellList<T>>::remove(&nkey);
 				Ok(())
 			})?;
-
-			//<AnchorOwner<T>>::remove(&nkey);
-			//<AnchorOwner<T>>::insert(&nkey, (&sender,owner.1));
 			Ok(())
 		}
 
@@ -329,5 +312,4 @@ pub mod pallet {
 			Ok(())
 		}
 	}
-
 }
