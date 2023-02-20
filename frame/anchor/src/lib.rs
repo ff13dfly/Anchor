@@ -86,6 +86,9 @@ pub mod pallet {
 		///Anchor do not exist, can not change status.
 		AnchorNotExists,
 
+		///unknown anchor owner data in storage.
+		UnexceptDataError,
+
 		///Anchor do not belong to the account
 		AnchorNotBelogToAccount,
 
@@ -178,17 +181,20 @@ pub mod pallet {
 
 				//2.1.create new anchor
 				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
-
+				
 			}else{
 				//2.2.update exists anchor
 				let owner=data.ok_or(Error::<T>::AnchorNotExists)?;
 				ensure!(sender == owner.0, Error::<T>::AnchorNotBelogToAccount);
 				ensure!(pre == owner.1, Error::<T>::PreAnchorFailed);
 
-				<AnchorOwner<T>>::remove(&nkey);
-				<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
+				<AnchorOwner<T>>::try_mutate(&nkey, |status| -> DispatchResult {
+					let d = status.as_mut().ok_or(Error::<T>::UnexceptDataError)?;
+					d.1 = current_block_number;
+					Ok(())
+				})?;
 			}
-			
+
 			Ok(())
 		}
 
@@ -269,6 +275,9 @@ pub mod pallet {
 			ensure!(res.is_ok(), Error::<T>::TransferFailed);
 
 			//2.change the owner of anchor 
+			
+			//FIXME: the same issue need to modify.
+
 			<AnchorOwner<T>>::remove(&nkey);
 			<AnchorOwner<T>>::insert(&nkey, (&sender,owner.1));
 
