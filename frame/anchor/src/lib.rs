@@ -170,8 +170,7 @@ pub mod pallet {
 			let data = <AnchorOwner<T>>::get(&nkey); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
 
-			// FIXME: can not run properly on testing
-			log::info!("current_block_number is {:?}", current_block_number);
+			//log::info!("current_block_number is {:?}", current_block_number);
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
@@ -259,7 +258,7 @@ pub mod pallet {
 			}
 
 			//0.3.check anchor owner
-			let owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
+			let _owner=<AnchorOwner<T>>::get(&nkey).ok_or(Error::<T>::AnchorNotExists)?;
 
 			//1.transfer specail amout to seller
 			let amount= anchor.1;
@@ -277,12 +276,17 @@ pub mod pallet {
 			//2.change the owner of anchor 
 			
 			//FIXME: the same issue need to modify.
+			<AnchorOwner<T>>::try_mutate(&nkey, |status| -> DispatchResult {
+				let d = status.as_mut().ok_or(Error::<T>::UnexceptDataError)?;
+				d.0 = sender;
 
-			<AnchorOwner<T>>::remove(&nkey);
-			<AnchorOwner<T>>::insert(&nkey, (&sender,owner.1));
+				//3.remove the anchor from sell list
+				<SellList<T>>::remove(&nkey);
+				Ok(())
+			})?;
 
-			//3.remove the anchor from sell list
-			<SellList<T>>::remove(nkey);
+			//<AnchorOwner<T>>::remove(&nkey);
+			//<AnchorOwner<T>>::insert(&nkey, (&sender,owner.1));
 
 			Ok(())
 		}
