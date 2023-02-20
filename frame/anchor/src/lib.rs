@@ -24,6 +24,11 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
+// #[cfg(std)]
+// mod mock;
+// #[cfg(std)]
+// mod tests;
+
 pub mod weights;
 pub use weights::*;
 
@@ -161,6 +166,9 @@ pub mod pallet {
 
 			let data = <AnchorOwner<T>>::get(&nkey); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
+
+			// FIXME: can not run properly on testing
+			log::info!("current_block_number is {:?}", current_block_number);
 
 			//2.check anchor to determine add or update
 			if data.is_none() {

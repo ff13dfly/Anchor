@@ -298,6 +298,8 @@ wasmi = { opt-level = 3 }
 x25519-dalek = { opt-level = 3 }
 yamux = { opt-level = 3 }
 zeroize = { opt-level = 3 }
+# FIXME: This is just for console log, remove it when building
+log={ opt-level = 3 }
 
 [profile.release]
 # Substrate runtime requires unwinding.
