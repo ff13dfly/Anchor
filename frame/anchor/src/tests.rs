@@ -1,133 +1,13 @@
 // This file is part of Substrate.
-
-// Copyright (C) 2019-2022 Parity Technologies (UK) Ltd.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-//! Tests for pallet-example-basic.
-
-use crate::*;
+use super::*;
+use crate::mock::*;
 use frame_support::{
-	assert_ok,
-	assert_noop,
-	//dispatch::{DispatchInfo},
-	parameter_types,
-	traits::{ConstU64},
-	//assert_noop, 
-	//error::BadOrigin
-};
-use sp_core::H256;
-// The testing primitives are very useful for avoiding having to work with signatures
-// or public keys. `u64` is used as the `AccountId` and no `Signature`s are required.
-use sp_runtime::{
-	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup},
-	//BuildStorage,
-};
-//use sp_runtime::print;
+	assert_noop, 
+	assert_ok, 
+	error::BadOrigin};
+use frame_system::{EventRecord, Phase};
 
-use sp_std::convert::{TryFrom, TryInto};
 
-// Reexport crate as its pallet name for construct_runtime.
-use crate as pallet_anchor;
-
-type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
-type Block = frame_system::mocking::MockBlock<Test>;
-
-// For testing the pallet, we construct a mock runtime.
-frame_support::construct_runtime!(
-	pub enum Test where
-		Block = Block,
-		NodeBlock = Block,
-		UncheckedExtrinsic = UncheckedExtrinsic,
-	{
-		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
-		Anchor: pallet_anchor::{Pallet, Call, Storage, Config<T>, Event<T>},
-	}
-);
-
-parameter_types! {
-	pub BlockWeights: frame_system::limits::BlockWeights =
-		frame_system::limits::BlockWeights::simple_max(frame_support::weights::Weight::from_ref_time(1024));
-}
-impl frame_system::Config for Test {
-	type BaseCallFilter = frame_support::traits::Everything;
-	type BlockWeights = ();
-	type BlockLength = ();
-	type DbWeight = ();
-	type RuntimeOrigin = RuntimeOrigin;
-	type Index = u64;
-	type BlockNumber = u64;
-	type Hash = H256;
-	type RuntimeCall = RuntimeCall;
-	type Hashing = BlakeTwo256;
-	type AccountId = u64;
-	type Lookup = IdentityLookup<Self::AccountId>;
-	type Header = Header;
-	type RuntimeEvent = RuntimeEvent;
-	type BlockHashCount = ConstU64<250>;
-	type Version = ();
-	type PalletInfo = PalletInfo;
-	type AccountData = pallet_balances::AccountData<u64>;
-	type OnNewAccount = ();
-	type OnKilledAccount = ();
-	type SystemWeightInfo = ();
-	type SS58Prefix = ();
-	type OnSetCode = ();
-	type MaxConsumers = frame_support::traits::ConstU32<16>;
-}
-
-impl pallet_balances::Config for Test {
-	type MaxLocks = ();
-	type MaxReserves = ();
-	type ReserveIdentifier = [u8; 8];
-	type Balance = u64;
-	type DustRemoval = ();
-	type RuntimeEvent = RuntimeEvent;
-	type ExistentialDeposit = ConstU64<1>;
-	type AccountStore = System;
-	type WeightInfo = ();
-}
-
-impl Config for Test {
-	//type MagicNumber = ConstU64<1_000_000_000>;
-	type Currency = Balances;
-	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = ();
-}
-
-// This function basically just builds a genesis storage key/value store according to
-// our desired mockup.
-pub fn new_test_ext() -> sp_io::TestExternalities {
-	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
-
-	//set account balance
-	pallet_balances::GenesisConfig::<Test> {
-		balances: vec![
-			(11, 2000),
-			(22, 2000),
-			(33, 2000),
-		],
-	}
-	.assimilate_storage(&mut t)
-	.unwrap();
-
-	let mut ext = sp_io::TestExternalities::new(t);
-	ext.execute_with(|| System::set_block_number(1));
-	ext
-}
 
 //substrate document
 //https://docs.substrate.io/test/unit-testing/
@@ -149,7 +29,7 @@ fn set_anchor() {
 		System::set_block_number(start_block.clone()); 	//need to start
 
 		// set_anchor data.
-		let key=vec![72,105];						//anchor name : Hi
+		let key=vec![72,105];						//anchor name : Hi   //b"Hi" ?
 		let raw=vec![84,101,115,116,46,46,46];		//raw data : Test...
 		let protocol=vec![78,111,110,101];			//protocol data : None
 		let account_a=RuntimeOrigin::signed(11);	//test account A

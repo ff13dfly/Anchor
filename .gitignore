@@ -12,6 +12,7 @@ shell.nix
 /docker/
 /scripts/
 .vscode
+/frame/anchor/src/backup
 
 /frame/alliance
 /frame/assets
