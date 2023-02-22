@@ -66,8 +66,6 @@ Just locate it to "alliance: Default::default()", paste the code there, done.
 anchor:Default::default(),
 ```
 
-## Docker testing
-
 ### Issues about Rust & Substrate
 
 * Set up Rust environment. It is popular and you will find a lot of resource to learn about it. Only one suggestion myself, be patient instead of being crazy.
@@ -97,7 +95,7 @@ target/substrate --dev --state-pruning archive
 
 * Explorer Substrate
 
-
+## Docker testing
 
 ## API calls
 

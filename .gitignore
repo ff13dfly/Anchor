@@ -9,7 +9,7 @@ shell.nix
 /simnet_tests/
 /utils/
 /target/
-/docker/
+/docker/backup/
 /scripts/
 .vscode
 /frame/anchor/src/backup

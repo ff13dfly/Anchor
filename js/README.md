@@ -4,7 +4,7 @@
 
 Anchor.js is a library to access Anchor pallet which supply the On-chain Linked List function. There are two main parts of anchor.js, storage and market.
 
-## Functions
+## Methods
 
 ### Storage part
 
