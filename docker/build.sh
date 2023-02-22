@@ -21,6 +21,10 @@ echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
 time docker build -f ./docker/substrate_builder.Dockerfile -t ${GITUSER}/${GITREPO}:latest .
 docker tag ${GITUSER}/${GITREPO}:latest ${GITUSER}/${GITREPO}:v${VERSION}
 
+echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
+time docker build -f ./docker/substrate_builder.Dockerfile -t ff13dfly/anchor:latest .
+docker tag Anchor:latest Anchor:v${VERSION}
+
 # Show the list of available images for this repo
 echo "Image is ready"
 docker images | grep ${GITREPO}

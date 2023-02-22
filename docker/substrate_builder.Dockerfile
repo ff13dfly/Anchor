@@ -5,13 +5,18 @@ WORKDIR /substrate
 
 #Copy all files to substrate, can combine code here.
 
-#RUN git clone https://github.com/paritytech/substrate
-#RUN
+RUN git clone https://github.com/ff13dfly/Anchor
+
+#Copy the deploy files to target folder
+
 
 COPY . /substrate	
 
+# docker run -t -i 9ddeb8c05d767e0b710e657ccd915fa36d5ebc478d92ce39a2ab632e5b0b6182 /bin/bash 
+# docker run -it parity/substrate /bin/bash
+# docker run -it ff13dfly/anchor /bin/bash
 
-RUN cargo build --locked --release
+#RUN cargo build --locked --release
 
 # This is the 2nd stage: a very small image where we copy the Substrate binary."
 FROM docker.io/library/ubuntu:20.04
@@ -23,21 +28,23 @@ LABEL description="Multistage Docker image for Substrate: a platform for web3" \
 	io.parity.image.source="https://github.com/paritytech/polkadot/blob/${VCS_REF}/docker/substrate_builder.Dockerfile" \
 	io.parity.image.documentation="https://github.com/paritytech/polkadot/"
 
-COPY --from=builder /substrate/target/release/substrate /usr/local/bin
-COPY --from=builder /substrate/target/release/subkey /usr/local/bin
-COPY --from=builder /substrate/target/release/node-template /usr/local/bin
-COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
+#COPY --from=builder /substrate/target/release/substrate /usr/local/bin
+#COPY --from=builder /substrate/target/release/subkey /usr/local/bin
+#COPY --from=builder /substrate/target/release/node-template /usr/local/bin
+#COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
 
-RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate && \
-	mkdir -p /data /substrate/.local/share/substrate && \
-	chown -R substrate:substrate /data && \
-	ln -s /data /substrate/.local/share/substrate && \
-# unclutter and minimize the attack surface
-	rm -rf /usr/bin /usr/sbin && \
-# Sanity checks
+#RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate && \
+#	mkdir -p /data /substrate/.local/share/substrate && \
+#	chown -R substrate:substrate /data && \
+#	ln -s /data /substrate/.local/share/substrate && \
+
+## unclutter and minimize the attack surface
+#	rm -rf /usr/bin /usr/sbin && \
+## Sanity checks
 	#ldd /usr/local/bin/substrate && \
-	/usr/local/bin/substrate --version
+	#/usr/local/bin/substrate --version
 
+RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate
 USER substrate
 EXPOSE 30333 9933 9944 9615
 VOLUME ["/data"]
