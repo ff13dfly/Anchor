@@ -17,13 +17,14 @@ GITREPO=substrate
 # ANCHORREPO=Anchor
 
 # Build the image
-echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
-time docker build -f ./docker/substrate_builder.Dockerfile -t ${GITUSER}/${GITREPO}:latest .
-docker tag ${GITUSER}/${GITREPO}:latest ${GITUSER}/${GITREPO}:v${VERSION}
+#echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
+#time docker build -f ./docker/substrate_builder.Dockerfile -t ${GITUSER}/${GITREPO}:latest .
+#docker tag ${GITUSER}/${GITREPO}:latest ${GITUSER}/${GITREPO}:v${VERSION}
 
-echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
-time docker build -f ./docker/substrate_builder.Dockerfile -t ff13dfly/anchor:latest .
-docker tag Anchor:latest Anchor:v${VERSION}
+echo "Building from ${GITUSER}/${GITREPO}:latest docker image, hang on!"
+echo "Anchor pallet will be combine to the substrate and build."
+time docker build -f ./docker/substrate_builder.Dockerfile -t ff13dfly/test:latest .
+docker tag anchor:latest anchor:v${VERSION}
 
 # Show the list of available images for this repo
 echo "Image is ready"

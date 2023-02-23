@@ -1,4 +1,10 @@
-# Substrate Builder Docker Image
+# Anchor Pallet Docker Image
+
+## Anchor Pallet
+
+There are two parts of Anchor pallet, substrate binaries with Anchor pallet and playground for Anchor pallet.
+
+## Substrate Builder Docker Image
 
 The Docker image in this folder is a `builder` image. It is self contained and allow users to build the binaries themselves.
 There is no requirement on having Rust or any other toolchain installed but a working Docker environment.
