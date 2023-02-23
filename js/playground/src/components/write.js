@@ -1,10 +1,26 @@
 import { Container,Row, Col,Button, Form} from 'react-bootstrap';
-import { useEffect } from 'react';
+import { useEffect,useState } from 'react';
 
 function Write(props) {
+  let [name,setName]=useState("");
+  let [raw,setRaw]=useState("");
+  let [protocol,setProtocol]=useState("");
+
   const self={
+    changeName:(ev)=>{
+      setName(ev.target.value);
+    },
+    changeRaw:(ev)=>{
+      setRaw(ev.target.value);
+    },
+    changeProtocol:(ev)=>{
+      setProtocol(ev.target.value);
+    },
     onSave:()=>{
-      console.log('click me');
+      console.log(`Ready to write.`);
+      console.log({name});
+      console.log({raw});
+      console.log({protocol});
     },
   };
 
@@ -35,13 +51,13 @@ function Write(props) {
         <Col lg={5} xs={12} className="pt-4">
           <Row>
             <Col lg={12} xs={12} className="pt-2" >
-              <Form.Control size="md" type="text" placeholder="Anchor name..."/>
+              <Form.Control size="md" type="text" placeholder="Anchor name..." onChange={(ev) => { self.changeName(ev) }}/>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <Form.Control as="textarea" rows={3} placeholder="Raw data..."/>
+              <Form.Control as="textarea" rows={3} placeholder="Raw data..." onChange={(ev) => { self.changeRaw(ev) }}/>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <Form.Control size="md" type="text" placeholder="Protocol..." onChange={(ev) => { self.onChange(ev) }} />
+              <Form.Control size="md" type="text" placeholder="Protocol..." onChange={(ev) => { self.changeProtocol(ev) }} />
             </Col>
             <Col lg={12} xs={12} className="text-end pt-2" >
               <Button size="md" variant="primary" onClick={() => { self.onSave() }} > Write to Chain </Button>

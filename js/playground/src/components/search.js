@@ -1,10 +1,15 @@
 import { Container,Row, Col,Button, Form,Badge,Card} from 'react-bootstrap';
-import { useEffect } from 'react';
+import { useEffect,useState } from 'react';
 
 function Search(props) {
+  let [name,setName]=useState("");
+
   const self={
     onSave:()=>{
-      console.log('click me');
+      console.log(`Searching:${name}`);
+    },
+    onChange:(ev)=>{
+      setName(ev.target.value);
     },
   };
 

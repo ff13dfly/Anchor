@@ -1,4 +1,5 @@
 let wsAPI = null;
+let keyring=null;
 let unlistening = null;
 
 const limits={
@@ -18,6 +19,9 @@ const self = {
     },
 	setWebsocket: (ws) => {
 		wsAPI = ws;
+	},
+	setKeyring:(ks)=>{
+		keyring=ks;
 	},
 	unlistening:(ck)=>{
 		if(unlistening!==null) unlistening();
@@ -176,6 +180,7 @@ const self = {
 		return arr;
 	},
 	
+	// TODO: need to page and step
 	market: (ck) => {
 		if (wsAPI === null) return ck && ck(false);
 		wsAPI.query.anchor.sellList.entries().then((arr) => {
@@ -204,29 +209,9 @@ const self = {
 		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
 			unsub();	//关闭anchorOwner的订阅
 			const pre = res.isEmpty?0:res.value[1].words[0];
-			//console.log(wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre));
-			// console.log(wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).paymentInfo);
-			// wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).paymentInfo(pair,(res)=>{
-			// 	console.log(res);
-			// });
-			// wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
-			// 	return ck && ck(res);
-			// }).then().catch((err)=>{
-			// 	console.log(err);
-			// });
-
-			//下面注释掉的代码，没有办法捕捉错误的
-			// try {
-			// 	wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
-			// 		console.log(res);
-			// 		return ck && ck(res);
-			// 	});
-			// } catch (error) {
-			// 	return ck && ck({error:'Failed to write.'});
-			// }
 
 			//部署的会报错的代码
-			//TODO:重要！看了Polkadot自己的代码，可能本来就有问题在signAndSend上，捕获不到错误。可以考虑升级版本来处理。
+			//TODO: signAndSend througt 1010 error
 			return wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
 				return ck && ck(res);
 			});
@@ -274,6 +259,9 @@ const self = {
 		}).then((fun)=>{
 			unsub=fun;
 		});
+	},
+	load:(encryJSON,pass,ck)=>{
+
 	},
 	clean: () => {
 		if (unlistening != null) {
@@ -379,25 +367,20 @@ const self = {
 	},
 };
 
-const Direct = {
-	set: {
-		websocket: self.setWebsocket,
-	},
-	common: {
-		balance: self.balance,
-		search: self.latest,
-		multi: self.multi,
-		target:self.target,
-		history: self.history,
-		write: self.write,
-		sell: self.sell,
-		unsell:self.unsell,
-		buy: self.buy,
-		market: self.market,
-		list:self.list,
-		subscribe: self.listening,
-		clean: self.clean,
-	},
-};
+exports.anchorJS={
+	set:self.setWebsocket,		//cache the linker promise object
+	subcribe:self.listening,	//subcribe the latest block which including anchor data
+	load:self.load,				
+	search:self.latest,
+	balance:self.balance,
 
-export default Direct;
+	write:self.write,
+	latest:self.latest,
+	target:self.target,
+	history:self.history,
+
+	market:self.market,
+	sell:self.sell,
+	unsell:self.unsell,
+	buy:self.buy,
+};
