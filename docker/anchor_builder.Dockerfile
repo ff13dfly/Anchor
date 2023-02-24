@@ -2,32 +2,27 @@
 ##Demo## docker run -it parity/substrate /bin/bash
 ##Demo## docker run -it ff13dfly/anchor /bin/bash
 ##Demo## docker run -it ff13dfly/test /bin/bash
+##Demo## docker exec -it ff13dfly/test sh
+
 
 # This is the build stage for Substrate. Here we create the binary.
 FROM docker.io/paritytech/ci-linux:production as builder
 
 WORKDIR /substrate
+COPY . /substrate
 
 #Combine Anchor pallet code to substrate
+RUN git clone https://github.com/ff13dfly/Anchor
 
-RUN mkdir Anchor \
-&& pwd \
-#&& cp -r /Users/fuzhongqiang/Desktop/www/Anchor/* Anchor/ \ 
-#RUN git clone https://github.com/ff13dfly/Anchor \ 
-#&&	cp -rf Anchor/docker/deploy/Cargo.toml ./Cargo.toml \
-#&&	cp -rf Anchor/docker/deploy/bin_node_cli_src_chain_spec.rs ./bin/node/cli/src/chain_spec.rs \
-#&&	cp -rf Anchor/docker/deploy/bin_node_runtime_Cargo.toml ./bin/node/runtime/Cargo.toml \
-#&&	cp -rf Anchor/docker/deploy/bin_node_runtime_src_lib.rs ./bin/node/runtime/src/lib.rs \
-#&&	cp -rf Anchor/docker/deploy/bin_node_testing_src_genesis.rs ./bin/node/testing/src/genesis.rs \
-# test command
-#&&	cp Anchor/README.md ./ccc.md \
-# copy playground code
-&&	mkdir playground \
-#&&	cp -r Anchor/js/playground/* playground
-&& pwd
+RUN cp -rf Anchor/docker/deploy/Cargo.toml Cargo.toml 
+RUN cp -rf Anchor/docker/deploy/bin_node_cli_src_chain_spec.rs bin/node/cli/src/chain_spec.rs 
+RUN cp -rf Anchor/docker/deploy/bin_node_runtime_Cargo.toml bin/node/runtime/Cargo.toml
+RUN cp -rf Anchor/docker/deploy/bin_node_runtime_src_lib.rs bin/node/runtime/src/lib.rs
+RUN cp -rf Anchor/docker/deploy/bin_node_testing_src_genesis.rs bin/node/testing/src/genesis.rs
+RUN cp -rf Anchor/frame/anchor/* frame
 
-#Copy the deploy files to target folder
-COPY . /substrate	
+RUN	mkdir playground
+RUN cp -rf Anchor/js/playground/* playground
 
 #RUN cargo build --locked --release
 
@@ -47,21 +42,16 @@ LABEL description="Docker image for Anchor pallet base on substrate: an On-chain
 #COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
 
 #copy playground code
-COPY --from=builder /substrate/ccc.md /home/ccc.md
+#COPY --from=builder /substrate/ccc.md /home/ccc.md
+RUN mkdir /home/playground
+COPY --from=builder /substrate/playground/ /home/playground/
 
-#RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate && \
-#	mkdir -p /data /substrate/.local/share/substrate && \
-#	chown -R substrate:substrate /data && \
-#	ln -s /data /substrate/.local/share/substrate && \
-
-## unclutter and minimize the attack surface
-#	rm -rf /usr/bin /usr/sbin && \
-## Sanity checks
-	#ldd /usr/local/bin/substrate && \
-	#/usr/local/bin/substrate --version
-
-RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate && \
-mkdir /substrate/anchor
+RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate
+RUN mkdir -p /data /substrate/.local/share/substrate
+RUN chown -R substrate:substrate /data
+RUN ln -s /data /substrate/.local/share/substrate
+RUN rm -rf /usr/bin /usr/sbin
+#RUN /usr/local/bin/substrate --version
 
 USER substrate
 
