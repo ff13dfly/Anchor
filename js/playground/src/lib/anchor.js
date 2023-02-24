@@ -55,6 +55,7 @@ const self = {
 		return self.unlistening;		//返回撤销listening的方法
 	},
 	latest: (anchor, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 		let unsub=null;
@@ -70,6 +71,7 @@ const self = {
 		});
 	},
 	target:(anchor,block,ck)=>{
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if (anchor.substr(0, 2) === '0x') anchor = self.decodeUTF8(anchor);
 
@@ -112,6 +114,7 @@ const self = {
 		});
 	},
 	history: (anchor, ck, limit) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 
@@ -182,23 +185,24 @@ const self = {
 	
 	// TODO: need to page and step
 	market: (ck) => {
-		if (wsAPI === null) return ck && ck(false);
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		wsAPI.query.anchor.sellList.entries().then((arr) => {
 			return ck && ck(arr);
 		});
 	},
 	list: ( ck) => {
-		if (wsAPI === null) return ck && ck(false);
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		wsAPI.query.anchor.anchorOwner.entries().then((arr) => {
 			return ck && ck(arr);
 		});
 	},
 	view: (anchor,block,owner,ck)=>{
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		self.target(anchor,block,ck,owner);
 	},
 
 	write: (pair, anchor, raw, protocol, ck) => {
-
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		if (wsAPI === null) return ck && ck(false);
 		if (typeof protocol !== 'string') protocol = JSON.stringify(protocol);
 		if (typeof raw !== 'string') raw = JSON.stringify(raw);
@@ -221,6 +225,7 @@ const self = {
 	},
 	
 	sell: (pair, anchor, cost, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 		if (wsAPI === null) return ck && ck(false);
@@ -229,6 +234,7 @@ const self = {
 		});
 	},
 	unsell:(pair, anchor, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 		if (wsAPI === null) return ck && ck(false);
@@ -237,6 +243,7 @@ const self = {
 		});
 	},
 	buy: (pair, anchor, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 		if (wsAPI === null) return ck && ck(false);
@@ -250,6 +257,7 @@ const self = {
 	},
 	
 	balance: (account, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		if(self.limited(undefined,undefined,undefined,account)) return ck && ck(false);
 		if (wsAPI === null) return ck && ck(false);
 		let unsub=null;

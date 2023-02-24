@@ -13,7 +13,6 @@ function History(props) {
   };
 
 	useEffect(() => {
-    console.log(props.list);
     setList(props.list);
   },[]);
 

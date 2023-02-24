@@ -15,10 +15,10 @@ function Search(props) {
   const self={
     list:(name,cur)=>{
       ankr.history(name,(list)=>{
-        setMore(<History list={list} block={cur} change={self.change} />);
+        setMore(<History list={list} block={cur} change={self.select} />);
       });
     },
-    change:(ev)=>{
+    select:(ev)=>{
       const id=ev.target.id;
       const arr=id.split('_');
       const block=parseInt(arr.pop());
