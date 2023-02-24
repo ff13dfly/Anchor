@@ -47,20 +47,20 @@ function App() {
           break;
 
         case '#write':
-          setView(<Write />);
+          setView(<Write  anchorJS={anchorJS} />);
           break;
         case '#market':
-          setView(<Market />);
+          setView(<Market anchorJS={anchorJS} />);
           break;
         case '#account':
-          setView(<Account />);
+          setView(<Account anchorJS={anchorJS} />);
           break;
         case '#document':
-          setView(<Summary />);
+          setView(<Summary anchorJS={anchorJS} />);
           break;
 
         default:
-          setView(<Search />);
+          setView(<Search anchorJS={anchorJS} />);
           break;
       }
     },
@@ -81,7 +81,7 @@ function App() {
       if(!res) return self.status(`Failed to link to node ${res}`);
       anchorJS.set(wsAPI);
       anchorJS.search("hello",(an)=>{
-        console.log(an);
+        //console.log(an);
       });
     });
   },[]);

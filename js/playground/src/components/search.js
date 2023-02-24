@@ -1,12 +1,41 @@
-import { Container,Row, Col,Button, Form,Badge,Card} from 'react-bootstrap';
+import { Container,Row, Col,Button, Form} from 'react-bootstrap';
 import { useEffect,useState } from 'react';
+
+import Detail from './detail';
+import History from './history';
 
 function Search(props) {
   let [name,setName]=useState("");
+  let [result,setResult]=useState("");
+  let [more, setMore] = useState('');
+
+  const ankr=props.anchorJS;
+  
 
   const self={
+    list:(name,cur)=>{
+      ankr.history(name,(list)=>{
+        setMore(<History list={list} block={cur} change={self.change} />);
+      });
+    },
+    change:(ev)=>{
+      const id=ev.target.id;
+      const arr=id.split('_');
+      const block=parseInt(arr.pop());
+      ankr.target(name,block,(res)=>{
+        setResult((<Detail data={res} anchorJS={props.anchorJS} />));
+        self.list(name,block);
+      });
+    },
     onSave:()=>{
       console.log(`Searching:${name}`);
+      ankr.search(name,(res)=>{
+        setResult((<Detail data={res} anchorJS={props.anchorJS} />));
+        if(res && res.pre!==0){
+          //console.log(`Ready to get list`);
+          self.list(name,res.block);
+        }
+      });
     },
     onChange:(ev)=>{
       setName(ev.target.value);
@@ -14,7 +43,7 @@ function Search(props) {
   };
 
   useEffect(() => {
-    
+    //console.log(ankr);
   },[]);
 
   return (
@@ -27,25 +56,11 @@ function Search(props) {
 					<Button size="lg" variant="primary" onClick={() => { self.onSave() }} > Search </Button>
 				</Col >
 
-        <Col lg={12} xs={12} className="pt-2" >
-          <Row>
-            <Col lg={12} xs={12} className="pt-2" >
-              <h4>Anchor-name <Badge bg="info">On-sell</Badge> </h4>
-            </Col>
-            <Col lg={4} xs={4} className="pt-2" >
-            <Card>
-              <Card.Body>
-                <Card.Title>Block : 123</Card.Title>
-                <Card.Text>
-                  Raw :   <br/>
-                  Protocol : <br/>
-                  Pre: 0<br/>
-                  Owner : <small>5Dt3Diu9becXCqtY2nYucE7DYRaWb7a8V73xuphWeB7MbLVq</small>
-                </Card.Text>
-              </Card.Body>
-            </Card>
-            </Col>
-          </Row>
+        <Col lg={7} xs={12} className="pt-2" >
+          {result}
+        </Col>
+        <Col lg={5} xs={12} className="pt-2" >
+          {more}
         </Col>
 			</Row>
     </Container>

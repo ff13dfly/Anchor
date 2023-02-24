@@ -60,6 +60,10 @@ n latest
 
 ### View chain dada
 
+Browsing data is the enhanced part of anchor.js. By using polkadot.js, it is much complex, becasuse there are much more functions.
+
 ### History data of target Anchor
+
+It is a way to use the history data on chain.
 
 ### Market of Anchor
