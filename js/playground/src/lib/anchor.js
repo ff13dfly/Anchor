@@ -257,7 +257,9 @@ const self = {
 
 		let unsub = null;
 		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
-			unsub();	//关闭anchorOwner的订阅
+			unsub();	//close anchorOwner subcribition
+			const owner=res.value[0].toHuman();
+			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
 			const pre = res.isEmpty?0:res.value[1].words[0];
 			try {
 				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
@@ -270,16 +272,9 @@ const self = {
 			unsub = fun;
 		});
 	},
-	// checkPassword:(json,password)=>{
-	// 	if(!password) return false;
-	// 	const pair = keyRing.createFromJson(json);
-	// 	try {
-	// 		pair.decodePkcs8(password);
-	// 		return pair;
-	// 	} catch (error) {
-	// 		return false;
-	// 	}
-	// },
+	check:(anchor,address,ck)=>{
+
+	},
 	load:(encryJSON,password,ck)=>{
 		if(!password) return false;
 		const pair = keyRing.createFromJson(encryJSON);
@@ -289,9 +284,6 @@ const self = {
 		} catch (error) {
 			return ck && ck(false);
 		}
-	},
-	checkEncry:(json)=>{
-
 	},
 	/************************/
 	/***Anchor market funs***/

@@ -51,9 +51,24 @@ function Write(props) {
       setDisabled(true);
       self.getPair((pair)=>{
         if(pair===false) return false;
-        ankr.write(pair,name,raw, protocol, (status)=>{
-          setInfo(status.toHuman());
-          //console.log(status);
+        ankr.write(pair,name,raw, protocol, (res)=>{
+          if(res.error){
+            setDisabled(false);
+            return setInfo(res.error);
+          } 
+
+          const status=res.status.toHuman();
+          if (typeof (status) == 'string') return setInfo(status);
+
+          if(status.InBlock){
+            setDisabled(false);
+            return setInfo('InBlock, waiting for Finalized');
+          }
+
+          if(status.Finalized){
+            setDisabled(false);
+            return setInfo('Finalized');
+          }
         });
       });
     },
@@ -93,7 +108,7 @@ function Write(props) {
               <small className='text-success'>Password:<span className='text-danger ml-2 mr-2 bg-warning'>123456</span></small>
               <Form.Control size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
-            <Col lg={4} xs={4} className="pt-2" >{info}</Col>
+            <Col lg={8} xs={8} className="pt-2" >{info}</Col>
             <Col lg={4} xs={4} className="text-end pt-2" >
               <Button size="md" variant="primary" disabled={disabled} onClick={() => { self.onSave() }} > Write to Chain </Button>
             </Col>
