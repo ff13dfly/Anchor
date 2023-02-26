@@ -1,23 +1,30 @@
-import { Container,Row, Col,Badge,Card} from 'react-bootstrap';
-import { useEffect } from 'react';
+import { Container, Row, Col, Badge, Card } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 
 function Market(props) {
-  const self={
-    onSave:()=>{
+  let [list, setList] = useState([]);
+
+  const ankr = props.anchorJS;
+
+  const self = {
+    onSave: () => {
       console.log('click me');
     },
   };
 
   useEffect(() => {
-    
-  },[]);
+    ankr.market((res) => {
+      let arr = [{}, {},{}];
+      setList(arr);
+    });
+  }, []);
 
   return (
-    <Container> 
+    <Container>
       <Row>
-      <Col lg={12} xs={12} className="pt-2" >
-          <Row>
-            <Col lg={3} xs={3} className="pt-2" >
+        <Col lg={12} xs={12} className="pt-2" ></Col>
+        {list.map((item, index) => (
+          <Col lg={3} xs={3} className="pt-2" >
             <Card>
               <Card.Body>
                 <Card.Title>
@@ -29,10 +36,9 @@ function Market(props) {
                 </Card.Text>
               </Card.Body>
             </Card>
-            </Col>
-          </Row>
-        </Col>
-			</Row>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 }

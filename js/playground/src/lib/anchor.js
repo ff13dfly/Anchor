@@ -1,5 +1,5 @@
 let wsAPI = null;
-let keyring=null;
+let keyRing=null;
 let unlistening = null;
 
 const limits={
@@ -21,7 +21,17 @@ const self = {
 		wsAPI = ws;
 	},
 	setKeyring:(ks)=>{
-		keyring=ks;
+		keyRing=new ks({ type: 'sr25519' });;
+	},
+	checkPassword:(json,password)=>{
+		if(!password) return false;
+		const pair = keyRing.createFromJson(json);
+		try {
+			pair.decodePkcs8(password);
+			return pair;
+		} catch (error) {
+			return false;
+		}
 	},
 	unlistening:(ck)=>{
 		if(unlistening!==null) unlistening();
@@ -377,6 +387,7 @@ const self = {
 
 exports.anchorJS={
 	set:self.setWebsocket,		//cache the linker promise object
+	setKeyring:self.setKeyring,
 	subcribe:self.listening,	//subcribe the latest block which including anchor data
 	load:self.load,				
 	search:self.latest,

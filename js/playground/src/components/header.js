@@ -17,7 +17,7 @@ function Header(props) {
             <Nav.Link href="#home">Search</Nav.Link>
             <Nav.Link href="#write">Write</Nav.Link>
             <Nav.Link href="#market">Market</Nav.Link>
-            <Nav.Link href="#account">Setting</Nav.Link>
+            <Nav.Link href="#setting">Setting</Nav.Link>
             <Nav.Link href="#document">Document</Nav.Link>
           </Nav>
         </Navbar.Collapse>

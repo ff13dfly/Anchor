@@ -1,16 +1,17 @@
 
 import { useState,useEffect,useCallback} from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { Keyring } from '@polkadot/api';
 
 import Header from './components/header';
 import Search from './components/search';
 import Write from './components/write';
 import Market from './components/market';
-import Account from './components/account';
+import Setting from './components/setting';
 import Summary from './components/summary';
 
 import {Servers} from './config/servers';
-//import {Accounts} from './config/accounts';
+import {Accounts} from './config/accounts';
 
 import {anchorJS} from './lib/anchor';
 
@@ -33,40 +34,31 @@ function App() {
         ApiPromise.create({ provider: provider }).then((api) => {
           if(wsAPI===null) wsAPI=api;
           linking=false;
-          ck && ck(true);
+          return ck && ck(true);
         });
       } catch (error) {
         linking=false;
-        ck && ck(error);
+        return ck && ck(error);
       }
     },
-    router:(page)=>{
-      switch (page) {
-        case '#home':
-          setView(<Search anchorJS={anchorJS} />);
-          break;
-
-        case '#write':
-          setView(<Write  anchorJS={anchorJS} />);
-          break;
-        case '#market':
-          setView(<Market anchorJS={anchorJS} />);
-          break;
-        case '#account':
-          setView(<Account anchorJS={anchorJS} />);
-          break;
-        case '#document':
-          setView(<Summary anchorJS={anchorJS} />);
-          break;
-
-        default:
-          setView(<Search anchorJS={anchorJS} />);
-          break;
-      }
+    router:(hash)=>{
+      const dom=pages[hash]===undefined?pages['#home']:pages[hash];
+      setView(dom);
     },
     status:(info)=>{
       console.log(info);
     },
+    fresh:(node)=>{
+
+    },
+  };
+
+  const pages={
+    '#home':(<Search anchorJS={anchorJS}></Search>),
+    '#write':(<Write  anchorJS={anchorJS} accounts={Accounts}></Write>),
+    '#market':(<Market anchorJS={anchorJS} />),
+    '#setting':(<Setting anchorJS={anchorJS} list={Accounts} server={Servers} fresh={self.fresh}/>),
+    '#document':(<Summary anchorJS={anchorJS} />),
   };
 
   const handleChangeEvent = useCallback(() => {
@@ -80,9 +72,7 @@ function App() {
     self.link(Servers.nodes[0],(res)=>{
       if(!res) return self.status(`Failed to link to node ${res}`);
       anchorJS.set(wsAPI);
-      anchorJS.search("hello",(an)=>{
-        //console.log(an);
-      });
+      anchorJS.setKeyring(Keyring);
     });
   },[]);
 

@@ -22,18 +22,16 @@ function History(props) {
         <h4>History </h4>
     </Col>
     <Col lg={12} xs={12} className="pt-2" >
-    <ListGroup as="ol">
-		{list.map((item,index) => (
-			<ListGroup.Item as="li" id={`${item.name}_${item.block}`} key={index} active={item.block===props.block?true:false} onClick={props.change}>
-				Block : {item.block} , raw length : {item.raw.length} <br/>
-        Owner : {self.shortenAddress(item.signer)}
-			</ListGroup.Item >
-		))}
-    	</ListGroup>
+      <ListGroup as="ol">
+        {list.map((item,index) => (
+          <ListGroup.Item as="li" id={`${item.name}_${item.block}`} key={index} active={item.block===props.block?true:false} onClick={props.change}>
+            Block : {item.block} , raw length : {item.raw.length} <br/>
+            Owner : {self.shortenAddress(item.signer)}
+          </ListGroup.Item >
+        ))}
+      </ListGroup>
     </Col>
     </Row>
-    
-		
 	);
 }
 export default History;

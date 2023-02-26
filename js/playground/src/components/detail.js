@@ -23,14 +23,14 @@ function Detail(props) {
 
   return (
     <Row>
-      <Col lg={12} xs={12} className="pt-2" >
-        <h4>{anchor.name} <Badge bg="info">Block:{anchor.block}</Badge> </h4>
+      <Col lg={12} xs={12} className="pt-2">
+        <h4>{anchor.name}<Badge bg="info">Block:{anchor.block}</Badge></h4>
       </Col>
       <Col lg={6} xs={6} className="pt-2" >
         Node : ws://localhost:9944
       </Col>
       <Col lg={6} xs={6} className="pt-2 text-end" >
-        <a target="_blank" href={URI}>Browse on https://polkadot.js.org/apps/</a>
+        <a target="_blank" rel="noreferrer" href={URI}>Browse on https://polkadot.js.org/apps/</a>
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
         <Card>
