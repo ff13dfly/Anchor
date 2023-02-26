@@ -18,6 +18,9 @@ import {anchorJS} from './lib/anchor';
 let wsAPI=null;
 let linking = false;
 
+//UI documents
+//https://www.react-bootstrap.cn/components/alerts
+
 function App() {
   let [view,setView]=useState('');
   const self={

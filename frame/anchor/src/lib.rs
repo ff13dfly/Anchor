@@ -161,7 +161,9 @@ pub mod pallet {
 			let data = <AnchorOwner<T>>::get(&nkey); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
 
+			// TODO : ensure the account balance is enough, to avoid 1010 error
 			//log::info!("current_block_number is {:?}", current_block_number);
+			//ensure!(T::Currency::free_balance(&sender) >= tx.saturated_into(), Error::<T>::InsufficientBalance);
 
 			//2.check anchor to determine add or update
 			if data.is_none() {

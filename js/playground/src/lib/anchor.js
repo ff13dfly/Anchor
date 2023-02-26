@@ -6,15 +6,19 @@ const limits={
     key:40,					//Max length of anchor name ( ASCII character )
     protocol:256,			//Max length of protocol	
     raw:4*1024*1024,		//Max length of raw data
-	account:48,				//SS58 address length
+	address:48,				//SS58 address length
 };
 
 const self = {
-	limited:(key,proto,raw,account)=>{
+	/************************/
+	/***Params and setting***/
+	/************************/
+
+	limited:(key,raw,protocol,address)=>{
         if(key!==undefined) return key.length>limits.key?true:false;
-        if(proto!==undefined) return proto.length>limits.protocol?true:false;
+        if(protocol!==undefined) return protocol.length>limits.protocol?true:false;
         if(raw!==undefined) return raw.length>limits.raw?true:false;
-		if(account!==undefined) return account.length!==limits.account?true:false;
+		if(address!==undefined) return address.length!==limits.address?true:false;
         return false;
     },
 	setWebsocket: (ws) => {
@@ -23,16 +27,10 @@ const self = {
 	setKeyring:(ks)=>{
 		keyRing=new ks({ type: 'sr25519' });;
 	},
-	checkPassword:(json,password)=>{
-		if(!password) return false;
-		const pair = keyRing.createFromJson(json);
-		try {
-			pair.decodePkcs8(password);
-			return pair;
-		} catch (error) {
-			return false;
-		}
-	},
+
+	/************************/
+	/***Polkadot functions***/
+	/************************/
 	unlistening:(ck)=>{
 		if(unlistening!==null) unlistening();
 		return ck && ck();
@@ -64,6 +62,30 @@ const self = {
 		});
 		return self.unlistening;		//返回撤销listening的方法
 	},
+	clean: () => {
+		if (unlistening != null) {
+			unlistening();
+			unlistening = null;
+		}
+		return true;
+	},
+	balance: (account, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if(self.limited(undefined,undefined,undefined,account)) return ck && ck(false);
+		if (wsAPI === null) return ck && ck(false);
+		let unsub=null;
+		wsAPI.query.system.account(account, (res) => {
+			if(unsub!=null) unsub();
+			return ck && ck(res);
+		}).then((fun)=>{
+			unsub=fun;
+		});
+	},
+
+	/************************/
+	/***Anchor data browse***/
+	/************************/
+
 	latest: (anchor, ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -160,7 +182,10 @@ const self = {
 			},anchor);
 		});
 	},
+	//TODO: [[anchor,block],[anchor,block],...,[anchor,block]], the anchor target list
+	footprint:(anchor,ck)=>{
 
+	},
 	multi: (list,ck,done,map)=>{
 		if(!done) done=[];
 		if(!map) map={};
@@ -189,105 +214,9 @@ const self = {
 			const data=map[(typeof (row) == 'string')?row:(row[0]+'_'+row[1])];
 			arr.push(!data?format(list[i]):data);
 		}
-		//console.log(arr);
 		return arr;
 	},
-	
-	// TODO: need to page and step
-	market: (ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		wsAPI.query.anchor.sellList.entries().then((arr) => {
-			return ck && ck(arr);
-		});
-	},
-	list: ( ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		wsAPI.query.anchor.anchorOwner.entries().then((arr) => {
-			return ck && ck(arr);
-		});
-	},
-	view: (anchor,block,owner,ck)=>{
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		self.target(anchor,block,ck,owner);
-	},
 
-	write: (pair, anchor, raw, protocol, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		if (wsAPI === null) return ck && ck(false);
-		if (typeof protocol !== 'string') protocol = JSON.stringify(protocol);
-		if (typeof raw !== 'string') raw = JSON.stringify(raw);
-
-		if(self.limited(anchor,protocol,raw)) return ck && ck(false);
-
-		let unsub = null;
-		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
-			unsub();	//关闭anchorOwner的订阅
-			const pre = res.isEmpty?0:res.value[1].words[0];
-
-			//部署的会报错的代码
-			//TODO: signAndSend througt 1010 error
-			return wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
-				return ck && ck(res);
-			});
-		}).then((fun)=>{
-			unsub = fun;
-		});
-	},
-	
-	sell: (pair, anchor, cost, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		anchor = anchor.toLocaleLowerCase();
-		if(self.limited(anchor)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
-		wsAPI.tx.anchor.sellAnchor(anchor, cost).signAndSend(pair, (res) => {
-			return ck && ck(res);
-		});
-	},
-	unsell:(pair, anchor, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		anchor = anchor.toLocaleLowerCase();
-		if(self.limited(anchor)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
-		wsAPI.tx.anchor.unsellAnchor(anchor).signAndSend(pair, (res) => {
-			return ck && ck(res);
-		});
-	},
-	buy: (pair, anchor, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		anchor = anchor.toLocaleLowerCase();
-		if(self.limited(anchor)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
-		try {
-			wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (result) => {
-				return ck && ck(result);
-			});
-		} catch (error) {
-			return ck && ck(error);
-		}
-	},
-	
-	balance: (account, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		if(self.limited(undefined,undefined,undefined,account)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
-		let unsub=null;
-		wsAPI.query.system.account(account, (res) => {
-			if(unsub!=null) unsub();
-			return ck && ck(res);
-		}).then((fun)=>{
-			unsub=fun;
-		});
-	},
-	load:(encryJSON,pass,ck)=>{
-
-	},
-	clean: () => {
-		if (unlistening != null) {
-			unlistening();
-			unlistening = null;
-		}
-		return true;
-	},
 	specific:(hash,ck,anchor)=>{
 		if(self.limited(anchor)) return ck && ck(false);
 		wsAPI.rpc.chain.getBlock(hash).then((dt) => {
@@ -316,6 +245,114 @@ const self = {
 		});
 	},
 
+	/**************************/
+	/***Anchor data to chain***/
+	/**************************/
+
+	write: (pair, anchor, raw, protocol, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (typeof protocol !== 'string') protocol = JSON.stringify(protocol);
+		if (typeof raw !== 'string') raw = JSON.stringify(raw);
+		if(self.limited(anchor,raw,protocol)) return ck && ck({error:"Params error"});
+
+		let unsub = null;
+		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
+			unsub();	//关闭anchorOwner的订阅
+			const pre = res.isEmpty?0:res.value[1].words[0];
+			try {
+				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
+					return ck && ck(res);
+				});
+			} catch (error) {
+				return ck && ck({error:error});
+			}
+		}).then((fun)=>{
+			unsub = fun;
+		});
+	},
+	// checkPassword:(json,password)=>{
+	// 	if(!password) return false;
+	// 	const pair = keyRing.createFromJson(json);
+	// 	try {
+	// 		pair.decodePkcs8(password);
+	// 		return pair;
+	// 	} catch (error) {
+	// 		return false;
+	// 	}
+	// },
+	load:(encryJSON,password,ck)=>{
+		if(!password) return false;
+		const pair = keyRing.createFromJson(encryJSON);
+		try {
+			pair.decodePkcs8(password);
+			return ck && ck(pair);
+		} catch (error) {
+			return ck && ck(false);
+		}
+	},
+	checkEncry:(json)=>{
+
+	},
+	/************************/
+	/***Anchor market funs***/
+	/************************/
+	
+	// TODO: need to page and step
+	market: (ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		wsAPI.query.anchor.sellList.entries().then((arr) => {
+			return ck && ck(arr);
+		});
+	},
+	// list: ( ck) => {
+	// 	if(wsAPI===null) return ck && ck({error:"No websocke link."});
+	// 	wsAPI.query.anchor.anchorOwner.entries().then((arr) => {
+	// 		return ck && ck(arr);
+	// 	});
+	// },
+	// view: (anchor,block,owner,ck)=>{
+	// 	if(wsAPI===null) return ck && ck({error:"No websocke link."});
+	// 	self.target(anchor,block,ck,owner);
+	// },
+
+	
+	
+	sell: (pair, anchor, cost, target, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		anchor = anchor.toLocaleLowerCase();
+		if(self.limited(anchor)) return ck && ck(false);
+		if (wsAPI === null) return ck && ck(false);
+		wsAPI.tx.anchor.sellAnchor(anchor,cost,target).signAndSend(pair, (res) => {
+			return ck && ck(res);
+		});
+	},
+	unsell:(pair, anchor, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		anchor = anchor.toLocaleLowerCase();
+		if(self.limited(anchor)) return ck && ck(false);
+		if (wsAPI === null) return ck && ck(false);
+		wsAPI.tx.anchor.unsellAnchor(anchor).signAndSend(pair, (res) => {
+			return ck && ck(res);
+		});
+	},
+	buy: (pair, anchor, ck) => {
+		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		anchor = anchor.toLocaleLowerCase();
+		if(self.limited(anchor)) return ck && ck(false);
+		if (wsAPI === null) return ck && ck(false);
+		try {
+			wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (result) => {
+				return ck && ck(result);
+			});
+		} catch (error) {
+			return ck && ck(error);
+		}
+	},
+	
+	
+	/************************/
+	/***Anchor data format***/
+	/************************/
 	decor:(data)=>{
 		if(data.key.substr(0, 2).toLowerCase() === '0x') data.key=self.decodeUTF8(data.key);
 		if(data.raw.substr(0, 2).toLowerCase() === '0x') data.raw = self.decodeUTF8(data.raw);
@@ -330,7 +367,7 @@ const self = {
 		}
 		data.pre=parseInt(data.pre.replace(/,/gi, ''));
 		
-		//扩展部分的数据处理
+		//remove the thound seperetor
 		if(data.block) data.block=parseInt(data.block.replace(/,/gi, ''));
 		return data;
 	},
@@ -387,16 +424,19 @@ const self = {
 
 exports.anchorJS={
 	set:self.setWebsocket,		//cache the linker promise object
-	setKeyring:self.setKeyring,
+	setKeyring:self.setKeyring,	//set Keyring to get pair
 	subcribe:self.listening,	//subcribe the latest block which including anchor data
-	load:self.load,				
+	load:self.load,						
 	search:self.latest,
 	balance:self.balance,
 
-	write:self.write,
 	latest:self.latest,
 	target:self.target,
 	history:self.history,
+	multi:self.multi,
+	footprint:self.footprint,
+
+	write:self.write,
 
 	market:self.market,
 	sell:self.sell,
