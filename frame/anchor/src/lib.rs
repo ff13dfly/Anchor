@@ -1,3 +1,39 @@
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! # Anchor Pallet
+//! Anchor is an On-chain Linked List system base on substrate. 
+//! On another hand, Anchor can alse be treated as Name Service or On-chain Key-value Storage.
+//!
+//! ## Overview
+//! There are two main parts storage and market of Anchor pallet. 
+//! 1.Storage part: set_anchor.
+//! 2.Market part: sell_anchor,unsell_anchor,buy_anchor.
+//!
+//! ### Terminology
+//! - Anchor: The unique key which store data on chain.
+//! - Raw : 4M bytes max string storage, UTF8 support.
+//! - Protocol: 256 bytes max string, customize protocol.
+//! - Pre: block number linked to previous anchor storage.
+//! 
+//! ## Interface
+//! * set_anchor, one method to update and init storage.
+//! * sell_anchor, sell anchor freely or to target account
+//! * unsell_anchor, revoke selling status
+//! * buy_anchor, buy a selling anchor
+//! 
+
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 
@@ -21,7 +57,6 @@ mod tests;
 
 pub mod weights;
 pub use weights::*;
-
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -98,16 +133,20 @@ pub mod pallet {
 		OnlySellToTargetBuyer,
 	}
 
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		AnchorToSell(T::AccountId,u32,T::AccountId),	//( owner, cost , target account , preview block )
+		/// An anchor is set to selling status.
+		AnchorToSell(T::AccountId,u32,T::AccountId),	//(owner, price , target)
 	}
 
+	/// Hashmap to record anchor status, Anchor => ( Owner, last block )
 	#[pallet::storage]
 	#[pallet::getter(fn owner)]
 	pub(super) type AnchorOwner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId,T::BlockNumber)>;
 
+	/// Selling anchor status, Anchor => ( Owner, Price, Target customer )
 	#[pallet::storage]
 	#[pallet::getter(fn selling)]
 	pub(super) type SellList<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (T::AccountId, u32,T::AccountId)>;
@@ -134,7 +173,7 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		//set a new anchor or update an exist anchor
+		/// set a new anchor or update an exist anchor
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
@@ -193,7 +232,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		//put an anchor to sell list
+		/// Set anchor to sell status and added to sell list
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_sell()
 		)]
@@ -225,7 +264,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		//buy an anchor from sell list.
+		/// buy an anchor on-sell.
  		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
 		)]
@@ -284,7 +323,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		//remove anchor from sell list
+		/// Revoke anchor from selling status
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_unsell()
 		)]

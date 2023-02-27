@@ -73,7 +73,7 @@ function Write(props) {
           if(status.Finalized){
             self.render();
             setDisabled(false);
-            self.clear();
+            //self.clear();
             return setInfo('Finalized');
           }
         });
