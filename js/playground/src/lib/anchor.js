@@ -92,6 +92,7 @@ const self = {
 			unsub();
 			if(res.isEmpty) return ck && ck(false);
 			const owner=res.value[0].toHuman();
+			//const block = res.value[1].words[0];
 			return ck && ck(owner);
 		}).then((fun)=>{
 			unsub = fun;
@@ -198,6 +199,7 @@ const self = {
 
 	},
 	multi: (list,ck,done,map)=>{
+		if(list.length===0) return [];
 		if(!done) done=[];
 		if(!map) map={};
 
@@ -343,7 +345,7 @@ const self = {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		console.log(anchor);
-		if(self.limited(anchor)) return ck && ck(false);
+		if(self.limited(anchor)) return ck && ck({error:"Name error"});
 		self.owner(anchor,(owner)=>{
 			if(!owner) return ck && ck({error:"No such anchor."});
 			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
@@ -355,15 +357,21 @@ const self = {
 	buy: (pair, anchor, ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
-		if(self.limited(anchor)) return ck && ck(false);
+		if(self.limited(anchor)) return ck && ck({error:"Name error"});
 
-		try {
-			wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (result) => {
-				return ck && ck(result);
+		self.owner(anchor,(owner)=>{
+			if(owner===pair.address) return ck && ck({error:"Your own anchor"});
+			wsAPI.query.anchor.sellList(anchor, (dt) => {
+				if (dt.value.isEmpty) return ck && ck({error:`'${anchor}' is not on sell`});
+				try {
+					wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (result) => {
+						return ck && ck(result);
+					});
+				} catch (error) {
+					return ck && ck(error);
+				}
 			});
-		} catch (error) {
-			return ck && ck(error);
-		}
+		});
 	},
 	
 	

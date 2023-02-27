@@ -1,4 +1,4 @@
-import { Container,Row, Col,Button, Form} from 'react-bootstrap';
+import { Container,Row, Col,Badge,Button, Form} from 'react-bootstrap';
 import { useEffect,useState } from 'react';
 
 import History from './history';
@@ -16,6 +16,7 @@ function Write(props) {
   let [more, setMore] = useState("");
   let [disabled,setDisabled]= useState(false);
   let [info,setInfo]=useState('');
+  let [remind,setRemind]=useState(accounts[0].password);
 
   const ankr=props.anchorJS;
 
@@ -25,20 +26,24 @@ function Write(props) {
     },
     changeRaw:(ev)=>{
       setRaw(ev.target.value);
-      if(!name) return false;
-      ankr.history(name,(list)=>{
-        if(!list) return setMore('No result.');
-        setMore(<History list={list} block={0} change={()=>{}} />);
-      });
+      self.render();
     },
     changeProtocol:(ev)=>{
       setProtocol(ev.target.value);
     },
     changeAccount:(ev)=>{
       setAccount(ev.target.value);
+      const row=accounts[ev.target.value];
+      setRemind(row.password);
     },
     changePassword:(ev)=>{
       setPassword(ev.target.value);
+    },
+    clear:()=>{
+      setName('');
+      setRaw('');
+      setProtocol('');
+      setPassword('');
     },
     getPair:(ck)=>{
       const acc=accounts[account];
@@ -61,15 +66,24 @@ function Write(props) {
           if (typeof (status) == 'string') return setInfo(status);
 
           if(status.InBlock){
-            setDisabled(false);
+            //setDisabled(false);
             return setInfo('InBlock, waiting for Finalized');
           }
 
           if(status.Finalized){
+            self.render();
             setDisabled(false);
+            self.clear();
             return setInfo('Finalized');
           }
         });
+      });
+    },
+    render:()=>{
+      if(!name) return false;
+      ankr.history(name,(list)=>{
+        if(!list) return setMore('No result.');
+        setMore(<History list={list} block={0} change={()=>{}} />);
       });
     },
   };
@@ -97,7 +111,7 @@ function Write(props) {
             </Col>
             <Col lg={12} xs={12} className="pt-2" ><hr/></Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-secondary'>Test account password here : </small>
+              <small className='text-secondary'>Select test account to write to the chain.</small>
               <Form.Select aria-label="Default select" disabled={disabled} onChange={(ev) => { self.changeAccount(ev) }}>
               {accounts.map((item,index) => (
                 <option value={index} key={index}>{item.encry.meta.name}:{item.encry.address}</option>
@@ -105,8 +119,8 @@ function Write(props) {
               </Form.Select>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-secondary'>Password: <span className='text-dark bg-warning'>123456</span></small>
-              <Form.Control size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
+              <small className='text-secondary'>Selected demo account password: <Badge bg="info">{remind}</Badge></small>
+              <Form.Control className="pt-2" size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
             <Col lg={8} xs={8} className="pt-4" >{info}</Col>
             <Col lg={4} xs={4} className="text-end pt-4" >

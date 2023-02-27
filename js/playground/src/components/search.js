@@ -30,6 +30,7 @@ function Search(props) {
     onSave:()=>{
       console.log(`Searching:${name}`);
       ankr.search(name,(res)=>{
+        if(res===false) return setResult(`No such anchor : ${name}`);
         setResult((<Detail data={res} anchorJS={props.anchorJS} />));
         if(res && res.pre!==0){
           //console.log(`Ready to get list`);

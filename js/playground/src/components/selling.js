@@ -14,6 +14,8 @@ function Selling(props) {
   let [free,setFree]=useState(false);
   let [password,setPassword]=useState(0);
 
+  let [remind,setRemind]=useState(Accounts[0].password);
+
   const self={
     changePrice:(ev)=>{
       setPrice(ev.target.value);
@@ -21,11 +23,13 @@ function Selling(props) {
     changeFree:(ev)=>{
       setFree(!free);
     },
-    changeAccount:(ev)=>{
-      setAccount(ev.target.value);
-    },
     changePassword:(ev)=>{
       setPassword(ev.target.value);
+    },
+    changeAccount:(ev)=>{
+      setAccount(ev.target.value);
+      const row=Accounts[ev.target.value];
+      setRemind(row.password);
     },
     sell:()=>{
       if(price <=0) return false;
@@ -76,7 +80,7 @@ function Selling(props) {
         <Button size="md" variant="primary" onClick={() => {self.sell()}} > Sell </Button>
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
-        <small className='text-success'>Selling anchor in two ways target and freely. Anchor owner Password:<span className='text-danger ml-2 mr-2 bg-warning'>123456</span></small>
+        <small className='text-success'>Selling anchor in two ways target and freely. Anchor owner Password:<span className='text-danger ml-2 mr-2 bg-warning'>{remind}</span></small>
       </Col>
     </Row>
   );
