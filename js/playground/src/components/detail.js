@@ -2,20 +2,42 @@ import { Row, Col, Badge, Card,Button,Form} from 'react-bootstrap';
 import { useState } from 'react';
 
 import Selling from './selling';
+import {Accounts} from '../config/accounts';
 
 function Detail(props) {
   const anchor = props.data.error ? {} : props.data;
   const ankr = props.anchorJS;
 
   let [URI, setURI] = useState(!anchor ? '#' : `https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer/query/${anchor.block}`);
+  let [password,setPassword]=useState(0);
 
   const self = {
     format: (stamp) => {
       var dt = new Date(stamp);
       return dt.toLocaleString();
     },
+    changePassword:(ev)=>{
+      setPassword(ev.target.value);
+    },
     unsell:()=>{
-      console.log('here');
+      console.log('here,password:'+password);
+      const owner=anchor.signer;
+
+      let acc=null;
+      for(let i=0;i<Accounts.length;i++){
+        const  row=Accounts[i];
+        if(row.encry.address===owner) acc=row;
+      }
+      console.log(acc);
+
+      if(acc===null) return false;
+      ankr.load(acc.encry,password,(pair)=>{
+        if(!pair) return false;
+        console.log(pair);
+        ankr.unsell(pair,anchor.name,(res)=>{
+          console.log(res);
+        });
+      });
     },
   };
 
@@ -57,8 +79,8 @@ function Detail(props) {
                   <td>Selling</td>
                   <td>
                     <Row>
-                      <Col lg={4} xs={4}>{!anchor ? '' : (anchor.sell ? "Yes" : "No")}</Col>
-                      <Col lg={6} xs={6} className="text-end">
+                      <Col lg={5} xs={5}>{!anchor ? '' : (anchor.sell ? ("Yes, price "+anchor.cost.toLocaleString()) : "No")}</Col>
+                      <Col lg={5} xs={5} className="text-end">
                         <Form.Control size="sm" type="password" disabled={!anchor.sell} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
                       </Col>
                       <Col lg={2} xs={2} className="text-end">

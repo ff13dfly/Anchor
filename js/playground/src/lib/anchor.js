@@ -359,10 +359,14 @@ const self = {
 	unsell:(pair, anchor, ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
+		console.log(anchor);
 		if(self.limited(anchor)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
-		wsAPI.tx.anchor.unsellAnchor(anchor).signAndSend(pair, (res) => {
-			return ck && ck(res);
+		self.owner(anchor,(owner)=>{
+			if(!owner) return ck && ck({error:"No such anchor."});
+			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
+			wsAPI.tx.anchor.unsellAnchor(anchor).signAndSend(pair, (res) => {
+				return ck && ck(res);
+			});
 		});
 	},
 	buy: (pair, anchor, ck) => {

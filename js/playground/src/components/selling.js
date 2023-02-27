@@ -40,7 +40,6 @@ function Selling(props) {
       const target=!free?Accounts[account].encry.address:undefined;
       ankr.load(acc.encry,password,(pair)=>{
         if(!pair) return false;
-        console.log(pair);
         ankr.sell(pair,anchor,price,(res)=>{
           console.log(res);
         },target);

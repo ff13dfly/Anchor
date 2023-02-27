@@ -84,20 +84,20 @@ function Write(props) {
         <Col lg={7} xs={12} className="pt-4">
           <Row>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-success'>Unique name. If not exsist, will initialize, otherwise will update. 40 Bytes max.</small>
+              <small className='text-secondary'>Unique name. If not exsist, will initialize, otherwise will update. 40 Bytes max.</small>
               <Form.Control size="md" type="text" disabled={disabled} placeholder="Anchor name..." onChange={(ev) => { self.changeName(ev) }}/>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-success'>Any data, 4M bytes max</small>
+              <small className='text-secondary'>Any data, 4M bytes max</small>
               <Form.Control as="textarea" rows={3} disabled={disabled} placeholder="Raw data..." onChange={(ev) => { self.changeRaw(ev) }}/>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-success'>Customized protocol, 256 Bytes max.</small>
+              <small className='text-secondary'>Customized protocol, 256 Bytes max.</small>
               <Form.Control size="md" type="text" disabled={disabled} placeholder="Protocol..." onChange={(ev) => { self.changeProtocol(ev) }} />
             </Col>
             <Col lg={12} xs={12} className="pt-2" ><hr/></Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-success'>Test account password here : </small>
+              <small className='text-secondary'>Test account password here : </small>
               <Form.Select aria-label="Default select" disabled={disabled} onChange={(ev) => { self.changeAccount(ev) }}>
               {accounts.map((item,index) => (
                 <option value={index} key={index}>{item.encry.meta.name}:{item.encry.address}</option>
@@ -105,11 +105,11 @@ function Write(props) {
               </Form.Select>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-success'>Password:<span className='text-danger ml-2 mr-2 bg-warning'>123456</span></small>
+              <small className='text-secondary'>Password: <span className='text-dark bg-warning'>123456</span></small>
               <Form.Control size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
-            <Col lg={8} xs={8} className="pt-2" >{info}</Col>
-            <Col lg={4} xs={4} className="text-end pt-2" >
+            <Col lg={8} xs={8} className="pt-4" >{info}</Col>
+            <Col lg={4} xs={4} className="text-end pt-4" >
               <Button size="md" variant="primary" disabled={disabled} onClick={() => { self.onSave() }} > Write to Chain </Button>
             </Col>
           </Row>
