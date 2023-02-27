@@ -92,8 +92,8 @@ const self = {
 			unsub();
 			if(res.isEmpty) return ck && ck(false);
 			const owner=res.value[0].toHuman();
-			//const block = res.value[1].words[0];
-			return ck && ck(owner);
+			const block = res.value[1].words[0];
+			return ck && ck(owner,block);
 		}).then((fun)=>{
 			unsub = fun;
 		});
@@ -102,16 +102,10 @@ const self = {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
-		let unsub=null;
-		wsAPI.query.anchor.anchorOwner(anchor, (res) =>{
-			unsub();
-			if (res.isEmpty){
-				return ck && ck(false);
-			}
-			const block = res.value[1].words[0];
+
+		self.owner(anchor,(owner,block)=>{
+			if(owner===false) return ck && ck(false);
 			self.target(anchor,block,ck);
-		}).then((fun) => {
-			unsub = fun;
 		});
 	},
 	target:(anchor,block,ck)=>{
@@ -120,13 +114,10 @@ const self = {
 		if (anchor.substr(0, 2) === '0x') anchor = self.decodeUTF8(anchor);
 
 		if(self.limited(anchor)) return ck && ck(false);
-
-		let unsub=null;
-		wsAPI.query.anchor.anchorOwner(anchor, (res) =>{
-			unsub();
+		self.owner(anchor,(owner)=>{
 			const details={block:block};
-			if (res.isEmpty) return ck && ck(self.format(anchor,details));
-			details.owner=res.value[0].toHuman();
+			if(owner===false) return ck && ck(self.format(anchor,details));
+			details.owner=owner;
 			wsAPI.rpc.chain.getBlockHash(block, (res) => {
 				const hash = res.toHex();
 				if (!hash) return ck && ck(self.format(anchor,details));
@@ -153,8 +144,6 @@ const self = {
 
 				},{anchor:anchor});
 			});
-		}).then((fun)=>{
-			unsub=fun;
 		});
 	},
 	history: (anchor, ck, limit) => {
@@ -162,11 +151,8 @@ const self = {
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 
-		let unsub = null;
-		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
-			unsub();
-			if (res.isEmpty) return ck && ck(false);
-			const block = res.value[1].words[0];
+		self.owner(anchor,(owner,block)=>{
+			if (owner===false) return ck && ck(false);
 			self.loop(anchor, block, limit, (list)=>{
 				if(list.length===0) return ck && ck(list);
 				const res=[],format=self.format;
@@ -176,8 +162,6 @@ const self = {
 				}
 				return ck && ck(res);
 			});
-		}).then((fun)=>{
-			unsub = fun;
 		});
 	},
 	loop: (anchor, block, limit, ck, list) => {
@@ -268,14 +252,10 @@ const self = {
 		if (typeof raw !== 'string') raw = JSON.stringify(raw);
 		if(self.limited(anchor,raw,protocol)) return ck && ck({error:"Params error"});
 
-		let unsub = null;
-		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
-			unsub();	//close anchorOwner subcribition
-			if(!res.isEmpty){
-				const owner=res.value[0].toHuman();
-				if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
-			}
-			const pre = res.isEmpty?0:res.value[1].words[0];
+		self.owner(anchor,(owner,block)=>{
+			if(owner!==false &&  owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
+
+			const pre = owner===false?0:block;
 			try {
 				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
 					return ck && ck(res);
@@ -283,8 +263,6 @@ const self = {
 			} catch (error) {
 				return ck && ck({error:error});
 			}
-		}).then((fun)=>{
-			unsub = fun;
 		});
 	},
 	load:(encryJSON,password,ck)=>{
@@ -327,24 +305,17 @@ const self = {
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 
-		let unsub = null;
-		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
-			unsub();
-			if(res.isEmpty) return ck && ck({error:"No target anchor."});
-
-			const owner=res.value[0].toHuman();
+		self.owner(anchor,(owner,block)=>{
+			if(owner===false) return ck && ck({error:"No target anchor."});
 			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
 			wsAPI.tx.anchor.sellAnchor(anchor,price,!target?owner:target).signAndSend(pair, (res) => {
 				return ck && ck(res);
 			});
-		}).then((fun)=>{
-			unsub = fun;
 		});
 	},
 	unsell:(pair, anchor, ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
-		console.log(anchor);
 		if(self.limited(anchor)) return ck && ck({error:"Name error"});
 		self.owner(anchor,(owner)=>{
 			if(!owner) return ck && ck({error:"No such anchor."});
@@ -429,7 +400,7 @@ const self = {
 	decodeUTF8:(str) => {
 		return decodeURIComponent(str.slice(2).replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'));
 	},
-	format:(anchor,obj,emtpy)=>{
+	format:(anchor,obj)=>{
 		return {
 			"name":!anchor?"":anchor,
 			"protocol":(obj && obj.protocol)?obj.protocol:null,
