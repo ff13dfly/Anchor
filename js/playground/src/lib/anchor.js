@@ -85,7 +85,17 @@ const self = {
 	/************************/
 	/***Anchor data browse***/
 	/************************/
-
+	owner:(anchor,ck)=>{
+		let unsub = null;
+		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
+			unsub();
+			if(res.isEmpty) return ck && ck(false);
+			const owner=res.value[0].toHuman();
+			return ck && ck(owner);
+		}).then((fun)=>{
+			unsub = fun;
+		});
+	},
 	latest: (anchor, ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -130,10 +140,10 @@ const self = {
 						unlist();
 						if (dt.value.isEmpty){
 							return ck && ck(self.format(anchor,details));
-						} 
+						}
 						details.sell = true;
 						details.cost = dt.value[1].words[0];		//selling cost
-						details.target=dt.value[2].words[0];		//selling target 
+						details.target=dt.value[2].toHuman();		//selling target 
 						return ck && ck(self.format(anchor,details));
 					}).then((fun) => {
 						unlist = fun;
@@ -258,8 +268,10 @@ const self = {
 		let unsub = null;
 		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
 			unsub();	//close anchorOwner subcribition
-			const owner=res.value[0].toHuman();
-			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
+			if(!res.isEmpty){
+				const owner=res.value[0].toHuman();
+				if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
+			}
 			const pre = res.isEmpty?0:res.value[1].words[0];
 			try {
 				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
@@ -296,6 +308,7 @@ const self = {
 			return ck && ck(arr);
 		});
 	},
+
 	// list: ( ck) => {
 	// 	if(wsAPI===null) return ck && ck({error:"No websocke link."});
 	// 	wsAPI.query.anchor.anchorOwner.entries().then((arr) => {
@@ -309,13 +322,23 @@ const self = {
 
 	
 	
-	sell: (pair, anchor, cost, target, ck) => {
+	sell: (pair, anchor, price, ck , target) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
-		wsAPI.tx.anchor.sellAnchor(anchor,cost,target).signAndSend(pair, (res) => {
-			return ck && ck(res);
+
+		let unsub = null;
+		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
+			unsub();
+			if(res.isEmpty) return ck && ck({error:"No target anchor."});
+
+			const owner=res.value[0].toHuman();
+			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
+			wsAPI.tx.anchor.sellAnchor(anchor,price,!target?owner:target).signAndSend(pair, (res) => {
+				return ck && ck(res);
+			});
+		}).then((fun)=>{
+			unsub = fun;
 		});
 	},
 	unsell:(pair, anchor, ck) => {
@@ -427,6 +450,7 @@ exports.anchorJS={
 	history:self.history,
 	multi:self.multi,
 	footprint:self.footprint,
+	owner:self.owner,
 
 	write:self.write,
 

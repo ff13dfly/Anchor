@@ -1,7 +1,7 @@
 import { Row, Col, Badge, Card } from 'react-bootstrap';
 import { useState } from 'react';
 
-import Options from './options';
+import Operation from './operation';
 
 function Detail(props) {
   const anchor = props.data.error ? {} : props.data;
@@ -64,7 +64,12 @@ function Detail(props) {
       </Col>
       
       <Col lg={12} xs={12} className="pt-2" >
-        <Options sell={(!anchor || !anchor.sell) ? false : true} anchor={!anchor ? '' : anchor.name} />
+        <Operation 
+          sell={(!anchor || !anchor.sell) ? false : true} 
+          anchor={!anchor ? '' : anchor.name} 
+          owner={anchor.signer}  
+          anchorJS={props.anchorJS}
+        />
       </Col>
     </Row>
   );

@@ -67,3 +67,13 @@ Browsing data is the enhanced part of anchor.js. By using polkadot.js, it is muc
 It is a way to use the history data on chain.
 
 ### Market of Anchor
+
+## Error
+
+All functions with callback
+
+```Javascript
+{error:"error message"}
+```
+
+You just need to check the "error" key to figure out what happened.
