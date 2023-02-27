@@ -13,9 +13,8 @@ function Market(props) {
   };
 
   useEffect(() => {
-    ankr.market((res) => {
-      let arr = [{}, {},{}];
-      setList(arr);
+    ankr.market((alist) => {
+      setList(alist);
     });
   }, []);
 
@@ -24,15 +23,15 @@ function Market(props) {
       <Row>
         <Col lg={12} xs={12} className="pt-2" ></Col>
         {list.map((item, index) => (
-          <Col lg={3} xs={3} className="pt-2" >
+          <Col lg={3} xs={3} className="pt-2" key={index} >
             <Card>
               <Card.Body>
                 <Card.Title>
-                  Anchor-name <Badge bg="info">1,999</Badge>
+                  {item.name}  <Badge bg="info">{item.price}</Badge>
                 </Card.Title>
                 <Card.Text>
-                  Target : free to buy <br />
-                  Owner : 5Dt3Diu9becXCqtY2nYucE7DYRaWb7a8V73xuphWeB7MbLVq
+                  Target : {item.target} <br />
+                  Owner : {item.owner}
                 </Card.Text>
               </Card.Body>
             </Card>

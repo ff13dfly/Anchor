@@ -1,7 +1,7 @@
-import { Row, Col, Badge, Card } from 'react-bootstrap';
+import { Row, Col, Badge, Card,Button,Form} from 'react-bootstrap';
 import { useState } from 'react';
 
-import Operation from './operation';
+import Selling from './selling';
 
 function Detail(props) {
   const anchor = props.data.error ? {} : props.data;
@@ -13,6 +13,9 @@ function Detail(props) {
     format: (stamp) => {
       var dt = new Date(stamp);
       return dt.toLocaleString();
+    },
+    unsell:()=>{
+      console.log('here');
     },
   };
 
@@ -28,7 +31,7 @@ function Detail(props) {
               <tbody>
                 <tr>
                   <td>Block</td>
-                  <td><h5><Badge bg="info">{anchor.block}</Badge></h5></td>
+                  <td><h5><Badge bg="info">{anchor.block.toLocaleString()}</Badge></h5></td>
                 </tr>
                 <tr>
                   <td>Raw</td>
@@ -52,7 +55,17 @@ function Detail(props) {
                 </tr>
                 <tr>
                   <td>Selling</td>
-                  <td>{!anchor ? '' : (anchor.sell ? "Yes" : "No")}</td>
+                  <td>
+                    <Row>
+                      <Col lg={4} xs={4}>{!anchor ? '' : (anchor.sell ? "Yes" : "No")}</Col>
+                      <Col lg={6} xs={6} className="text-end">
+                        <Form.Control size="sm" type="password" disabled={!anchor.sell} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
+                      </Col>
+                      <Col lg={2} xs={2} className="text-end">
+                        <Button size="sm" variant="primary" disabled={!anchor.sell} onClick={() => {self.unsell()}} > Unsell </Button>
+                      </Col>
+                    </Row>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -64,7 +77,7 @@ function Detail(props) {
       </Col>
       
       <Col lg={12} xs={12} className="pt-2" >
-        <Operation 
+        <Selling 
           sell={(!anchor || !anchor.sell) ? false : true} 
           anchor={!anchor ? '' : anchor.name} 
           owner={anchor.signer}  

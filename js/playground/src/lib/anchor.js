@@ -304,8 +304,23 @@ const self = {
 	// TODO: need to page and step
 	market: (ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		//console.log(wsAPI.query.anchor.sellList);
 		wsAPI.query.anchor.sellList.entries().then((arr) => {
-			return ck && ck(arr);
+			let list=[];
+			if(!arr) return ck && ck(list);
+			for(let i=0;i<arr.length;i++){
+				const row=arr[i];
+				const key=row[0].toHuman();
+				const info=row[1].toHuman();
+				list.push({
+					name:key[0],
+					owner:info[0],
+					price:info[1],
+					target:info[2],
+					free:info[0]===info[2],
+				});
+			}
+			return ck && ck(list);
 		});
 	},
 
