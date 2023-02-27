@@ -199,10 +199,17 @@ pub mod pallet {
 
 			let data = <AnchorOwner<T>>::get(&nkey); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
+			
+			//1.2.确认账号里有多的费用
+			let len:u128=raw.len().try_into().unwrap();
+			let basic:u128=10000000000;
+			let tx=len.saturating_mul(basic);
 
-			// TODO : ensure the account balance is enough, to avoid 1010 error
 			//log::info!("current_block_number is {:?}", current_block_number);
-			//ensure!(T::Currency::free_balance(&sender) >= tx.saturated_into(), Error::<T>::InsufficientBalance);
+			ensure!(
+				T::Currency::free_balance(&sender) >= tx.saturated_into(),
+				Error::<T>::InsufficientBalance
+			);
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
