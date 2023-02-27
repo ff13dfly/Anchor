@@ -13,7 +13,6 @@ const self = {
 	/************************/
 	/***Params and setting***/
 	/************************/
-
 	limited:(key,raw,protocol,address)=>{
         if(key!==undefined) return key.length>limits.key?true:false;
         if(protocol!==undefined) return protocol.length>limits.protocol?true:false;
@@ -27,7 +26,9 @@ const self = {
 	setKeyring:(ks)=>{
 		keyRing=new ks({ type: 'sr25519' });;
 	},
-
+	ready:()=>{
+		return wsAPI===null?false:true;
+	},
 	/************************/
 	/***Polkadot functions***/
 	/************************/
@@ -46,12 +47,12 @@ const self = {
 			const format=self.format;
 			self.specific(hash,(exs)=>{
 				for(let i=0;i<exs.length;i++){
-					var ex=exs[i],row=ex.args;
+					const ex=exs[i],row=ex.args;
 					if(row.key.substr(0, 2).toLowerCase() === '0x') row.key=self.decodeUTF8(row.key);
 					row.signer=ex.owner;
 					row.block=block;
 
-					var dt=format(row.key,self.decor(row));
+					const dt=format(row.key,self.decor(row));
 					dt.empty=false;
 					list.push(dt);
 				}
@@ -133,9 +134,9 @@ const self = {
 					if(dt===false) return ck && ck(self.format(anchor,details));
 					
 					details.empty = false;
-					for(var k in dt) details[k]=dt[k];
+					for(let k in dt) details[k]=dt[k];
 
-					var unlist=null;
+					let unlist=null;
 					wsAPI.query.anchor.sellList(anchor, (dt) => {
 						unlist();
 						if (dt.value.isEmpty){
@@ -149,7 +150,7 @@ const self = {
 						unlist = fun;
 					});
 
-				},anchor);
+				},{anchor:anchor});
 			});
 		}).then((fun)=>{
 			unsub=fun;
@@ -169,7 +170,7 @@ const self = {
 				if(list.length===0) return ck && ck(list);
 				const res=[],format=self.format;
 				for(let i=0;i<list.length;i++){
-					var row=list[i];
+					const row=list[i];
 					res.push(format(row.key,row));
 				}
 				return ck && ck(res);
@@ -189,7 +190,7 @@ const self = {
 				list.push(dt);
 				if (dt.pre === limit || parseInt(dt.pre) === 0) return ck && ck(list);
 				else return self.loop(anchor, dt.pre, limit, ck, list);
-			},anchor);
+			},{anchor:anchor});
 		});
 	},
 	//TODO: [[anchor,block],[anchor,block],...,[anchor,block]], the anchor target list
@@ -227,23 +228,23 @@ const self = {
 		return arr;
 	},
 
-	specific:(hash,ck,anchor)=>{
-		if(self.limited(anchor)) return ck && ck(false);
+	specific:(hash,ck,cfg)=>{
+		if(self.limited(cfg.anchor)) return ck && ck(false);
 		wsAPI.rpc.chain.getBlock(hash).then((dt) => {
 			if (dt.block.extrinsics.length === 1) return ck && ck(false);
 
+			
 			wsAPI.query.system.events.at(hash,(evs)=>{
-
 				const exs = self.filter(dt, 'setAnchor',self.status(evs));
 				if(exs.length===0) return ck && ck(false);
-				if(anchor===undefined) return ck && ck(exs);
+				if(cfg.anchor===undefined) return ck && ck(exs);
 				
 				//单一的block里只有一个anchor，才可以这么处理
-				var data=null;
+				let data=null;
 				for(let i=0;i<exs.length;i++){
-					var ex=exs[i],row=ex.args;
+					let ex=exs[i],row=ex.args;
 					if(row.key.substr(0, 2).toLowerCase() === '0x') row.key=self.decodeUTF8(row.key);
-					if(row.key.toLowerCase()===anchor){
+					if(row.key.toLowerCase()===cfg.anchor.toLowerCase()){
 						data=row;
 						data.signer=ex.owner;
 						data.stamp=parseInt(ex.stamp);
@@ -284,9 +285,6 @@ const self = {
 			unsub = fun;
 		});
 	},
-	check:(anchor,address,ck)=>{
-
-	},
 	load:(encryJSON,password,ck)=>{
 		if(!password) return false;
 		const pair = keyRing.createFromJson(encryJSON);
@@ -304,7 +302,6 @@ const self = {
 	// TODO: need to page and step
 	market: (ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		//console.log(wsAPI.query.anchor.sellList);
 		wsAPI.query.anchor.sellList.entries().then((arr) => {
 			let list=[];
 			if(!arr) return ck && ck(list);
@@ -323,20 +320,6 @@ const self = {
 			return ck && ck(list);
 		});
 	},
-
-	// list: ( ck) => {
-	// 	if(wsAPI===null) return ck && ck({error:"No websocke link."});
-	// 	wsAPI.query.anchor.anchorOwner.entries().then((arr) => {
-	// 		return ck && ck(arr);
-	// 	});
-	// },
-	// view: (anchor,block,owner,ck)=>{
-	// 	if(wsAPI===null) return ck && ck({error:"No websocke link."});
-	// 	self.target(anchor,block,ck,owner);
-	// },
-
-	
-	
 	sell: (pair, anchor, price, ck , target) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -373,7 +356,7 @@ const self = {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
+
 		try {
 			wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (result) => {
 				return ck && ck(result);
@@ -392,7 +375,7 @@ const self = {
 		if(data.raw.substr(0, 2).toLowerCase() === '0x') data.raw = self.decodeUTF8(data.raw);
 		if(data.protocol){
 			try {
-				var proto=JSON.parse(data.protocol);
+				let proto=JSON.parse(data.protocol);
 				data.protocol=proto;
 				if (proto.type === "data" && proto.format === "JSON") data.raw = JSON.parse(data.raw);
 			} catch (error) {
@@ -428,7 +411,7 @@ const self = {
 	status:(list)=>{
 		const evs=list.toHuman();
 		const map={};
-		for(var i=0;i<evs.length;i++){
+		for(let i=0;i<evs.length;i++){
 			const ev=evs[i],index=ev.phase.ApplyExtrinsic;
 			if(ev.event.section!=="system") continue;
 			map[index]=ev.event.method;
@@ -459,6 +442,7 @@ const self = {
 exports.anchorJS={
 	set:self.setWebsocket,		//cache the linker promise object
 	setKeyring:self.setKeyring,	//set Keyring to get pair
+	ready:self.ready,			//check the ws is ready
 	subcribe:self.listening,	//subcribe the latest block which including anchor data
 	load:self.load,						
 	search:self.latest,

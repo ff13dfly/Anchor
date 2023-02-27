@@ -31,8 +31,7 @@ function History(props) {
               active={item.block===props.block?true:false} 
               onClick={props.change}
             >
-              Block : {item.block} , raw length : {item.raw.length}
-              Owner : {self.shortenAddress(item.signer)}
+              {item.block} , owner:{self.shortenAddress(item.signer)}
             </ListGroup.Item >
           ))}
         </ListGroup>
