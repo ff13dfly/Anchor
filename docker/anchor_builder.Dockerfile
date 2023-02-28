@@ -1,9 +1,6 @@
 ##Demo## docker run -t -i 9ddeb8c05d767e0b710e657ccd915fa36d5ebc478d92ce39a2ab632e5b0b6182 /bin/bash 
 ##Demo## docker run -it parity/substrate /bin/bash
-##Demo## docker run -it ff13dfly/anchor /bin/bash
-##Demo## docker run -it ff13dfly/test /bin/bash
-##Demo## docker exec -it ff13dfly/test sh
-
+##Demo## docker run -it ff13dfly/test /bin/bash -c
 
 # This is the build stage for Substrate. Here we create the binary.
 FROM docker.io/paritytech/ci-linux:production as builder
@@ -24,7 +21,7 @@ RUN cp -rf Anchor/frame/anchor/* frame
 RUN	mkdir playground
 RUN cp -rf Anchor/js/playground/* playground
 
-#RUN cargo build --locked --release
+RUN cargo build --locked --release
 
 # This is the 2nd stage: a very small image where we copy the Substrate binary."
 FROM docker.io/library/ubuntu:20.04
@@ -34,12 +31,12 @@ LABEL description="Docker image for Anchor pallet base on substrate: an On-chain
 	io.parity.image.vendor="Fuu" \
 	io.parity.image.description="Anchor pallet test image" \
 	io.parity.image.source="https://github.com/paritytech/polkadot/blob/${VCS_REF}/docker/substrate_builder.Dockerfile" \
-	io.parity.image.documentation="https://github.com/paritytech/polkadot/"
+	io.parity.image.documentation="https://github.com/ff13dfly/Anchor/"
 
-#COPY --from=builder /substrate/target/release/substrate /usr/local/bin
-#COPY --from=builder /substrate/target/release/subkey /usr/local/bin
-#COPY --from=builder /substrate/target/release/node-template /usr/local/bin
-#COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
+COPY --from=builder /substrate/target/release/substrate /usr/local/bin
+COPY --from=builder /substrate/target/release/subkey /usr/local/bin
+COPY --from=builder /substrate/target/release/node-template /usr/local/bin
+COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
 
 #copy playground code
 #COPY --from=builder /substrate/ccc.md /home/ccc.md
@@ -51,7 +48,7 @@ RUN mkdir -p /data /substrate/.local/share/substrate
 RUN chown -R substrate:substrate /data
 RUN ln -s /data /substrate/.local/share/substrate
 RUN rm -rf /usr/bin /usr/sbin
-#RUN /usr/local/bin/substrate --version
+RUN /usr/local/bin/substrate --version
 
 USER substrate
 

@@ -13,6 +13,8 @@ const self = {
 	/************************/
 	/***Params and setting***/
 	/************************/
+
+	//check the basic limitation of anchor
 	limited:(key,raw,protocol,address)=>{
         if(key!==undefined) return key.length>limits.key?true:false;
         if(protocol!==undefined) return protocol.length>limits.protocol?true:false;
@@ -20,22 +22,36 @@ const self = {
 		if(address!==undefined) return address.length!==limits.address?true:false;
         return false;
     },
+
+	//set websocket link object.
 	setWebsocket: (ws) => {
 		wsAPI = ws;
+		return true;
 	},
+
+	//set keyring object.
 	setKeyring:(ks)=>{
-		keyRing=new ks({ type: 'sr25519' });;
+		keyRing=new ks({ type: 'sr25519' });
+		return true;
 	},
+
+	//check wether the websocket link is ok.
 	ready:()=>{
 		return wsAPI===null?false:true;
 	},
+
+	
+
 	/************************/
 	/***Polkadot functions***/
 	/************************/
+
 	unlistening:(ck)=>{
 		if(unlistening!==null) unlistening();
 		return ck && ck();
 	},
+
+	// subcribe the newest block data
 	listening: (ck) => {
 		if (wsAPI === null) return ck && ck(false);
 		self.clean();
@@ -70,17 +86,26 @@ const self = {
 		}
 		return true;
 	},
-	balance: (account, ck) => {
+	balance: (address, ck) => {
 		if(wsAPI===null) return ck && ck({error:"No websocke link."});
-		if(self.limited(undefined,undefined,undefined,account)) return ck && ck(false);
-		if (wsAPI === null) return ck && ck(false);
+		if(self.limited(undefined,undefined,undefined,address)) return ck && ck(false);
 		let unsub=null;
-		wsAPI.query.system.account(account, (res) => {
+		wsAPI.query.system.account(address, (res) => {
 			if(unsub!=null) unsub();
 			return ck && ck(res);
 		}).then((fun)=>{
 			unsub=fun;
 		});
+	},
+	load:(encryJSON,password,ck)=>{
+		if(!password) return false;
+		const pair = keyRing.createFromJson(encryJSON);
+		try {
+			pair.decodePkcs8(password);
+			return ck && ck(pair);
+		} catch (error) {
+			return ck && ck(false);
+		}
 	},
 
 	/************************/
@@ -265,16 +290,7 @@ const self = {
 			}
 		});
 	},
-	load:(encryJSON,password,ck)=>{
-		if(!password) return false;
-		const pair = keyRing.createFromJson(encryJSON);
-		try {
-			pair.decodePkcs8(password);
-			return ck && ck(pair);
-		} catch (error) {
-			return ck && ck(false);
-		}
-	},
+	
 	/************************/
 	/***Anchor market funs***/
 	/************************/
