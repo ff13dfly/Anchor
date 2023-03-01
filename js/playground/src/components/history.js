@@ -19,7 +19,7 @@ function History(props) {
 	return (
     <Row>
       <Col lg={12} xs={12} className="pt-2" >
-        <h4>History </h4>
+        <h5>History </h5>
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
         <ListGroup as="ol">
@@ -35,6 +35,9 @@ function History(props) {
             </ListGroup.Item >
           ))}
         </ListGroup>
+      </Col>
+      <Col lg={12} xs={12} className="pt-2" >
+        Above is the history data list on chain.
       </Col>
     </Row>
 	);

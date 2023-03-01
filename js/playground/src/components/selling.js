@@ -15,6 +15,7 @@ function Selling(props) {
   let [password,setPassword]=useState(0);
 
   let [remind,setRemind]=useState(Accounts[0].password);
+  let [process,setProcess]=useState('process infomation');
 
   const self={
     changePrice:(ev)=>{
@@ -57,15 +58,17 @@ function Selling(props) {
 
   return (
     <Row>
-      
-      <Col lg={10} xs={12} className="pt-2" >
+      <Col lg={12} xs={12} className="pt-2" >
+        <small className='text-success'>Selling anchor in two ways target and freely. Anchor owner Password:<span className='text-danger ml-2 mr-2 bg-warning'>{remind}</span></small>
+      </Col>
+      <Col lg={10} xs={12}>
         <Form.Select aria-label="Default select" disabled={free} onChange={(ev) => { self.changeAccount(ev) }}>
           {Accounts.map((item,index) => (
               <option value={index} key={index}>{item.encry.meta.name}:{item.encry.address}</option>
           ))}
         </Form.Select>
       </Col>
-      <Col lg={2} xs={12} className="pt-2" >
+      <Col lg={2} xs={12}>
         <Form.Group className="mb-3" controlId="formBasicCheckbox" onChange={(ev) => { self.changeFree(ev)}} >
           <Form.Check type="checkbox" label="Freely" className='pt-2'/>
         </Form.Group>
@@ -79,9 +82,7 @@ function Selling(props) {
       <Col lg={2} xs={12} className="pt-2 text-end" >
         <Button size="md" variant="primary" onClick={() => {self.sell()}} > Sell </Button>
       </Col>
-      <Col lg={12} xs={12} className="pt-2" >
-        <small className='text-success'>Selling anchor in two ways target and freely. Anchor owner Password:<span className='text-danger ml-2 mr-2 bg-warning'>{remind}</span></small>
-      </Col>
+      <Col lg={12} xs={12} className="text-end" >{process}</Col>
     </Row>
   );
 }

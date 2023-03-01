@@ -27,15 +27,13 @@ function Search(props) {
         self.list(name,block);
       });
     },
-    onSave:()=>{
+    onSearch:()=>{
       console.log(`Searching:${name}`);
       ankr.search(name,(res)=>{
         if(res===false) return setResult(`No such anchor : ${name}`);
         setResult((<Detail data={res} anchorJS={props.anchorJS} />));
-        if(res && res.pre!==0){
-          //console.log(`Ready to get list`);
-          self.list(name,res.block);
-        }
+        if(!res) return false;
+        self.list(name,res.block);
       });
     },
     onChange:(ev)=>{
@@ -57,7 +55,7 @@ function Search(props) {
 					<Form.Control size="lg" type="text" placeholder="Anchor name..." onChange={(ev) => { self.onChange(ev) }} />
 				</Col>
 				<Col lg={2} xs={4} className="text-end" >
-					<Button size="lg" variant="primary" onClick={() => { self.onSave() }} > Search </Button>
+					<Button size="lg" variant="primary" onClick={() => { self.onSearch() }} > Search </Button>
 				</Col >
 
         <Col lg={7} xs={12} className="pt-2" >

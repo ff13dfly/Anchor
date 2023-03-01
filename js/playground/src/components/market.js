@@ -112,7 +112,7 @@ function Market(props) {
             </Card.Body>
           </Card>
           <Row>
-            <Col lg={12} xs={12} >
+            <Col lg={12} xs={12} className="pt-2">
               <small>Selet account to buy the anchor.</small>
               <Form.Select aria-label="Default select" id={prefix.select+item.name} onChange={(ev) => {self.changeAccount(ev)}}>
                 {Accounts.map((item,index) => (

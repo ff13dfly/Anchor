@@ -98,7 +98,7 @@ function Write(props) {
         <Col lg={7} xs={12} className="pt-4">
           <Row>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-secondary'>Unique name. If not exsist, will initialize, otherwise will update. 40 Bytes max.</small>
+              <small className='text-secondary'>Unique name. If not exsist, will initialize, otherwise will update. 40 bytes max.</small>
               <Form.Control size="md" type="text" disabled={disabled} placeholder="Anchor name..." onChange={(ev) => { self.changeName(ev) }}/>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
@@ -106,10 +106,12 @@ function Write(props) {
               <Form.Control as="textarea" rows={3} disabled={disabled} placeholder="Raw data..." onChange={(ev) => { self.changeRaw(ev) }}/>
             </Col>
             <Col lg={12} xs={12} className="pt-2" >
-              <small className='text-secondary'>Customized protocol, 256 Bytes max.</small>
+              <small className='text-secondary'>Customized protocol, 256 bytes max.</small>
               <Form.Control size="md" type="text" disabled={disabled} placeholder="Protocol..." onChange={(ev) => { self.changeProtocol(ev) }} />
             </Col>
-            <Col lg={12} xs={12} className="pt-2" ><hr/></Col>
+            <Col lg={12} xs={12} className="pt-4" ></Col>
+            <Col lg={12} xs={12} className="pt-4" ></Col>
+            <Col lg={12} xs={12} className="pt-4" ></Col>
             <Col lg={12} xs={12} className="pt-2" >
               <small className='text-secondary'>Select test account to write to the chain.</small>
               <Form.Select aria-label="Default select" disabled={disabled} onChange={(ev) => { self.changeAccount(ev) }}>
@@ -118,14 +120,14 @@ function Write(props) {
               ))}
               </Form.Select>
             </Col>
-            <Col lg={12} xs={12} className="pt-2" >
+            <Col lg={7} xs={6} className="pt-2" >
               <small className='text-secondary'>Selected demo account password: <Badge bg="info">{remind}</Badge></small>
               <Form.Control className="pt-2" size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
-            <Col lg={8} xs={8} className="pt-4" >{info}</Col>
-            <Col lg={4} xs={4} className="text-end pt-4" >
+            <Col lg={5} xs={6} className="text-end pt-4" >
               <Button size="md" variant="primary" disabled={disabled} onClick={() => { self.onSave() }} > Write to Chain </Button>
             </Col>
+            <Col lg={12} xs={12} className="text-end" >{info}</Col>
           </Row>
 				</Col>
         <Col lg={5} xs={12} className="pt-4" >

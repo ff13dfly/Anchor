@@ -43,9 +43,6 @@ function Detail(props) {
 
   return (
     <Row>
-      <Col lg={12} xs={12} className="pt-2 text-end" >
-        <a target="_blank" rel="noreferrer" href={URI}>Browse block on https://polkadot.js.org/apps/</a>
-      </Col>
       <Col lg={12} xs={12} className="pt-2" >
         <Card>
           <Card.Body>
@@ -53,7 +50,16 @@ function Detail(props) {
               <tbody>
                 <tr>
                   <td>Block</td>
-                  <td><h5><Badge bg="info">{anchor.block.toLocaleString()}</Badge></h5></td>
+                  <td>
+                  <Row>
+                    <Col lg={3} xs={6}>
+                      <h5><Badge bg="info">{anchor.block.toLocaleString()}</Badge></h5>
+                    </Col>
+                    <Col lg={9} xs={6} className="text-end" >
+                    <a target="_blank" rel="noreferrer" href={URI}>Browse block on https://polkadot.js.org/apps/</a>
+                    </Col>
+                  </Row>
+                  </td>
                 </tr>
                 <tr>
                   <td>Raw</td>
