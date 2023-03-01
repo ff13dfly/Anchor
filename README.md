@@ -97,6 +97,24 @@ target/substrate --dev --state-pruning archive
 
 ## Docker testing
 
+### Intergration files
+
+The 5 files which are needed to modify, is included in folder "deploy". The path is included in filename, connect by "_".
+
+* bin_node_cli_src_chain_spec.rs
+* bin_node_runtime_Cargo.toml
+* bin_node_runtime_src_lib.rs
+* bin_node_testing_src_genesis.rs
+* Cargo.toml
+
+### Build from source code
+
+There is a shell file to create docker image, you can test it by one command.
+
+```SHELL
+    sh build.sh
+```
+
 ## API calls
 
 There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on Polkadot.js and anchor.js.
@@ -186,13 +204,19 @@ Buy the anchor.
 
 1. How to delete an anchor ?
 
+> No, you can not delete an exsist anchor.
+
 2. Can I update anchor when it is on selling ?
+
+> Yes, you can.
 
 3. Is UTF8 supported by Anchor ?
 
+> Yes, but UTF8 characters will cost more bytes.
+
 4. What does the "protocol" feild mean ?
 
-5. How to load the anchor code ?
+> It is a 256 bytes string to define your own protocol on chain.
 
 ## More details
 
@@ -202,9 +226,13 @@ Anchor is the storage part of EasyPolka.
 
 ### Anchor details
 
-* Name Service
+* Name Service, anchor is the unique name stored on chain, the ownership can not been modified without the operation of owner.
 
-* Key-value Storage
+* Key-value Storage, the same reason as Name Service, only owner can modify the anchor data. It is an enhanced storage.
+
+### Anchor.js
+
+* You can check the details on [anchor.js README](https://github.com/ff13dfly/Anchor/js/README.md)
 
 ### Playground details
 
