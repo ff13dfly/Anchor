@@ -54,6 +54,11 @@ function App() {
     fresh:(node)=>{
 
     },
+
+    //load customer localstorage accounts
+    loadCustomerAccounts:()=>{
+
+    }
   };
 
   const pages={
@@ -74,7 +79,10 @@ function App() {
     self.router(window.location.hash);
     self.link(Servers.nodes[0],(res)=>{
       if(!res) return self.status(`Failed to link to node ${res}`);
-      anchorJS.set(wsAPI);
+      if(!anchorJS.set(wsAPI)){
+        console.log('Error anchor node.');
+      }
+
       anchorJS.setKeyring(Keyring);
     });
   },[]);

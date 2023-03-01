@@ -25,6 +25,9 @@ const self = {
 
 	//set websocket link object.
 	setWebsocket: (ws) => {
+		//check the node support anchor
+		console.log()
+		if(!ws.query.anchor || !ws.tx.anchor) return false;
 		wsAPI = ws;
 		return true;
 	},
@@ -96,6 +99,10 @@ const self = {
 		}).then((fun)=>{
 			unsub=fun;
 		});
+	},
+
+	account: (password, ck )=>{
+
 	},
 	load:(encryJSON,password,ck)=>{
 		if(!password) return false;
