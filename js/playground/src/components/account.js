@@ -1,4 +1,4 @@
-import { Container, Row, Col, Button, Card, Form } from 'react-bootstrap';
+import {  Row, Col, Button, Card, Form,Image } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 
 import {Accounts} from '../config/accounts';
@@ -13,10 +13,7 @@ function Account(props) {
   };
 
   useEffect(() => {
-    //Accounts.push({"hello":"world"});
-    //console.log(Accounts);
-    //setList(props.list);
-    //console.log(balance);
+
   }, []);
 
   return (
@@ -41,7 +38,11 @@ function Account(props) {
               </Card.Title>
               <Row>
                 <Col lg={3} xs={12} >
-                  <img src="https://robohash.org/5Dt3Diu9becXCqtY2nYucE7DYRaWb7a8V73xuphWeB7MbLVq.png" alt="" />
+                  <Image 
+                    src="https://robohash.org/5Dt3Diu9becXCqtY2nYucE7DYRaWb7a8V73xuphWeB7MbLVq.png"
+                    rounded
+                    width="100%"
+                  />
                 </Col>
                 <Col lg={9} xs={12} >
                   <Row>

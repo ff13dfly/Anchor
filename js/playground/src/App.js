@@ -10,10 +10,12 @@ import Market from './components/market';
 import Setting from './components/setting';
 import Summary from './components/summary';
 
+import {anchorJS} from './lib/anchor';
 import {Servers} from './config/servers';
 import {Accounts} from './config/accounts';
 
-import {anchorJS} from './lib/anchor';
+import STORAGE from './lib/storage';
+import Keys from './config/keys';
 
 let wsAPI=null;
 let linking = false;
@@ -23,6 +25,12 @@ let linking = false;
 
 function App() {
   let [view,setView]=useState('');
+
+  //persist node storage.
+  const map={};
+  map.node_persist=Keys.node_persist;
+  STORAGE.setMap(map);
+  
   const self={
     link:(node,ck) => {
       if(linking) return setTimeout(()=>{
@@ -56,8 +64,21 @@ function App() {
     },
 
     //load customer localstorage accounts
-    loadCustomerAccounts:()=>{
-
+    loadSetting:()=>{
+      //load custome nodes.
+      const ps=STORAGE.getPersist('node_persist');
+      let list=[];
+      if(ps!==null){
+        for(let i=0;i<ps.length;i++){
+          list.push(ps[i]);
+        }
+      }else{
+        for(let i=0;i<Servers.nodes.length;i++){
+          list.push(Servers.nodes[i]);
+        }
+        STORAGE.setPersist('node_persist',list);
+      }
+      STORAGE.setCache(Keys.node,list);
     }
   };
 
@@ -65,7 +86,7 @@ function App() {
     '#home':(<Search anchorJS={anchorJS}></Search>),
     '#write':(<Write  anchorJS={anchorJS} accounts={Accounts}></Write>),
     '#market':(<Market anchorJS={anchorJS} />),
-    '#setting':(<Setting anchorJS={anchorJS} list={Accounts} server={Servers} fresh={self.fresh}/>),
+    '#setting':(<Setting anchorJS={anchorJS} list={Accounts} fresh={self.fresh}/>),
     '#document':(<Summary anchorJS={anchorJS} />),
   };
 
@@ -76,6 +97,7 @@ function App() {
   
   useEffect( ()=> {
     window.addEventListener('hashchange', handleChangeEvent);
+    self.loadSetting();
     self.router(window.location.hash);
     self.link(Servers.nodes[0],(res)=>{
       if(!res) return self.status(`Failed to link to node ${res}`);

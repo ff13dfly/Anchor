@@ -1,14 +1,15 @@
-import { Container, Row, Col, Button, Card, Form } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 
 import Node from './node';
 import Account from './account';
 
-function Setting(props) {
-  const list = props.list;
-  const nodes = props.server.nodes;
+import STORAGE from '../lib/storage';
+import Keys from '../config/keys';
 
-  let [balance, setBalance] = useState(new Array(list.length).fill(0));
+function Setting(props) {
+  const nodes=STORAGE.getCache(Keys.node);
+  //let [balance, setBalance] = useState(new Array(list.length).fill(0));
 
   const self = {
     onSave: () => {
@@ -23,7 +24,7 @@ function Setting(props) {
 
   return (
     <Container>
-      <Node nodes={props.server.nodes} />
+      <Node nodes={nodes} />
       <Row>
       <Col lg={12} xs={12} className="pt-4" ></Col>
       <Col lg={12} xs={12} className="pt-4" ></Col>
