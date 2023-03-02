@@ -64,7 +64,7 @@ function Selling(props) {
       <Col lg={10} xs={12}>
         <Form.Select aria-label="Default select" disabled={free} onChange={(ev) => { self.changeAccount(ev) }}>
           {Accounts.map((item,index) => (
-              <option value={index} key={index}>{item.encry.meta.name}:{item.encry.address}</option>
+              <option value={index} key={index}>{item.encry.address}</option>
           ))}
         </Form.Select>
       </Col>

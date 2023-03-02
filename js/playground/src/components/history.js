@@ -31,7 +31,7 @@ function History(props) {
               active={item.block===props.block?true:false} 
               onClick={props.change}
             >
-              {item.block} , signer:{self.shortenAddress(item.signer)}
+              {item.block.toLocaleString()} , pre : {item.pre.toLocaleString()} , signer:{self.shortenAddress(item.signer)}
             </ListGroup.Item >
           ))}
         </ListGroup>

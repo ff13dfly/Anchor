@@ -78,6 +78,10 @@ function Detail(props) {
                   <td>{anchor.signer}</td>
                 </tr>
                 <tr>
+                  <td>Owner</td>
+                  <td>{anchor.owner}</td>
+                </tr>
+                <tr>
                   <td>Stamp</td>
                   <td>{!anchor.stamp ? '' : self.format(anchor.stamp)}</td>
                 </tr>
@@ -85,7 +89,11 @@ function Detail(props) {
                   <td>Selling</td>
                   <td>
                     <Row>
-                      <Col lg={5} xs={5}>{!anchor ? '' : (anchor.sell ? ("Yes, price "+anchor.cost.toLocaleString()) : "No")}</Col>
+                      <Col lg={5} xs={5}>
+                        <h5><Badge bg="info">
+                          {!anchor ? '' : (anchor.sell ? ("Yes, price "+anchor.cost.toLocaleString()) : "No")}
+                        </Badge></h5>
+                      </Col>
                       <Col lg={5} xs={5} className="text-end">
                         <Form.Control size="sm" type="password" disabled={!anchor.sell} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
                       </Col>
@@ -100,11 +108,9 @@ function Detail(props) {
           </Card.Body>
         </Card>
       </Col>
-      <Col lg={12} xs={12} className="pt-2" >
-        Node : ws://localhost:9944
-      </Col>
-      
-      <Col lg={12} xs={12} className="pt-2" >
+      <Col lg={12} xs={12} className="pt-2" ></Col>
+      <Col lg={12} xs={12} className="pt-4" ></Col>
+      <Col lg={12} xs={12}>
         <Selling 
           sell={(!anchor || !anchor.sell) ? false : true} 
           anchor={!anchor ? '' : anchor.name} 

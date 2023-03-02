@@ -116,12 +116,12 @@ function Write(props) {
               <small className='text-secondary'>Select test account to write to the chain.</small>
               <Form.Select aria-label="Default select" disabled={disabled} onChange={(ev) => { self.changeAccount(ev) }}>
               {accounts.map((item,index) => (
-                <option value={index} key={index}>{item.encry.meta.name}:{item.encry.address}</option>
+                <option value={index} key={index}>{item.encry.address}</option>
               ))}
               </Form.Select>
             </Col>
             <Col lg={7} xs={6} className="pt-2" >
-              <small className='text-secondary'>Selected demo account password: <Badge bg="info">{remind}</Badge></small>
+              <small className='text-secondary'>Selected account password: <Badge bg="info">{remind}</Badge>, please type.</small>
               <Form.Control className="pt-2" size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
             <Col lg={5} xs={6} className="text-end pt-4" >

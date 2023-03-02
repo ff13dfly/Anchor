@@ -25,7 +25,9 @@ function Setting(props) {
     <Container>
       <Node nodes={props.server.nodes} />
       <Row>
-        <Col lg={12} xs={12} ><hr /></Col>
+      <Col lg={12} xs={12} className="pt-4" ></Col>
+      <Col lg={12} xs={12} className="pt-4" ></Col>
+      <Col lg={12} xs={12} className="pt-4" ></Col>
       </Row>
       <Account />
     </Container>

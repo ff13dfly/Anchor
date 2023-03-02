@@ -22,7 +22,7 @@ function Account(props) {
   return (
     <Row>
       <Col lg={3} xs={6}><h6>Testing Accounts</h6></Col>
-      <Col lg={3} xs={6}> </Col>
+      <Col lg={3} xs={6}></Col>
       <Col lg={4} xs={6}>
         <Form.Control size="md" type="text" placeholder="Passwor for new account..." onChange={(ev) => {}} />
       </Col>
