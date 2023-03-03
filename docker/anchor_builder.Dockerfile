@@ -39,8 +39,8 @@ COPY --from=builder /substrate/target/release/node-template /usr/local/bin
 COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
 
 ## copy playground code
-RUN mkdir /home/playground
-COPY --from=builder /substrate/playground/ /home/playground/
+#RUN mkdir /home/playground
+#COPY --from=builder /substrate/playground/ /home/playground/
 
 ## setup substrate env
 RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate

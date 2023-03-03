@@ -1,6 +1,7 @@
 .DS_Store
 Cargo.lock
 shell.nix
+rustfmt.toml
 /test-utils/
 /bin/
 /client/

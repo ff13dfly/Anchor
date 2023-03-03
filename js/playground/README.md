@@ -1,4 +1,4 @@
-# Playground
+# Anchor Playground
 
 It is a web application to test anchor.js, you can try it by two ways.
 
@@ -50,30 +50,34 @@ n latest
 
 ## Functions
 
-* Playground is the demo for anchor.js, you can get the released one here [https://github.com/ff13dfly/Anchor/js/publish](https://github.com/ff13dfly/Anchor/js/publish).
-
-* Follow operation manual will treat [https://playground.metanchor.net](https://playground.metanchor.net) as default.
-
 ### Write to chain
 
-* Click the navbar "Write" to access or just use this URL [https://playground.metanchor.net#write](https://playground.metanchor.net#write)
+* Link : [https://playground.metanchor.net#write](https://playground.metanchor.net#write)
 
-### View chain dada
+* It is 3 feilds input form, try anything, then you do storage data on blockchain.
 
-Browsing data is the enhanced part of anchor.js. By using polkadot.js, it is much complex, becasuse there are much more functions.
+### Search anchor dada
 
-### History data of target Anchor
+* Link : [https://playground.metanchor.net#home](https://playground.metanchor.net#home)
 
-It is a way to use the history data on chain.
+* Search target anchor name, you will find details more than 3 feilds. Even a link helps you to check the raw data on anchor node.
 
 ### Market of Anchor
 
-## Error
+* Link : [https://playground.metanchor.net#market](https://playground.metanchor.net#market)
 
-All functions with callback
+* The list of anchors which are on sell, try to buy one, you will know the ownship of anchor well.
 
-```Javascript
-{error:"error message"}
-```
+### Nodes and Accounts
 
-You just need to check the "error" key to figure out what happened.
+* Link : [https://playground.metanchor.net#setting](https://playground.metanchor.net#setting)
+
+* Set the node here. Default is localhost and dev.metanchor.net.
+
+* Set the mock accounts here, the account can be used in live network, but please do not do such thing, the passwords are exposed.
+
+### More details
+
+* Link : [https://playground.metanchor.net#document](https://playground.metanchor.net#document)
+
+* More help, enjoy !

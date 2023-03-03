@@ -1,19 +1,28 @@
-# Anchor.js, lib to access to anchor network
+# Anchor.js, lib to access Anchor node
 
 ## Overview
 
-Anchor.js is a library to access Anchor pallet which supply the On-chain Linked List function. 
+Anchor.js is a library to access Anchor pallet which supply the On-chain Linked List function. Playing on the Playgroud is the recommand way to know Anchor well. All functions in anchor.js  is used in the playground code.
 
 ## Data structure
 
-### anchor
+Anchor is a simple way to access substrate world, there are four main data structure which you need paying attention to.
+
+### Anchor Location
+
+Coding with anchor, you need to locate the data on chain. There are two ways, almost the same, the most important part is anchor name. By the way, as the data is pubilc on-chian, anybody can access the anchor data.
 
 ```Javascript
+    //just anchor name. Anchor.js treated as the latest data of anchor
     "anchor_name";
+
+    //anchor name and block number. Anchor.js will search the target block to get the data.
     ["anchor_name","block_number"];
 ```
 
-### anchor oject
+### Anchor Data Object
+
+This object includes all details of a specfic anchor. Combined the data part and market part.
 
 ```Javascript
 {
@@ -32,7 +41,9 @@ Anchor.js is a library to access Anchor pallet which supply the On-chain Linked 
 }
 ```
 
-### marker oject
+### Anchor Marker Oject
+
+Simple market information about anchor. Normally, it is used to list the on-sell anchors.
 
 ```Javascript
 {
@@ -44,7 +55,7 @@ Anchor.js is a library to access Anchor pallet which supply the On-chain Linked 
 }
 ```
 
-### error
+### Error
 
 If there is any error, will through error message on callback.
 
@@ -89,7 +100,7 @@ Check wether the websocket linker is ready, then anchor.js can work properly.
 ```javascript
     // no param
     // return true || false
-    function ready(){}
+    anchorJS.ready()
 ```
 
 #### load
@@ -99,9 +110,10 @@ Load pair from encry file which can verify account.
 ```javascript
     // @param encryJSON object      //polkadot encry data
     // @param password string       //password for encry data
-    // @param callback function     //callback function
     // return callback( pair || error )
-    function load(encryJSON,password,callback){}
+    anchorJS.load(encryJSON,password,function(pair){
+
+    })
 ```
 
 #### balance
@@ -110,9 +122,10 @@ Get the balance of account, used to check insufficient balance normally.
 
 ```javascript
     // @param address string        //ss58 address of account
-    // @param callback function     //callback function
     // return callback( number || error )
-    function balance(address,callback){}
+    anchorJS.balance(address,function(amount){
+
+    })
 ```
 
 #### subcribe
@@ -120,9 +133,10 @@ Get the balance of account, used to check insufficient balance normally.
 Subscribe data on substrate node, when there is anchor data changed, will callback the data.
 
 ```javascript
-    // @param callback function     //callback function
-    // return callback( anchor object )
-    function subcribe(callback){}
+    // return callback( [ anchor object ] )
+    anchorJS.subcribe(function(object_list){
+
+    })
 ```
 
 ### Storage part
@@ -136,9 +150,10 @@ Only way to write anchor data, skip the previous block number. Will search the l
     // @param   anchor    string         //unique anchor name, 40 bytes max
     // @param   raw       string         //data wil write to chain, 4MB max
     // @param   protocol  string         //customize protocol, 256 bytes max
-    // @param   callback  function       //callback function
-    // return callback( anchor object )
-    function write(pair, anchor, raw, protocol, callback){}
+    // return callback( status )
+    anchorJS.write(pair, anchor, raw, protocol, function(status){
+
+    })
 ```
 
 #### search
@@ -147,9 +162,22 @@ Search the target anchor name, return the latest data.
 
 ```javascript
     // @param   anchor      string      //anchor name
-    // @param   callback    function    //callback function
     // return callback( anchor object )
-    function search(anchor,callback){}
+    anchorJS.search(anchor,function(object){
+
+    })
+```
+
+#### owner
+
+Search the target anchor name, return the latest data.
+
+```javascript
+    // @param   anchor      string      //anchor name
+    // return callback( anchor object )
+    anchorJS.owner(anchor,function(object){
+
+    })
 ```
 
 #### history
@@ -158,23 +186,37 @@ Get the whole linked list of anchor.
 
 ```javascript
     // @param   anchor      string      //anchor name
-    // @param   callback    function    //callback function
     // @param   limit       number      //ending block number
     // return callback( [ anchor object ] )
-    function history(anchor,callback,limit){}
+    anchorJS.history(anchor,function(object_array){
+
+    },limit)
 ```
 
 #### target
 
+Get the whole linked list of anchor.
+
+```javascript
+    // @param   anchor      string      //anchor name
+    // @param   block       number      //special block number
+    // return callback( anchor object )
+    anchorJS.target(anchor,block,function(object){
+
+    })
+```
+
 #### multi
 
-Get multi anchor data from list.
+Get multi anchor data from list. There are two ways to get anchor. One is just the name, such as "hello" .Another way is the name and target block, such as ["hello",123].
+You can use the mix list here, such as ["hello",["anchor_name",333],"world",["music",3345]] .
 
 ```javascript
     // @param   list        array       //[anchor,anchor]
-    // @param   callback    function    //callback function
     // return callback( [ anchor object ] )
-    function multi(list,callback){}
+    anchorJS.multi(list,function(object_array){
+
+    })
 ```
 
 ### Market part
@@ -184,9 +226,10 @@ Get multi anchor data from list.
 The list of selling anchors. No page function yet.
 
 ```javascript
-    // @param   callback    function    //callback function
     // return callback( [ market object ] )
-    function market(callback){}
+    anchorJS.market(function(selling_array){
+
+    })
 ```
 
 #### sell
@@ -197,10 +240,11 @@ Set anchor to selling status. If set the target buyer, the anchor only can be so
     // @param   pair      object         //account verify pair
     // @param   anchor    string         //unique anchor name
     // @param   price     number         //selling price
-    // @param   callback  function       //callback function
     // @param   target    string         //target buyer SS58 address
-    // return callback( true || error object )
-    function sell(pair,anchor,price,callback ,target){}
+    // return callback( status || error object )
+    anchorJS.sell(pair,anchor,price,function(status){
+
+    } ,target)
 ```
 
 #### unsell
@@ -210,9 +254,10 @@ Revoke the anchor selling status.
 ```javascript
     // @param   pair      object         //account verify pair
     // @param   anchor    string         //unique anchor name
-    // @param   callback  function       //callback function
-    // return callback( true || error object )
-    function unsell(pair,anchor,callback){}
+    // return callback( status || error object )
+    anchorJS.unsell(pair,anchor,function(status){
+
+    })
 ```
 
 #### buy
@@ -222,7 +267,8 @@ Buy a selling anchor, will follow the seller's price.
 ```javascript
     // @param   pair      object         //account verify pair
     // @param   anchor    string         //unique anchor name
-    // @param   callback  function       //callback function
     // return callback( true || error object )
-    function buy(pair,anchor,callback){}
+    anchorJS.buy(pair,anchor,function(status){
+
+    })
 ```

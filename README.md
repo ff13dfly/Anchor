@@ -1,8 +1,8 @@
 # Anchor, an On-chain Linked List storage pallet base on Substrate
 
-Anchor is an On-chain Linked List system base on substrate. On another hand, Anchor can alse be treated as Name Service or On-chain Key-value Storage.
+Anchor is an On-chain Linked List system base on [Substrate](). On another hand, Anchor can alse be treated as Name Service or On-chain Key-value Storage.
 
-Anchor is an isolated Substrate pallet. It can provide flexible on-chain data structureand and complex logic without upgrading the substrate node itself. That makes blockchain development easy for developer who do not know the blockchain well enough.
+Anchor is an isolated Substrate pallet. It can provide flexible on-chain data structure and complex logic without upgrading the substrate node itself. That makes blockchain development easy for developper who do not know the blockchain well enough.
 
 You can access the [Playground](https://playground.metanchor.net) to know it well. And, it is easy to test local by following introduction.
 
@@ -68,10 +68,11 @@ anchor:Default::default(),
 
 ### Issues about Rust & Substrate
 
-* Set up Rust environment. It is popular and you will find a lot of resource to learn about it. Only one suggestion myself, be patient instead of being crazy.
+1. Rust language.
+It is popular and you will find a lot of resource to learn about it. Only one suggestion myself, be patient instead of being crazy.
+After the enviroment is set up successful, the following commands are used to test and build anchor code.
 
 ```SHELL
-
 # unit test , change directory to frame/anchor first
 cargo test
 
@@ -82,18 +83,36 @@ cargo build --release
 cargo clean
 ```
 
-* Library problems.
-
-1. clang version
-2. protobuf
-
-* Run Substrate
+2. Clang version.
+In some system such as centos which I have tested, the clang version is too low, you need to update and set to new version manually.
 
 ```SHELL
+# set clang version to target one
+scl enable devtoolset-7 bash
+```
+
+3. Protobuf
+It is a new problem, this helps to reduce the size of substrate bin nearly 40%, but in mac, it is not installed.
+
+```SHELL
+brew install automake
+brew install libtool
+brew install protobuf
+protoc --version
+```
+
+4. Run anchor binrary  
+Anchor pallet need to read the block hash, new versions of Substrate will drop the map to save memory. To avoid this, you need to add the parameters when start anchor node.
+
+```SHELL
+# --state-pruning archive
+# without this parameter, the hash of block can not been read.
 target/substrate --dev --state-pruning archive
 ```
 
-* Explorer Substrate
+5. Browser Substrate
+
+Polkadot explorer works pretty good, you can run local by downloading here. Or, just trying the web application here.
 
 ## Docker testing
 
@@ -115,41 +134,55 @@ There is a shell file to create docker image, you can test it by one command.
     sh build.sh
 ```
 
+### Run from docker image
+
+Not yet. It is still a problem need to sovle myself.
+
 ## API calls
 
-There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on Polkadot.js and anchor.js.
+There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on [@polkadot/api]() and [anchor.js]().
 
 ### 1. set_anchor, storage part
 
 To make it simple, there is just one single call to set anchor data.
 
 ```Javascript
-    //polkadot.js code
-    wsPolka.tx.anchor.setAnchor(anchor, raw, protocol, previous_block).signAndSend(pair, (res) => {
+    //@polkadot/api code
+    polkadotWebsocket.tx.anchor.setAnchor(anchor, raw, protocol, previous_block).signAndSend(pair, (res) => {
     
     });
 ```
 
 ```Javascript
     //anchor.js code
+    anchorJS.write(pair, anchor, raw, protocol, (status) => {
+    
+    });
 ```
 
 Limitation of the parameters.
 
-* Key :
-* Raw :
-* Protocol :
-* Pre :
+* Key : Vec<u8> , 40 bytes max
+* Raw : Vec<u8> , 4MB max
+* Protocol : Vec<u8>  , 256 bytes max
+* Pre : block_number
 
 Substrate/Polkadot supplies API to access the storage, you can get the lastest anchor information as follow way.
 
 ```Javascript
-    //polkadot.js code
-    wsPolka.query.anchor.anchorOwner(anchor, (res) =>{
+    //@polkadot/api code
+    polkadotWebsocket.query.anchor.anchorOwner(anchor, (res) =>{
 
     }).then((unsub) => {
 
     });
+```
+
+```Javascript
+    //anchor.js code
+    anchorJS.owner(anchor,(object)=>{
+
+    })
 ```
 
 Anchor.js supply more methods to access the anchor data, you can check in details here.
@@ -160,14 +193,17 @@ Anchor.js supply more methods to access the anchor data, you can check in detail
 Set the anchor to selling status.
 
 ```Javascript
-    //polkadot.js code
-    wsPolka.tx.anchor.sellAnchor(anchor,price).signAndSend(pair,(res) => {
+    //@polkadot/api code
+    polkadotWebsocket.tx.anchor.sellAnchor(anchor,price,target).signAndSend(pair,(res) => {
         // code here .
     });
 ```
 
 ```Javascript
     //anchor.js code
+    anchorJS.sell(pair,anchor,price,(status)=>{
+
+    } ,target)
 ```
 
 ### 3. unsell_anchor, market part
@@ -175,65 +211,55 @@ Set the anchor to selling status.
 Revoke the anchor selling status.
 
 ```Javascript
-    //polkadot.js code
-    wsPolka.tx.anchor.unsellAnchor(anchor).signAndSend(pair,(res) => {
+    //@polkadot/api code
+    polkadotWebsocket.tx.anchor.unsellAnchor(anchor).signAndSend(pair,(res) => {
         // code here .
     });
 ```
 
 ```Javascript
     //anchor.js code
+    anchorJS.unsell(pair,anchor,(status)=>{
+
+    })
 ```
 
 ### 4. buy_anchor, market part
 
-Buy the anchor.
+Buy the anchor. The ownership will change and the history data will not change.
 
 ```Javascript
-    //polkadot.js code
-    wsPolka.tx.anchor.buyAnchor(anchor).signAndSend(pair,(res) => {
+    //@polkadot/api code
+    polkadotWebsocket.tx.anchor.buyAnchor(anchor).signAndSend(pair,(res) => {
         // code here .
     });
 ```
 
 ```Javascript
     //anchor.js code
+    anchorJS.buy(pair,anchor,(status)=>{
+
+    })
 ```
 
 ### Q&A about APIs
 
-1. How to delete an anchor ?
+1. how to delete an exsist anchor ?
+
+> No, you can not delete even you are the owner of the anchor.
+
+2. How to remove the anchor data ?
 
 > No, you can not delete an exsist anchor.
 
-2. Can I update anchor when it is on selling ?
+3. Can I update anchor when it is on selling ?
 
 > Yes, you can.
 
-3. Is UTF8 supported by Anchor ?
+4. Is UTF8 supported by Anchor ?
 
 > Yes, but UTF8 characters will cost more bytes.
 
-4. What does the "protocol" feild mean ?
+5. What does the "protocol" feild mean ?
 
 > It is a 256 bytes string to define your own protocol on chain.
-
-## More details
-
-### EasyPolka
-
-Anchor is the storage part of EasyPolka.
-
-### Anchor details
-
-* Name Service, anchor is the unique name stored on chain, the ownership can not been modified without the operation of owner.
-
-* Key-value Storage, the same reason as Name Service, only owner can modify the anchor data. It is an enhanced storage.
-
-### Anchor.js
-
-* You can check the details on [anchor.js README](https://github.com/ff13dfly/Anchor/js/README.md)
-
-### Playground details
-
-* This web application is base on React.
