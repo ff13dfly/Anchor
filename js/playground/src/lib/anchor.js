@@ -64,6 +64,7 @@ const self = {
 			const block=lastHeader.number.toHuman();
 			const list=[];
 			const format=self.format;
+
 			self.specific(hash,(exs)=>{
 				for(let i=0;i<exs.length;i++){
 					const ex=exs[i],row=ex.args;
@@ -77,6 +78,7 @@ const self = {
 				}
 				return ck && ck(list);
 			});
+
 		}).then((fun) => {
 			unlistening = fun;
 		});
@@ -149,7 +151,6 @@ const self = {
 		self.owner(anchor,(owner)=>{
 			const details={block:block};
 			if(owner===false) return ck && ck(self.format(anchor,details));
-			details.owner=owner;
 			wsAPI.rpc.chain.getBlockHash(block, (res) => {
 				const hash = res.toHex();
 				if (!hash) return ck && ck(self.format(anchor,details));
@@ -159,6 +160,7 @@ const self = {
 					
 					details.empty = false;
 					for(let k in dt) details[k]=dt[k];
+					details.owner=owner;
 
 					let unlist=null;
 					wsAPI.query.anchor.sellList(anchor, (dt) => {
@@ -174,7 +176,7 @@ const self = {
 						unlist = fun;
 					});
 
-				},{anchor:anchor});
+				},{anchor:anchor});		//add the owner details here.
 			});
 		});
 	},
@@ -202,12 +204,15 @@ const self = {
 		if (!list) list = [];
 		wsAPI.rpc.chain.getBlockHash(block, (res)=>{
 			const hash = res.toHex();
-			self.specific(hash,(dt)=>{
-				dt.block=block;
-				list.push(dt);
-				if (dt.pre === limit || parseInt(dt.pre) === 0) return ck && ck(list);
-				else return self.loop(anchor, dt.pre, limit, ck, list);
-			},{anchor:anchor});
+			self.owner(anchor,(owner)=>{
+				self.specific(hash,(dt)=>{
+					dt.block=block;
+					dt.owner=owner;
+					list.push(dt);
+					if (dt.pre === limit || parseInt(dt.pre) === 0) return ck && ck(list);
+					else return self.loop(anchor, dt.pre, limit, ck, list);
+				},{anchor:anchor});
+			});
 		});
 	},
 	//TODO: [[anchor,block],[anchor,block],...,[anchor,block]], the anchor target list
@@ -251,13 +256,11 @@ const self = {
 		wsAPI.rpc.chain.getBlock(hash).then((dt) => {
 			if (dt.block.extrinsics.length === 1) return ck && ck(false);
 
-			
 			wsAPI.query.system.events.at(hash,(evs)=>{
 				const exs = self.filter(dt, 'setAnchor',self.status(evs));
 				if(exs.length===0) return ck && ck(false);
 				if(cfg.anchor===undefined) return ck && ck(exs);
-				
-				//单一的block里只有一个anchor，才可以这么处理
+
 				let data=null;
 				for(let i=0;i<exs.length;i++){
 					let ex=exs[i],row=ex.args;
@@ -269,6 +272,8 @@ const self = {
 					}
 				}
 				if(data===null) return ck && ck(false);
+				//if(cfg.owner) data.owner=cfg.owner;
+
 				return ck && ck(self.decor(data));
 			});
 		});
@@ -454,7 +459,7 @@ exports.anchorJS={
 	target:self.target,
 	history:self.history,
 	multi:self.multi,
-	footprint:self.footprint,
+	//footprint:self.footprint,
 	owner:self.owner,
 
 	write:self.write,
