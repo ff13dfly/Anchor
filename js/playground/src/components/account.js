@@ -1,4 +1,4 @@
-import { Row, Col, Button, Card, Form,Image } from 'react-bootstrap';
+import { Row, Col, Button, Card, Form,Image,Badge } from 'react-bootstrap';
 import { useState } from 'react';
 
 import {Accounts} from '../config/accounts';
@@ -63,7 +63,9 @@ function Account(props) {
               <Card.Title>
                 <Row>
                   <Col lg={6} xs={6} >{item.encry.meta.name}</Col>
-                  <Col lg={6} xs={6} className="text-end" >{balance[item.encry.address]}</Col>
+                  <Col lg={6} xs={6} className="text-end" >
+                    <Badge bg="info">{balance[item.encry.address]}</Badge>
+                  </Col>
                 </Row>
               </Card.Title>
               <Row>

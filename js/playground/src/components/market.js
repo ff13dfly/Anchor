@@ -4,13 +4,14 @@ import { useState } from 'react';
 import {Accounts} from '../config/accounts';
 
 function Market(props) {
+  const ankr = props.anchorJS;
+
+
   let [list, setList] = useState([]);
   let [dom, setDom]=useState('');
   let [accs, setAccs] = useState({});   //storage the select of buying
   let [unselling,setUnselling]=useState({});
   let [buying,setBuying]=useState({});
-
-  const ankr = props.anchorJS;
 
   const prefix={
     select:'select_',
@@ -97,16 +98,12 @@ function Market(props) {
                 <Col lg={12} xs={12} >
                     Last : {!item.stamp ? '' : self.format(item.stamp)}
                 </Col>
-                <Col lg={12} xs={12} >
-                  <Form.Group className="mb-3">
-                    <Form.Check type="checkbox" label="Free to buy" className='pt-2' readOnly checked={item.owner===item.target} />
-                  </Form.Group>
-                </Col>
-                <Col lg={9} xs={8} className="text-end">
-                  <Form.Control size="sm" type="password" id={prefix.unsell+item.name} placeholder="Unselling passowrd..." onChange={(ev) => {self.changeUnselling(ev)}}/>
-                </Col>
-                <Col lg={3} xs={4} className="text-end">
-                  <Button size="sm" variant="primary" onClick={() => {}} > Unsell </Button>
+                <Col lg={12} xs={12} className="pt-4" ></Col>
+                <Col lg={12} xs={12} className="text-end">
+                  {item.owner===item.target?
+                    (<h6><Badge bg="warning">Free to buy</Badge></h6>):
+                    (<h6>Only to {self.shortenAddress(item.target)}</h6>)
+                  }
                 </Col>
               </Row>
             </Card.Body>

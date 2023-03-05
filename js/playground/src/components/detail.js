@@ -90,12 +90,12 @@ function Detail(props) {
                   <td>{anchor.pre}</td>
                 </tr>
                 <tr>
-                  <td>Signer</td>
-                  <td>{anchor.signer}</td>
-                </tr>
-                <tr>
                   <td>Owner</td>
                   <td>{anchor.owner}</td>
+                </tr>
+                <tr>
+                  <td>Last</td>
+                  <td>{anchor.signer}</td>
                 </tr>
                 <tr>
                   <td>Stamp</td>
@@ -131,7 +131,7 @@ function Detail(props) {
         <Selling 
           sell={(!anchor || !anchor.sell) ? false : true} 
           anchor={!anchor ? '' : anchor.name} 
-          owner={anchor.signer}  
+          owner={anchor.owner}  
           anchorJS={props.anchorJS}
           fresh={props.fresh}
         />
