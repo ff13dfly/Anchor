@@ -1,5 +1,5 @@
 import { Row, Col, Button, Card, Form,Image,Badge } from 'react-bootstrap';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 import {Accounts} from '../config/accounts';
 
@@ -35,16 +35,27 @@ function Account(props) {
       });
     },
     render:()=>{
+      console.log('here');
       const accs=self.getList(balance);
       self.getBalances(accs,(done)=>{
         setBalance(done);
       });
+
+      let avs={};
+      for(let acc in icons){
+        avs[acc]=`https://robohash.org/${acc}.png`;
+      }
+      setIcons(avs);
     },
   };
 
   let [balance, setBalance] = useState(self.getMap());
+  let [icons,setIcons] = useState(self.getMap());
 
-  self.render();
+  useEffect(() => {
+    //setList(props.list);
+    self.render();
+  },[]);
 
   return (
     <Row>
@@ -71,7 +82,7 @@ function Account(props) {
               <Row>
                 <Col lg={3} xs={12} >
                   <Image 
-                    src="https://robohash.org/5Dt3Diu9becXCqtY2nYucE7DYRaWb7a8V73xuphWeB7MbLVq.png"
+                    src={icons[item.encry.address]}
                     rounded
                     width="100%"
                   />

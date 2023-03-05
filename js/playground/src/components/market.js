@@ -129,7 +129,10 @@ function Market(props) {
       </Row>)
     }
   };
-
+  
+  // useEffect(() => {
+  //   self.render();
+  // },[]);
   self.render();
 
   return (<Container>{dom}</Container>);
