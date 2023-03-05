@@ -10,6 +10,7 @@ import Keys from '../config/keys';
 function Setting(props) {
   const nodes=STORAGE.getCache(Keys.node);
   //let [balance, setBalance] = useState(new Array(list.length).fill(0));
+  //console.log(props);
 
   const self = {
     onSave: () => {
@@ -30,7 +31,7 @@ function Setting(props) {
       <Col lg={12} xs={12} className="pt-4" ></Col>
       <Col lg={12} xs={12} className="pt-4" ></Col>
       </Row>
-      <Account />
+      <Account anchoJS={props.anchorJS}/>
     </Container>
   );
 }

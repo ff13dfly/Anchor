@@ -27,13 +27,4 @@ exports.Accounts = [
     },
     "password": "123456",
   },
-  {
-    "encry": {
-      "encoded":"rAFoLywXyd+hSmv9SlTDOmkn746DymjuStyhRUmELB8AgAAAAQAAAAgAAAB5MQZyl8EoSyEsAymNrtzyFD8IV09C1TIbqyj+UcMmgiurOuJw17wi7gQiG8YFBD7e4gyrRRoQ0Aj5K7JUgL/QRGN5Gj9l9bWU9Vg/ZlIOTDmbkG/oOLUXV2tuo3ZyPpRQJdCQ7kdUPWFrsbCUyBEg0GBVAwsIB/LxILkRSCT2gLKdSoTWRYJgVDvrX08sEOPkQR1uNHARvIDFwQVQ",
-      "encoding":{"content":["pkcs8","sr25519"],"type":["scrypt","xsalsa20-poly1305"],"version":"3"},
-      "address":"5G4NYSSkwk4hk13QYa5GvxogaeNnjA8qaXBqLk9BvxYXJvaW",
-      "meta":{"name":"account_d"}
-    },
-    "password": "123456",
-  },
 ];

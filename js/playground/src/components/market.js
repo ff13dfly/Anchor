@@ -57,7 +57,7 @@ function Market(props) {
       return dt.toLocaleString();
     },
     render:()=>{
-      if(!ankr.ready()) return setTimeout(self.render,200);
+      //if(!ankr.ready()) return setTimeout(self.render,200);
       ankr.market((alist) => {
         if(alist.length===0) return setDom((<Row>
           <Col lg={12} xs={12} className="text-center pt-4">

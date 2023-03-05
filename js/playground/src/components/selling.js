@@ -15,7 +15,8 @@ function Selling(props) {
   let [password,setPassword]=useState(0);
 
   let [remind,setRemind]=useState(Accounts[0].password);
-  let [process,setProcess]=useState('process infomation');
+  let [process,setProcess]=useState('');
+  let [disabled,setDisabled]= useState(false);
 
   const self={
     changePrice:(ev)=>{
@@ -42,11 +43,29 @@ function Selling(props) {
 
       if(acc===null) return false;
 
+      setDisabled(true);
       const target=!free?Accounts[account].encry.address:undefined;
       ankr.load(acc.encry,password,(pair)=>{
         if(!pair) return false;
         ankr.sell(pair,anchor,price,(res)=>{
-          console.log(res);
+          if(res.error){
+            return setProcess(res.error);
+          }
+
+          const status=res.status.toHuman();
+          if (typeof (status) == 'string') return setProcess(status);
+          if(status.InBlock){
+            return setProcess('InBlock, nearly done.');
+          }
+          if(status.Finalized){
+            setDisabled(false);
+            setProcess('Finalized');
+            return setTimeout(()=>{
+              setProcess('');
+              props.fresh(anchor);
+            },1000);
+          }
+
         },target);
       });
     },
@@ -62,7 +81,7 @@ function Selling(props) {
         <small className='text-success'>Selling anchor in two ways target and freely. Anchor owner Password:<span className='text-danger ml-2 mr-2 bg-warning'>{remind}</span></small>
       </Col>
       <Col lg={10} xs={12}>
-        <Form.Select aria-label="Default select" disabled={free} onChange={(ev) => { self.changeAccount(ev) }}>
+        <Form.Select aria-label="Default select" disabled={free || disabled} onChange={(ev) => { self.changeAccount(ev) }}>
           {Accounts.map((item,index) => (
               <option value={index} key={index}>{item.encry.address}</option>
           ))}
@@ -74,13 +93,13 @@ function Selling(props) {
         </Form.Group>
       </Col>
       <Col lg={5} xs={12} className="pt-2" >
-        <Form.Control size="md" type="number" placeholder="Price..." onChange={(ev) => { self.changePrice(ev)}} />
+        <Form.Control size="md" type="number" disabled={disabled} placeholder="Price..." onChange={(ev) => { self.changePrice(ev)}} />
       </Col>
       <Col lg={5} xs={12} className="pt-2" >
-        <Form.Control size="md" type="password" placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
+        <Form.Control size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
       </Col>
       <Col lg={2} xs={12} className="pt-2 text-end" >
-        <Button size="md" variant="primary" onClick={() => {self.sell()}} > Sell </Button>
+        <Button size="md" variant="primary" disabled={disabled} onClick={() => {self.sell()}} > Sell </Button>
       </Col>
       <Col lg={12} xs={12} className="text-end" >{process}</Col>
     </Row>

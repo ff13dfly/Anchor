@@ -13,6 +13,14 @@ function Search(props) {
   
 
   const self={
+    fresh:(name)=>{
+      ankr.search(name,(res)=>{
+        if(res===false) return setResult(`No such anchor : ${name}`);
+        setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
+        if(!res) return false;
+        self.list(name,res.block);
+      });
+    },
     list:(name,cur)=>{
       ankr.history(name,(list)=>{
         setMore(<History list={list} block={cur} change={self.select} />);
@@ -23,7 +31,7 @@ function Search(props) {
       const arr=id.split('_');
       const block=parseInt(arr.pop());
       ankr.target(name,block,(res)=>{
-        setResult((<Detail data={res} anchorJS={props.anchorJS} />));
+        setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
         self.list(name,block);
       });
     },
@@ -31,7 +39,7 @@ function Search(props) {
       console.log(`Searching:${name}`);
       ankr.search(name,(res)=>{
         if(res===false) return setResult(`No such anchor : ${name}`);
-        setResult((<Detail data={res} anchorJS={props.anchorJS} />));
+        setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
         if(!res) return false;
         self.list(name,res.block);
       });

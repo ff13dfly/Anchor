@@ -30,7 +30,11 @@ function App() {
   const map={};
   map.node_persist=Keys.node_persist;
   STORAGE.setMap(map);
-  
+
+  const handleChangeEvent = useCallback(() => {
+    self.router(window.location.hash);
+  }, []);
+
   const self={
     link:(node,ck) => {
       if(linking) return setTimeout(()=>{
@@ -53,14 +57,20 @@ function App() {
       }
     },
     router:(hash)=>{
+      if(hash!=="#home" && !anchorJS.ready()){
+        return setTimeout(()=>{
+          self.router(hash);
+        },200);
+      }
       const dom=pages[hash]===undefined?pages['#home']:pages[hash];
       setView(dom);
     },
     status:(info)=>{
       console.log(info);
     },
-    fresh:(node)=>{
-
+    fresh:(anchor)=>{
+      self.router(window.location.hash);
+      console.log(anchor);
     },
 
     //load customer localstorage accounts
@@ -83,16 +93,14 @@ function App() {
   };
 
   const pages={
-    '#home':(<Search anchorJS={anchorJS}></Search>),
+    '#home':(<Search anchorJS={anchorJS} fresh={self.fresh} ></Search>),
     '#write':(<Write  anchorJS={anchorJS} accounts={Accounts}></Write>),
     '#market':(<Market anchorJS={anchorJS} />),
     '#setting':(<Setting anchorJS={anchorJS} list={Accounts} fresh={self.fresh}/>),
     '#document':(<Summary anchorJS={anchorJS} />),
   };
 
-  const handleChangeEvent = useCallback(() => {
-      self.router(window.location.hash);
-  }, []);
+
 
   
   useEffect( ()=> {

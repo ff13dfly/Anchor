@@ -97,7 +97,12 @@ const self = {
 		let unsub=null;
 		wsAPI.query.system.account(address, (res) => {
 			if(unsub!=null) unsub();
-			return ck && ck(res);
+			//console.log(res);
+			const data=res.toJSON().data;
+
+			//parseFloat(res.data.free.toBn()*0.000000000001).toLocaleString()
+			//console.log(data);
+			return ck && ck(data);
 		}).then((fun)=>{
 			unsub=fun;
 		});

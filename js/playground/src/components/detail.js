@@ -10,6 +10,8 @@ function Detail(props) {
 
   let [URI, setURI] = useState(!anchor ? '#' : `https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer/query/${anchor.block}`);
   let [password,setPassword]=useState(0);
+  let [process,setProcess]=useState('');
+  let [disabled,setDisabled]= useState(false);
 
   const self = {
     format: (stamp) => {
@@ -20,22 +22,36 @@ function Detail(props) {
       setPassword(ev.target.value);
     },
     unsell:()=>{
-      console.log('here,password:'+password);
-      const owner=anchor.signer;
-
+      //console.log('here,password:'+password);
+      const owner=anchor.owner;
       let acc=null;
       for(let i=0;i<Accounts.length;i++){
         const  row=Accounts[i];
         if(row.encry.address===owner) acc=row;
       }
-      console.log(acc);
-
       if(acc===null) return false;
+      setDisabled(true);
+
       ankr.load(acc.encry,password,(pair)=>{
         if(!pair) return false;
-        console.log(pair);
         ankr.unsell(pair,anchor.name,(res)=>{
-          console.log(res);
+          if(res.error){
+            return setProcess(res.error);
+          }
+
+          const status=res.status.toHuman();
+          if (typeof (status) == 'string') return setProcess(status);
+          if(status.InBlock){
+            return setProcess('InBlock, nearly done.');
+          }
+          if(status.Finalized){
+            setDisabled(false);
+            setProcess('Finalized');
+            return setTimeout(()=>{
+              setProcess('');
+              props.fresh(anchor.name);
+            },1000);
+          }
         });
       });
     },
@@ -95,11 +111,12 @@ function Detail(props) {
                         </Badge></h5>
                       </Col>
                       <Col lg={5} xs={5} className="text-end">
-                        <Form.Control size="sm" type="password" disabled={!anchor.sell} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
+                        <Form.Control size="sm" type="password" disabled={!anchor.sell || disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
                       </Col>
                       <Col lg={2} xs={2} className="text-end">
-                        <Button size="sm" variant="primary" disabled={!anchor.sell} onClick={() => {self.unsell()}} > Unsell </Button>
+                      <Button size="sm" variant="primary" disabled={!anchor.sell || disabled} onClick={() => {self.unsell()}} > Unsell </Button>
                       </Col>
+                      <Col lg={12} xs={12} className="text-end" >{process}</Col>
                     </Row>
                   </td>
                 </tr>
@@ -116,6 +133,7 @@ function Detail(props) {
           anchor={!anchor ? '' : anchor.name} 
           owner={anchor.signer}  
           anchorJS={props.anchorJS}
+          fresh={props.fresh}
         />
       </Col>
     </Row>

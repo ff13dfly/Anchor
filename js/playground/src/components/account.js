@@ -1,20 +1,50 @@
-import {  Row, Col, Button, Card, Form,Image } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
+import { Row, Col, Button, Card, Form,Image } from 'react-bootstrap';
+import { useState } from 'react';
 
 import {Accounts} from '../config/accounts';
 
 function Account(props) {
-  let [balance, setBalance] = useState(new Array(Accounts.length).fill(0));
+  const ankr=props.anchoJS;
 
   const self = {
     onSave: () => {
       console.log('click me');
     },
+    getMap:()=>{
+      let map={};
+      for(let i=0;i<Accounts.length;i++){
+        const row=Accounts[i];
+        //console.log(row);
+        map[row.encry.address]=0;
+      }
+      return map;
+    },
+    getList:(map)=>{
+      let list=[];
+      for(let address in map) list.push(address);
+      return list;
+    },
+    getBalances:(list,ck,done)=>{
+      if(done===undefined) done={};
+      if(list.length===0) return ck && ck(done);
+
+      let address=list.pop();
+      ankr.balance(address,(bc)=>{
+        done[address]=parseInt(bc.free*0.000000000001).toLocaleString();
+        return self.getBalances(list,ck,done);
+      });
+    },
+    render:()=>{
+      const accs=self.getList(balance);
+      self.getBalances(accs,(done)=>{
+        setBalance(done);
+      });
+    },
   };
 
-  useEffect(() => {
+  let [balance, setBalance] = useState(self.getMap());
 
-  }, []);
+  self.render();
 
   return (
     <Row>
@@ -33,7 +63,7 @@ function Account(props) {
               <Card.Title>
                 <Row>
                   <Col lg={6} xs={6} >{item.encry.meta.name}</Col>
-                  <Col lg={6} xs={6} className="text-end" >{balance[index]}</Col>
+                  <Col lg={6} xs={6} className="text-end" >{balance[item.encry.address]}</Col>
                 </Row>
               </Card.Title>
               <Row>
