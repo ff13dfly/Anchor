@@ -39,12 +39,8 @@ function Detail(props) {
             return setProcess(res.error);
           }
 
-          const status=res.status.toHuman();
-          if (typeof (status) == 'string') return setProcess(status);
-          if(status.InBlock){
-            return setProcess('InBlock, nearly done.');
-          }
-          if(status.Finalized){
+          setProcess(res.message);
+          if(res.step==="Finalized"){
             setDisabled(false);
             setProcess('Finalized');
             return setTimeout(()=>{
@@ -52,6 +48,7 @@ function Detail(props) {
               props.fresh(anchor.name);
             },1000);
           }
+          
         });
       });
     },

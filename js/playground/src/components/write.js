@@ -60,21 +60,15 @@ function Write(props) {
           if(res.error){
             setDisabled(false);
             return setInfo(res.error);
-          } 
-
-          const status=res.status.toHuman();
-          if (typeof (status) == 'string') return setInfo(status);
-
-          if(status.InBlock){
-            //setDisabled(false);
-            return setInfo('InBlock, waiting for Finalized');
           }
 
-          if(status.Finalized){
+          setInfo(res.message);
+          if(res.step==="Finalized"){
             self.render();
             setDisabled(false);
-            //self.clear();
-            return setInfo('Finalized');
+            setTimeout(() => {
+              setInfo("");
+            }, 1000);
           }
         });
       });

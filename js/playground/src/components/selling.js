@@ -52,12 +52,8 @@ function Selling(props) {
             return setProcess(res.error);
           }
 
-          const status=res.status.toHuman();
-          if (typeof (status) == 'string') return setProcess(status);
-          if(status.InBlock){
-            return setProcess('InBlock, nearly done.');
-          }
-          if(status.Finalized){
+          setProcess(res.message);
+          if(res.step==="Finalized"){
             setDisabled(false);
             setProcess('Finalized');
             return setTimeout(()=>{
@@ -65,7 +61,6 @@ function Selling(props) {
               props.fresh(anchor);
             },1000);
           }
-
         },target);
       });
     },

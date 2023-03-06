@@ -1,20 +1,12 @@
-import { useState,useEffect } from 'react';
-
 import { Row, Col,ListGroup} from 'react-bootstrap';
 
 function History(props) {
-  let [list, setList] = useState([]);
-
   const self={
     shortenAddress: (address, n) => {
       if (n === undefined) n = 10;
       return address.substr(0, n) + '...' + address.substr(address.length - n, n);
     },
   };
-
-	useEffect(() => {
-    setList(props.list);
-  },[]);
 
 	return (
     <Row>
@@ -23,7 +15,7 @@ function History(props) {
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
         <ListGroup as="ol">
-          {list.map((item,index) => (
+          {props.list.map((item,index) => (
             <ListGroup.Item 
               as="li" 
               id={`${item.name}_${item.block}`} 

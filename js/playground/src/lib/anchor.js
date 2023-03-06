@@ -408,7 +408,7 @@ const self = {
 
 		if(res.Finalized){
 			status.step='Finalized';
-			status.message='Finalized on node, done.';
+			status.message='Finalized, done.';
 			return status;
 		}
 		return status;

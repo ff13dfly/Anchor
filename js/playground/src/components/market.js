@@ -26,7 +26,7 @@ function Market(props) {
       ankr.load(acc.encry,buying[anchor],(pair)=>{
         if(pair===false) return false;
         ankr.buy(pair,anchor, (res)=>{
-          console.log(res);
+          
         });
       });
     },

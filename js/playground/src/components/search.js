@@ -22,14 +22,16 @@ function Search(props) {
       });
     },
     list:(name,cur)=>{
+      console.log(`${name} history. cur ${cur}`);
       ankr.history(name,(list)=>{
-        setMore(<History list={list} block={cur} change={self.select} />);
+        setMore((<History list={list} block={cur} change={self.select} />));
       });
     },
     select:(ev)=>{
       const id=ev.target.id;
       const arr=id.split('_');
       const block=parseInt(arr.pop());
+      console.log(name);
       ankr.target(name,block,(res)=>{
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
         self.list(name,block);
@@ -40,7 +42,6 @@ function Search(props) {
       ankr.search(name,(res)=>{
         if(res===false) return setResult(`No such anchor : ${name}`);
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
-        if(!res) return false;
         self.list(name,res.block);
       });
     },
