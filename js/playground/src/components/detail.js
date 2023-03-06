@@ -1,5 +1,5 @@
 import { Row, Col, Badge, Card,Button,Form} from 'react-bootstrap';
-import { useState } from 'react';
+import { useState,useRef } from 'react';
 
 import Selling from './selling';
 import {Accounts} from '../config/accounts';
@@ -12,6 +12,8 @@ function Detail(props) {
   let [password,setPassword]=useState(0);
   let [process,setProcess]=useState('');
   let [disabled,setDisabled]= useState(false);
+
+  const refPassword = useRef(null);
 
   const self = {
     format: (stamp) => {
@@ -43,6 +45,7 @@ function Detail(props) {
           if(res.step==="Finalized"){
             setDisabled(false);
             setProcess('Finalized');
+            refPassword.current.value="";
             return setTimeout(()=>{
               setProcess('');
               props.fresh(anchor.name);
@@ -108,10 +111,10 @@ function Detail(props) {
                         </Badge></h5>
                       </Col>
                       <Col lg={5} xs={5} className="text-end">
-                        <Form.Control size="sm" type="password" disabled={!anchor.sell || disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
+                        <Form.Control size="sm" type="password" ref={refPassword} disabled={!anchor.sell || disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
                       </Col>
                       <Col lg={2} xs={2} className="text-end">
-                      <Button size="sm" variant="primary" disabled={!anchor.sell || disabled} onClick={() => {self.unsell()}} > Unsell </Button>
+                        <Button size="sm" variant="primary" disabled={!anchor.sell || disabled} onClick={() => {self.unsell()}} > Unsell </Button>
                       </Col>
                       <Col lg={12} xs={12} className="text-end" >{process}</Col>
                     </Row>

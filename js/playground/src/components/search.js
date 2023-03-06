@@ -22,7 +22,7 @@ function Search(props) {
       });
     },
     list:(name,cur)=>{
-      console.log(`${name} history. cur ${cur}`);
+      //console.log(`${name} history. cur ${cur}`);
       ankr.history(name,(list)=>{
         setMore((<History list={list} block={cur} change={self.select} />));
       });
@@ -31,14 +31,14 @@ function Search(props) {
       const id=ev.target.id;
       const arr=id.split('_');
       const block=parseInt(arr.pop());
-      console.log(name);
+      //console.log(name);
       ankr.target(name,block,(res)=>{
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
         self.list(name,block);
       });
     },
     onSearch:()=>{
-      console.log(`Searching:${name}`);
+      //console.log(`Searching:${name}`);
       ankr.search(name,(res)=>{
         if(res===false) return setResult(`No such anchor : ${name}`);
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));

@@ -15,7 +15,7 @@ function Summary(props) {
   return (
     <Container> 
       <Row>
-				<Col lg={7} xs={12} className="pt-4" >
+				<Col lg={8} xs={12} className="pt-4" >
           <h4>Overview</h4>
           <p>
             This playground is a test enviment for anchor node. It is a Polkadot/Substrate extend pallet, details here <a href="https://github.com/ff13dfly/Anchor">https://github.com/ff13dfly/Anchor</a>.
@@ -32,11 +32,11 @@ function Summary(props) {
             That's the reason we keep the typing password step although it is a bit troublesome.
           </p>
         </Col>
-        <Col lg={5} xs={12} className="pt-4" >
+        <Col lg={4} xs={12} className="pt-4" >
 
         </Col>
-        <Col lg={7} xs={12} className="pt-4" >
-          <h4>Basic playway</h4>
+        <Col lg={8} xs={12} className="pt-4" >
+          <h4>Gameplay</h4>
           <p>
             It may take your 10 minutes to try this playround. 
             I think it is worthy, after playing, you  will find a new way of the blockchain world.
@@ -60,48 +60,26 @@ function Summary(props) {
             One, sell it freely; two, sell it to target account.
           </p>
           <p>
-            <Badge bg="primary">Step 5</Badge> Unsell the anchor.
+            <Badge bg="primary">Step 5</Badge> Unsell the anchor. 
+            You can find the "unsell" button on search result, after typing password, you will find what happen.
           </p>
           <p>
             <Badge bg="primary">Step 6</Badge> Buy the anchor.
+            On market page, beside the selling card, you can select account to buy the target anchor. 
+            After buying, you can search the anchor, will find the ownership changed in result details.
           </p>
           </Col>
-          <Col lg={5} xs={12} className="pt-4" >
-
-          </Col>
-          <Col lg={7} xs={12} className="pt-4" >
-          <h4>Coding playway</h4>
-          <p>
-            If you are interesting in this part, it is high possible that you are a developer, so there will be some code. 
-            But don't be afraid if you have no coding experince, the code is as simple as possible, just try.
-          </p>
-          <p>
-            <Badge bg="primary">func 1</Badge> Write an anchor by coding.
-          </p>
-          <p>
-            <Badge bg="primary">func 2</Badge> Create a new account by coding.
-          </p>
-          <p>
-            <Badge bg="primary">func 3</Badge> Data view.
-          </p>
-
-          </Col>
-          <Col lg={5} xs={12} className="pt-4" >
+          <Col lg={4} xs={12} className="pt-4" >
 
           </Col>
          <Col lg={12} xs={12} className="pt-4" >        
 
           <h4>Resource</h4>
           <p>
-            Anchor Pallet : 
+            Anchor Pallet : <a target="_blank" href="https://github.com/ff13dfly/Anchor">https://github.com/ff13dfly/Anchor</a>
           </p>
           <p>
-            Anchor.js : 
-          </p>
-
-          <h4>More details</h4>
-          <p>
-            Thank you for your patient, I am here, if you want to know more.
+            Anchor.js : <a target="_blank" href="https://github.com/ff13dfly/Anchor/blob/main/js/README.md">https://github.com/ff13dfly/Anchor/blob/main/js/README.md</a>
           </p>
 
           <h4>Notice</h4>

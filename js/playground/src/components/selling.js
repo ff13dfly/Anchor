@@ -1,5 +1,5 @@
 import { Row, Col, Button, Form } from 'react-bootstrap';
-import { useEffect,useState } from 'react';
+import { useEffect,useState,useRef } from 'react';
 
 import {Accounts} from '../config/accounts';
 
@@ -18,6 +18,9 @@ function Selling(props) {
   let [process,setProcess]=useState('');
   let [disabled,setDisabled]= useState(false);
 
+  const refPrice = useRef(null);
+  const refPassword = useRef(null);
+
   const self={
     changePrice:(ev)=>{
       setPrice(ev.target.value);
@@ -32,6 +35,10 @@ function Selling(props) {
       setAccount(ev.target.value);
       const row=Accounts[ev.target.value];
       setRemind(row.password);
+    },
+    clear:()=>{
+      refPrice.current.value = "";
+      refPassword.current.value = "";
     },
     sell:()=>{
       if(price <=0) return false;
@@ -56,6 +63,7 @@ function Selling(props) {
           if(res.step==="Finalized"){
             setDisabled(false);
             setProcess('Finalized');
+            self.clear();
             return setTimeout(()=>{
               setProcess('');
               props.fresh(anchor);
@@ -88,10 +96,10 @@ function Selling(props) {
         </Form.Group>
       </Col>
       <Col lg={5} xs={12} className="pt-2" >
-        <Form.Control size="md" type="number" disabled={disabled} placeholder="Price..." onChange={(ev) => { self.changePrice(ev)}} />
+        <Form.Control size="md" type="number" ref={refPrice} disabled={disabled} placeholder="Price..." onChange={(ev) => { self.changePrice(ev)}} />
       </Col>
       <Col lg={5} xs={12} className="pt-2" >
-        <Form.Control size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
+        <Form.Control size="md" type="password" ref={refPassword} disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
       </Col>
       <Col lg={2} xs={12} className="pt-2 text-end" >
         <Button size="md" variant="primary" disabled={disabled} onClick={() => {self.sell()}} > Sell </Button>
