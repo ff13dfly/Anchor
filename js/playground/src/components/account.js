@@ -60,13 +60,13 @@ function Account(props) {
   return (
     <Row>
       <Col lg={3} xs={6}><h6>Testing Accounts</h6></Col>
-      <Col lg={3} xs={6}></Col>
-      <Col lg={4} xs={6}>
+      <Col lg={9} xs={6}></Col>
+      {/* <Col lg={4} xs={6}>
         <Form.Control size="md" type="text" placeholder="Passwor for new account..." onChange={(ev) => {}} />
       </Col>
       <Col lg={2} xs={6} className="text-end">
         <Button size="md" variant="primary" onClick={() => {}} >New Account</Button>
-      </Col>
+      </Col> */}
       {Accounts.map((item, index) => (
         <Col lg={4} xs={4} className="pt-3" key={index}>
           <Card>

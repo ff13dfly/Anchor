@@ -56,7 +56,7 @@ const self = {
 
 	// subcribe the newest block data
 	listening: (ck) => {
-		if (wsAPI === null) return ck && ck(false);
+		if (!self.ready()) return ck && ck(false);
 		self.clean();
 		wsAPI.rpc.chain.subscribeFinalizedHeads((lastHeader) => {
 			//console.log(lastHeader);
@@ -92,7 +92,7 @@ const self = {
 		return true;
 	},
 	balance: (address, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		if(self.limited(undefined,undefined,undefined,address)) return ck && ck(false);
 		let unsub=null;
 		wsAPI.query.system.account(address, (res) => {
@@ -112,7 +112,7 @@ const self = {
 
 	},
 	load:(encryJSON,password,ck)=>{
-		if(!password) return false;
+		if(!password) return ck && ck({error:"No password."});
 		const pair = keyRing.createFromJson(encryJSON);
 		try {
 			pair.decodePkcs8(password);
@@ -138,7 +138,7 @@ const self = {
 		});
 	},
 	latest: (anchor, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 
@@ -148,7 +148,7 @@ const self = {
 		});
 	},
 	target:(anchor,block,ck)=>{
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if (anchor.substr(0, 2) === '0x') anchor = self.decodeUTF8(anchor);
 
@@ -186,7 +186,7 @@ const self = {
 		});
 	},
 	history: (anchor, ck, limit) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 
@@ -225,6 +225,7 @@ const self = {
 
 	},
 	multi: (list,ck,done,map)=>{
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		if(list.length===0) return [];
 		if(!done) done=[];
 		if(!map) map={};
@@ -289,7 +290,7 @@ const self = {
 	/**************************/
 
 	write: (pair, anchor, raw, protocol, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		if (typeof protocol !== 'string') protocol = JSON.stringify(protocol);
 		if (typeof raw !== 'string') raw = JSON.stringify(raw);
 		if(self.limited(anchor,raw,protocol)) return ck && ck({error:"Params error"});
@@ -300,7 +301,7 @@ const self = {
 			const pre = owner===false?0:block;
 			try {
 				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
-					return ck && ck(res);
+					return ck && ck(self.process(res));
 				});
 			} catch (error) {
 				return ck && ck({error:error});
@@ -314,7 +315,7 @@ const self = {
 	
 	// TODO: need to page and step
 	market: (ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		wsAPI.query.anchor.sellList.entries().then((arr) => {
 			let list=[];
 			if(!arr) return ck && ck(list);
@@ -334,32 +335,41 @@ const self = {
 		});
 	},
 	sell: (pair, anchor, price, ck , target) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck(false);
 
 		self.owner(anchor,(owner,block)=>{
 			if(owner===false) return ck && ck({error:"No target anchor."});
 			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
-			wsAPI.tx.anchor.sellAnchor(anchor,price,!target?owner:target).signAndSend(pair, (res) => {
-				return ck && ck(res);
-			});
+			try {
+				wsAPI.tx.anchor.sellAnchor(anchor,price,!target?owner:target).signAndSend(pair, (res) => {
+					return ck && ck(self.process(res));
+				});
+			} catch (error) {
+				return ck && ck({error:error});
+			}
+			
 		});
 	},
 	unsell:(pair, anchor, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck({error:"Name error"});
 		self.owner(anchor,(owner)=>{
 			if(!owner) return ck && ck({error:"No such anchor."});
 			if(owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
-			wsAPI.tx.anchor.unsellAnchor(anchor).signAndSend(pair, (res) => {
-				return ck && ck(res);
-			});
+			try {
+				wsAPI.tx.anchor.unsellAnchor(anchor).signAndSend(pair, (res) => {
+					return ck && ck(self.process(res));
+				});
+			} catch (error) {
+				return ck && ck({error:error});
+			}
 		});
 	},
 	buy: (pair, anchor, ck) => {
-		if(wsAPI===null) return ck && ck({error:"No websocke link."});
+		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
 		if(self.limited(anchor)) return ck && ck({error:"Name error"});
 
@@ -368,16 +378,41 @@ const self = {
 			wsAPI.query.anchor.sellList(anchor, (dt) => {
 				if (dt.value.isEmpty) return ck && ck({error:`'${anchor}' is not on sell`});
 				try {
-					wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (result) => {
-						return ck && ck(result);
+					wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (res) => {
+						return ck && ck(self.process(res));
 					});
 				} catch (error) {
-					return ck && ck(error);
+					return ck && ck({error:error});
 				}
 			});
 		});
 	},
-	
+	process:(obj)=>{
+		const status={
+			step:'',
+			message:'',
+		};
+		const res=obj.status.toHuman();
+
+		if (typeof (res) == 'string'){
+			status.step=res;
+			status.message='Ready to interact with node.';
+			return status;
+		}
+
+		if(res.InBlock){
+			status.step='InBlock';
+			status.message='Packaged to block, nearly done. Waiting for finalizing.';
+			return status;
+		}
+
+		if(res.Finalized){
+			status.step='Finalized';
+			status.message='Finalized on node, done.';
+			return status;
+		}
+		return status;
+	},
 	
 	/************************/
 	/***Anchor data format***/
@@ -420,6 +455,7 @@ const self = {
 		});
 		return arr;
 	},
+	
 	status:(list)=>{
 		const evs=list.toHuman();
 		const map={};
@@ -456,21 +492,21 @@ exports.anchorJS={
 	setKeyring:self.setKeyring,	//set Keyring to get pair
 	ready:self.ready,			//check the ws is ready
 	subcribe:self.listening,	//subcribe the latest block which including anchor data
-	load:self.load,						
-	search:self.latest,
-	balance:self.balance,
+	load:self.load,				//load encry json to create pair	
+	balance:self.balance,		//get the balance details of account
 
-	latest:self.latest,
-	target:self.target,
-	history:self.history,
-	multi:self.multi,
+	search:self.latest,			//search anchor name
+	latest:self.latest,			//get the latest data of anchor
+	target:self.target,			//view target anchor data
+	history:self.history,		//history of anchor data
+	multi:self.multi,			//get target data for a list of anchors
 	//footprint:self.footprint,
-	owner:self.owner,
+	owner:self.owner,			//get the owner of anchor
 
-	write:self.write,
+	write:self.write,			//init or update an anchor
 
-	market:self.market,
-	sell:self.sell,
-	unsell:self.unsell,
-	buy:self.buy,
+	market:self.market,			//get the list of selling anchors
+	sell:self.sell,				//set anchor to selling status
+	unsell:self.unsell,			//revoke anchor from selling status
+	buy:self.buy,				//buy selling anchor
 };

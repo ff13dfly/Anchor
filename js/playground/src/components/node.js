@@ -28,13 +28,13 @@ function Node(props) {
         <Col lg={1} xs={6} className="text-end">
           <Button size="md" variant="primary" onClick={() => {}} >Link</Button>
         </Col>
-        <Col lg={2} xs={6}></Col>
+        {/* <Col lg={2} xs={6}></Col>
         <Col lg={3} xs={6}>
           <Form.Control size="md" type="text" placeholder="New node..." onChange={(ev) => {}} />
         </Col>
         <Col lg={1} xs={6} className="text-end">
           <Button size="md" variant="primary" onClick={() => {}} >Add</Button>
-        </Col>
+        </Col> */}
 			</Row>
   );
 }

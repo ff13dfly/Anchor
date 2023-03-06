@@ -138,7 +138,7 @@ There is a shell file to create docker image, you can test it by one command.
 
 Not yet. It is still a problem need to sovle myself.
 
-## API calls
+## Exposed Methods
 
 There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on [@polkadot/api]() and [anchor.js]().
 
@@ -149,14 +149,14 @@ To make it simple, there is just one single call to set anchor data.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.setAnchor(anchor, raw, protocol, previous_block).signAndSend(pair, (res) => {
-    
+        //your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.write(pair, anchor, raw, protocol, (status) => {
-    
+        //your code here.
     });
 ```
 
@@ -172,7 +172,7 @@ Substrate/Polkadot supplies API to access the storage, you can get the lastest a
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.query.anchor.anchorOwner(anchor, (res) =>{
-
+        //your code here.
     }).then((unsub) => {
 
     });
@@ -181,7 +181,7 @@ Substrate/Polkadot supplies API to access the storage, you can get the lastest a
 ```Javascript
     //anchor.js code
     anchorJS.owner(anchor,(object)=>{
-
+        //your code here.
     })
 ```
 
@@ -195,14 +195,14 @@ Set the anchor to selling status.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.sellAnchor(anchor,price,target).signAndSend(pair,(res) => {
-        // code here .
+        //your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.sell(pair,anchor,price,(status)=>{
-
+        //your code here.
     } ,target)
 ```
 
@@ -213,14 +213,14 @@ Revoke the anchor selling status.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.unsellAnchor(anchor).signAndSend(pair,(res) => {
-        // code here .
+        //your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.unsell(pair,anchor,(status)=>{
-
+        //your code here.
     })
 ```
 
@@ -231,14 +231,14 @@ Buy the anchor. The ownership will change and the history data will not change.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.buyAnchor(anchor).signAndSend(pair,(res) => {
-        // code here .
+        //your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.buy(pair,anchor,(status)=>{
-
+        //your code here.
     })
 ```
 
