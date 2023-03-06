@@ -23,13 +23,16 @@ function Write(props) {
   const self={
     changeName:(ev)=>{
       setName(ev.target.value);
+      self.calcFee();
     },
     changeRaw:(ev)=>{
       setRaw(ev.target.value);
+      self.calcFee();
       self.render();
     },
     changeProtocol:(ev)=>{
       setProtocol(ev.target.value);
+      self.calcFee();
     },
     changeAccount:(ev)=>{
       setAccount(ev.target.value);
@@ -38,6 +41,12 @@ function Write(props) {
     },
     changePassword:(ev)=>{
       setPassword(ev.target.value);
+    },
+    calcFee:()=>{
+      const len=name.length+raw.length+protocol.length;
+      const base=153;         
+      const cost=parseFloat((len+base)*0.01).toFixed(3);
+      setInfo(`estimated cost : ${cost}`);
     },
     clear:()=>{
       setName('');
