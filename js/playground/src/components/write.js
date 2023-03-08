@@ -124,7 +124,7 @@ function Write(props) {
               </Form.Select>
             </Col>
             <Col lg={7} xs={6} className="pt-2" >
-              <small className='text-secondary'>Selected account password: <Badge bg="info">{remind}</Badge>, please type.</small>
+              <small className='text-secondary'>Selected account password: <Badge bg="info">{remind}</Badge></small>
               <Form.Control className="pt-2" size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
             <Col lg={5} xs={6} className="text-end pt-4" >
