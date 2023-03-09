@@ -101,7 +101,7 @@ function Account(props) {
       </Col> */}
       {Accounts.map((item, index) => (
         <Col lg={4} xs={4} className="pt-3" key={index}>
-          <Card>
+          <Card style={{height:'12rem'}}>
             <Card.Body>
               <Card.Title>
                 <Row>

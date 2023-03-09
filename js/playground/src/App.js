@@ -21,16 +21,14 @@ import Keys from './config/keys';
 let wsAPI=null;
 let linking = false;
 
-//UI documents
-//https://www.react-bootstrap.cn/components/alerts
-
 function App() {
 
   let [view,setView]=useState('');
 
   //persist node storage.
-  const map={};
-  map.node_persist=Keys.node_persist;
+  const map={
+    'node_persist':Keys.node_persist,
+  };
   STORAGE.setMap(map);
 
   const handleChangeEvent = useCallback(() => {
@@ -59,7 +57,6 @@ function App() {
       }
     },
     router:(hash)=>{
-      //console.log(hash);
       if(hash!=="#home" && !anchorJS.ready()){
         return setTimeout(()=>{
           self.router(hash);
@@ -74,21 +71,8 @@ function App() {
     fresh:(anchor)=>{
       self.router(window.location.hash);
     },
-    relink:(URI)=>{
-      wsAPI=null;
-      self.link(URI,(res)=>{
-        if(!res) return self.status(`Failed to link to node ${res}`);
-        if(!anchorJS.set(wsAPI)){
-          console.log('Error anchor node.');
-        }
-        anchorJS.setKeyring(Keyring);
-
-        self.router(window.location.hash);
-      });
-    },
-    //load customer localstorage accounts
+    
     loadSetting:()=>{
-      //load custome nodes.
       const ps=STORAGE.getPersist('node_persist');
       let list=[];
       if(ps!==null){
@@ -109,19 +93,22 @@ function App() {
     '#home':(<Search anchorJS={anchorJS} fresh={self.fresh} ></Search>),
     '#write':(<Write  anchorJS={anchorJS} accounts={Accounts}></Write>),
     '#market':(<Market anchorJS={anchorJS} />),
-    '#setting':(<Setting anchorJS={anchorJS} list={Accounts} fresh={self.relink}/>),
+    '#setting':(<Setting anchorJS={anchorJS} list={Accounts}/>),
     '#document':(<Summary anchorJS={anchorJS} />),
   };
   
   useEffect( ()=> {
+    //1.Loading page 
     if(window.location.hash!=='' || window.location.hash!=='#home'){
       setView((<Loading page={window.location.hash}></Loading>));
     }
 
+    //2.Router to right page
     window.addEventListener('hashchange', handleChangeEvent);
     self.loadSetting();
     self.router(window.location.hash);
 
+    //3.Link to anchor node
     const list=STORAGE.getCache(Keys.node);
     self.link(list[0],(res)=>{
       if(!res) return self.status(`Failed to link to node ${res}`);

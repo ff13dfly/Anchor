@@ -13,15 +13,12 @@ function Node(props) {
       setURI(nodes[index]);
     },
     onRelink:()=>{
-      
-
       const list=[URI];
       for(let i=0;i<nodes.length;i++){
         if(nodes[i]!==URI) list.push(nodes[i]);
       }
       STORAGE.setPersist('node_persist',list);
-
-      props.fresh(URI);
+      window.location.reload();
     },
   };
 
