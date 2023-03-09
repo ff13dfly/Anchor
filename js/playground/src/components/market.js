@@ -115,7 +115,7 @@ function Market(props) {
       </Card>
       <Row>
         <Col lg={12} xs={12} className="pt-3">
-          <small>Selet account to buy. Password: <Badge bg="info" id={prefix.password+item.name}>{password[item.name]}</Badge></small>
+          <small>Selet account to buy. Password: <Badge bg="success" id={prefix.password+item.name}>{password[item.name]}</Badge></small>
           <Form.Select className='pt-1' aria-label="Default select" id={prefix.select+item.name} onChange={(ev) => {self.changeAccount(ev)}}>
             {Accounts.map((item,index) => (
                 <option value={index} key={index}>{item.encry.address}</option>

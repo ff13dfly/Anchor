@@ -131,7 +131,7 @@ function Write(props) {
             <Col lg={12} xs={12} className="pt-4" ></Col>
             <Col lg={12} xs={12} className="text-end" >{info}</Col>
             <Col lg={7} xs={6} className="pt-2" >
-              <small className='text-secondary'>Selected account password: <Badge bg="info">{remind}</Badge></small>
+              <small className='text-secondary'>Selected account password: <Badge bg="success">{remind}</Badge></small>
               <Form.Control className="pt-2" size="md" type="password" disabled={disabled} placeholder="Passowrd..." onChange={(ev) => { self.changePassword(ev) }}/>
             </Col>
             <Col lg={5} xs={6} className="text-end pt-4" >

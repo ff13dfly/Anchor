@@ -90,7 +90,7 @@ function Selling(props) {
   return (
     <Row>
       <Col lg={5} xs={12} className="pt-2" >
-        <small className='text-success'>Owner password: <Badge bg="info">{remind}</Badge></small>
+        <small className='text-success'>Owner password: <Badge bg="success">{remind}</Badge></small>
       </Col>
       <Col lg={7} xs={12} className="pt-2 text-end" >{process}</Col>
       <Col lg={5} xs={12} className="pt-1" >
