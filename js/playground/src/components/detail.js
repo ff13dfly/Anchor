@@ -35,7 +35,11 @@ function Detail(props) {
       setDisabled(true);
 
       ankr.load(acc.encry,password,(pair)=>{
-        if(!pair) return false;
+        if(!pair){
+          setProcess('Password error.');
+          setDisabled(false);
+          return false;
+        } 
         ankr.unsell(pair,anchor.name,(res)=>{
           if(res.error){
             return setProcess(res.error);
@@ -90,16 +94,16 @@ function Detail(props) {
                   <td>{anchor.pre}</td>
                 </tr>
                 <tr>
-                  <td>Owner</td>
-                  <td>{anchor.owner}</td>
-                </tr>
-                <tr>
                   <td>Last</td>
                   <td>{anchor.signer}</td>
                 </tr>
                 <tr>
                   <td>Stamp</td>
                   <td>{!anchor.stamp ? '' : self.format(anchor.stamp)}</td>
+                </tr>
+                <tr>
+                  <td>Owner</td>
+                  <td><h5><Badge bg="info">{anchor.owner}</Badge></h5></td>
                 </tr>
                 <tr>
                   <td>Selling</td>

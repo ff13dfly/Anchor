@@ -42,10 +42,14 @@ function Summary(props) {
             I think it is worthy, after playing, you  will find a new way of the blockchain world.
           </p>
           <p>
+            <Badge bg="warning">Tips</Badge> If you connet to local running node, the mock account's balance is empty.
+            Please click the "Free charge" button on settling page, system will transfer random coins to mock accounts from test account "Charlie".
+          </p>
+          <p>
             <Badge bg="primary">Step 1</Badge> Search an exsist anchor, such as "hello", to check the details.
           </p>
           <p>
-            <Badge bg="primary">Step 2</Badge> Set a new anchor by default test account. 
+            <Badge bg="primary">Step 2</Badge> Set a new anchor by mock account. 
             By trying this, you can know what is storage on chain well. Yes, it is <Badge bg="info">Key-value Storage</Badge>.
           </p>
           <p>

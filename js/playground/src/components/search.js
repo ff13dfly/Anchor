@@ -26,7 +26,7 @@ function Search(props) {
     },
     list:(name,cur,owner)=>{
       ankr.history(name,(list)=>{
-        setMore((<History list={list} block={cur} owner={owner} change={self.select} />));
+        setMore((<History list={list} block={cur} change={self.select} />));
       });
     },
     select:(ev)=>{

@@ -49,19 +49,31 @@ function Selling(props) {
       }
     },
     sell:()=>{
-      if(price <=0) return false;
+      if(price <=0){
+        setProcess("Price error");
+        return false;
+      }
       let acc=null;
       for(let i=0;i<Accounts.length;i++){
         const  row=Accounts[i];
         if(row.encry.address===owner) acc=row;
       }
 
-      if(acc===null) return false;
+      if(acc===null){
+        setProcess("Account error");
+        return false;
+      }
 
       setDisabled(true);
       const target=!free?Accounts[account].encry.address:undefined;
       ankr.load(acc.encry,password,(pair)=>{
-        if(!pair) return false;
+        //if(!pair) return false;
+        if(pair===false){
+          setProcess("Password error");
+          setDisabled(false);
+          return false;
+        }
+
         ankr.sell(pair,anchor,price,(res)=>{
           if(res.error){
             return setProcess(res.error);
@@ -90,7 +102,7 @@ function Selling(props) {
   return (
     <Row>
       <Col lg={5} xs={12} className="pt-2" >
-        <small className='text-success'>Owner password: <Badge bg="success">{remind}</Badge></small>
+        <small>Owner password: <Badge bg="success">{remind}</Badge></small>
       </Col>
       <Col lg={7} xs={12} className="pt-2 text-end" >{process}</Col>
       <Col lg={5} xs={12} className="pt-1" >

@@ -377,13 +377,20 @@ const self = {
 			if(owner===pair.address) return ck && ck({error:"Your own anchor"});
 			wsAPI.query.anchor.sellList(anchor, (dt) => {
 				if (dt.value.isEmpty) return ck && ck({error:`'${anchor}' is not on sell`});
-				try {
-					wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (res) => {
-						return ck && ck(self.process(res));
-					});
-				} catch (error) {
-					return ck && ck({error:error});
-				}
+				//console.log(dt.toJSON());
+				const res=dt.toJSON();
+				const cost=res[1]*1000000000000;
+				self.balance(pair.address,(amount)=>{
+					//console.log(amount);
+					if(amount.free<cost) return ck && ck({error:'Not enough balance'});
+					try {
+						wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (res) => {
+							return ck && ck(self.process(res));
+						});
+					} catch (error) {
+						return ck && ck({error:error});
+					}
+				});
 			});
 		});
 	},

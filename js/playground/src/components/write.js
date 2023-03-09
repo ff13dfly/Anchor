@@ -65,7 +65,12 @@ function Write(props) {
       if(!accounts[account]) return console.log('Account error');
       setDisabled(true);
       self.getPair((pair)=>{
-        if(pair===false) return false;
+        if(pair===false){
+          setInfo("Password error");
+          setDisabled(false);
+          return false;
+        }
+        
         ankr.write(pair,name,raw, protocol, (res)=>{
           if(res.error){
             setDisabled(false);

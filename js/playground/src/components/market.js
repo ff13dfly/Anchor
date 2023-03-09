@@ -11,6 +11,7 @@ function Market(props) {
   let [unselling,setUnselling]=useState({});
   let [buying,setBuying]=useState({});
   let [password,setPassword]=useState({});
+  let [process,setProcess]=useState({});
 
   const prefix={
     select:'select_',
@@ -24,11 +25,25 @@ function Market(props) {
       const anchor=ev.target.id;
       const acc=Accounts[!accs[anchor]?0:accs[anchor]];
       ankr.load(acc.encry,buying[anchor],(pair)=>{
-        if(pair===false) return false;
+        if(pair===false){
+          process[anchor]='Password error';
+          setProcess(process);
+          return self.fresh();
+        } 
         ankr.buy(pair,anchor, (res)=>{
-          if(res.step==="InBlock"){
-            self.fresh();
-          }
+          if(!res){
+            process[anchor]='Unexcept error';
+            setProcess(process);
+            return self.fresh();
+          } 
+          if(res.error){
+            process[anchor]=res.error;
+            setProcess(process);
+            return self.fresh();
+          } 
+          process[anchor]=res.message;
+          setProcess(process);
+          self.fresh();
         });
       });
     },
@@ -128,6 +143,7 @@ function Market(props) {
         <Col lg={3} xs={3} className="text-end pt-2">
           <Button size="md" variant="primary" id={item.name} onClick={(ev) => {self.buy(ev)}} > Buy </Button>
         </Col>
+        <Col lg={12} xs={12} className="pt-2 text-end">{process[item.name]}</Col>
       </Row>
     </Col>
   ))}

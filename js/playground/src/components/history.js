@@ -11,7 +11,7 @@ function History(props) {
 	return (
     <Row>
       <Col lg={12} xs={12} className="pt-2" >
-        <h5>History </h5>
+        <h5>History</h5>
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
         <ListGroup as="ol">
@@ -32,7 +32,7 @@ function History(props) {
         Above is the history data list on chain.
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
-        Owner: <Badge bg="info">{props.owner}</Badge>
+        {!props.owner?'':'Owner: '}<h5><Badge bg="info">{props.owner}</Badge></h5>
       </Col>
     </Row>
 	);
