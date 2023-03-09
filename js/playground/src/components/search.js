@@ -1,5 +1,5 @@
 import { Container,Row, Col,Button, Form} from 'react-bootstrap';
-import { useEffect,useState } from 'react';
+import { useState } from 'react';
 
 import Detail from './detail';
 import History from './history';
@@ -15,14 +15,16 @@ function Search(props) {
   const self={
     fresh:(name)=>{
       ankr.search(name,(res)=>{
-        if(res===false) return setResult(`No such anchor : ${name}`);
+        if(res===false){
+          setMore('');
+          return setResult(`No such anchor : ${name}`);
+        }
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
         if(!res) return false;
         self.list(name,res.block);
       });
     },
     list:(name,cur)=>{
-      //console.log(`${name} history. cur ${cur}`);
       ankr.history(name,(list)=>{
         setMore((<History list={list} block={cur} change={self.select} />));
       });
@@ -38,21 +40,12 @@ function Search(props) {
       });
     },
     onSearch:()=>{
-      //console.log(`Searching:${name}`);
-      ankr.search(name,(res)=>{
-        if(res===false) return setResult(`No such anchor : ${name}`);
-        setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
-        self.list(name,res.block);
-      });
+      self.fresh(name);
     },
     onChange:(ev)=>{
       setName(ev.target.value);
     },
   };
-
-  useEffect(() => {
-    //console.log(ankr);
-  },[]);
 
   return (
     <Container> 

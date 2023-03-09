@@ -29,7 +29,7 @@ function Summary(props) {
           <p>
             <Badge bg="warning">Tips</Badge> Typing password is a normal action when you are playing. Actually, we can skip the process in code.
             Why not ? Account is an important part in blockchain world, feel it from your action. 
-            That's the reason we keep the typing password step although it is a bit troublesome.
+            That's the reason we keep the copy/paste password step although it is a bit troublesome.
           </p>
         </Col>
         <Col lg={4} xs={12} className="pt-4" >

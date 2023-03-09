@@ -1,4 +1,4 @@
-import { Row, Col, Card,Image,Badge } from 'react-bootstrap';
+import { Row, Col, Card,Image,Badge,Button } from 'react-bootstrap';
 import { useState,useEffect } from 'react';
 
 import {Accounts} from '../config/accounts';
@@ -18,6 +18,37 @@ function Account(props) {
       }
       return map;
     },
+    freeCharge:()=>{
+      const linker=ankr.getLinker();
+      const  fromAccount= linker.keyRing.addFromUri('//Charlie');
+      const list=[];
+      for(let i=0;i<Accounts.length;i++) list.push(Accounts[i].encry.address);
+      self.toAccounts(fromAccount,list,()=>{
+        self.render();
+      },linker.websocket);
+    },
+
+    toAccounts:(from,list,ck,ws)=>{
+      setInfo(`Charging, ${list.length} accounts left.`);
+      if(list.length===0){
+        setInfo(`Free charge successful.`);
+        setTimeout(()=>{
+          setInfo('');
+        },1000);
+        return ck && ck();
+      } 
+      const target=list.pop();
+      const amount=self.random(1000,4000);
+      ws.tx.balances.transfer(target, amount*1000000000000).signAndSend(from,(res)=>{
+        const status=res.status.toHuman();
+        if(status.InBlock){
+          self.toAccounts(from,list,ck,ws);
+        } 
+      });
+    },
+    random:function(min, max){
+      return Math.round(Math.random() * (max - min)) + min;
+  },
     getList:(map)=>{
       let list=[];
       for(let address in map) list.push(address);
@@ -50,6 +81,7 @@ function Account(props) {
 
   let [balance, setBalance] = useState(self.getMap());
   let [icons,setIcons] = useState(self.getMap());
+  let [info,setInfo] = useState('');
 
   useEffect(() => {
     self.render();
@@ -57,8 +89,11 @@ function Account(props) {
 
   return (
     <Row>
-      <Col lg={3} xs={6}><h6>Testing Accounts</h6></Col>
-      <Col lg={9} xs={6}></Col>
+      <Col lg={4} xs={12}><h6>Testing Accounts</h6></Col>
+      <Col lg={6} xs={6} className="text-end">{info}</Col>
+      <Col lg={2} xs={6} className="text-end">
+        <Button size="md" variant="primary" onClick={() => {self.freeCharge()}} >Free charge</Button>
+      </Col>
       {/* <Col lg={4} xs={6}>
         <Form.Control size="md" type="text" placeholder="Passwor for new account..." onChange={(ev) => {}} />
       </Col>

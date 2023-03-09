@@ -86,10 +86,16 @@ function Write(props) {
     render:(target)=>{
       const anchor=!target?name:target;
       if(!anchor) return false;
-      ankr.history(anchor,(list)=>{
-        if(!list) return setMore('No result.');
-        setMore(<History list={list} block={0} change={()=>{}} />);
+
+      ankr.search(anchor,(res)=>{
+        const owner=!res?false:res.owner;
+        ankr.history(anchor,(list)=>{
+          if(!list) return setMore('No result.');
+          setMore(<History list={list} block={0} owner={owner} change={()=>{}} />);
+        });
       });
+
+      
     },
   };
 

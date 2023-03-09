@@ -1,4 +1,4 @@
-import { Row, Col,ListGroup} from 'react-bootstrap';
+import { Row, Col,ListGroup,Badge} from 'react-bootstrap';
 
 function History(props) {
   const self={
@@ -30,6 +30,9 @@ function History(props) {
       </Col>
       <Col lg={12} xs={12} className="pt-2" >
         Above is the history data list on chain.
+      </Col>
+      <Col lg={12} xs={12} className="pt-2" >
+        Owner: <Badge bg="info">{props.owner}</Badge>
       </Col>
     </Row>
 	);

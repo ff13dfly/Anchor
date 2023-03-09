@@ -509,4 +509,13 @@ exports.anchorJS={
 	sell:self.sell,				//set anchor to selling status
 	unsell:self.unsell,			//revoke anchor from selling status
 	buy:self.buy,				//buy selling anchor
+
+	/***limited part***/
+	//this part can be removed
+	getLinker:()=>{
+		return {
+			websocket:wsAPI,
+			keyRing:keyRing,
+		};
+	},
 };
