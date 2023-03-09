@@ -27,10 +27,6 @@ const STORAGE={
 		return true;
 	},
 	setPersist:(name,obj) => {
-		console.log(name);
-		console.log(obj);
-		console.log(map);
-		
 		if(!map[name]) return false;
 		localStorage.setItem(map[name],JSON.stringify(obj));
 		return true;

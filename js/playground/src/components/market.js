@@ -41,6 +41,7 @@ function Market(props) {
       setAccs(accs);
 
       password[anchor]=Accounts[index].password;
+      setPassword(password);
       self.fresh();
     },
     changeUnselling:(ev)=>{

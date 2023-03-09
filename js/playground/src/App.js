@@ -57,6 +57,7 @@ function App() {
       }
     },
     router:(hash)=>{
+      console.log(hash);
       if(hash!=="#home" && !anchorJS.ready()){
         return setTimeout(()=>{
           self.router(hash);
@@ -70,9 +71,19 @@ function App() {
     },
     fresh:(anchor)=>{
       self.router(window.location.hash);
-      //console.log(anchor);
     },
+    relink:(URI)=>{
+      wsAPI=null;
+      self.link(URI,(res)=>{
+        if(!res) return self.status(`Failed to link to node ${res}`);
+        if(!anchorJS.set(wsAPI)){
+          console.log('Error anchor node.');
+        }
+        anchorJS.setKeyring(Keyring);
 
+        self.router(window.location.hash);
+      });
+    },
     //load customer localstorage accounts
     loadSetting:()=>{
       //load custome nodes.
@@ -89,30 +100,28 @@ function App() {
         STORAGE.setPersist('node_persist',list);
       }
       STORAGE.setCache(Keys.node,list);
-    }
+    },
   };
 
   const pages={
     '#home':(<Search anchorJS={anchorJS} fresh={self.fresh} ></Search>),
     '#write':(<Write  anchorJS={anchorJS} accounts={Accounts}></Write>),
     '#market':(<Market anchorJS={anchorJS} />),
-    '#setting':(<Setting anchorJS={anchorJS} list={Accounts} fresh={self.fresh}/>),
+    '#setting':(<Setting anchorJS={anchorJS} list={Accounts} fresh={self.relink}/>),
     '#document':(<Summary anchorJS={anchorJS} />),
   };
-
-
-
   
   useEffect( ()=> {
     window.addEventListener('hashchange', handleChangeEvent);
     self.loadSetting();
     self.router(window.location.hash);
-    self.link(Servers.nodes[0],(res)=>{
+
+    const list=STORAGE.getCache(Keys.node);
+    self.link(list[0],(res)=>{
       if(!res) return self.status(`Failed to link to node ${res}`);
       if(!anchorJS.set(wsAPI)){
         console.log('Error anchor node.');
       }
-
       anchorJS.setKeyring(Keyring);
     });
   },[]);

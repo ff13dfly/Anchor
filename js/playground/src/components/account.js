@@ -78,7 +78,7 @@ function Account(props) {
     },
   };
 
-  let [balance, setBalance] = useState(self.getMap());
+  let [balance,setBalance] = useState(self.getMap());
   let [icons,setIcons] = useState(self.getMap());
   let [info,setInfo] = useState('');
 
