@@ -70,7 +70,7 @@ function App() {
     },
     fresh:(anchor)=>{
       self.router(window.location.hash);
-      console.log(anchor);
+      //console.log(anchor);
     },
 
     //load customer localstorage accounts

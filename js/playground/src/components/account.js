@@ -1,4 +1,4 @@
-import { Row, Col, Button, Card, Form,Image,Badge } from 'react-bootstrap';
+import { Row, Col, Card,Image,Badge } from 'react-bootstrap';
 import { useState,useEffect } from 'react';
 
 import {Accounts} from '../config/accounts';
@@ -14,7 +14,6 @@ function Account(props) {
       let map={};
       for(let i=0;i<Accounts.length;i++){
         const row=Accounts[i];
-        //console.log(row);
         map[row.encry.address]=0;
       }
       return map;
@@ -53,7 +52,6 @@ function Account(props) {
   let [icons,setIcons] = useState(self.getMap());
 
   useEffect(() => {
-    //setList(props.list);
     self.render();
   },[]);
 
