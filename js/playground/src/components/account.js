@@ -65,7 +65,6 @@ function Account(props) {
       });
     },
     render:()=>{
-      console.log('here');
       const accs=self.getList(balance);
       self.getBalances(accs,(done)=>{
         setBalance(done);

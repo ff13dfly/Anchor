@@ -3,8 +3,6 @@ import { useEffect,useState } from 'react';
 
 import {Accounts} from '../config/accounts';
 
-let dataReady=false;
-
 function Market(props) {
   const ankr = props.anchorJS;
 
@@ -28,8 +26,8 @@ function Market(props) {
       ankr.load(acc.encry,buying[anchor],(pair)=>{
         if(pair===false) return false;
         ankr.buy(pair,anchor, (res)=>{
-          if(res.step==="Finalized"){
-            dataReady=false;
+          if(res.step==="InBlock"){
+            self.fresh();
           }
         });
       });
@@ -43,8 +41,7 @@ function Market(props) {
       setAccs(accs);
 
       password[anchor]=Accounts[index].password;
-      //console.log(password);
-      setPassword(password);
+      self.fresh();
     },
     changeUnselling:(ev)=>{
       const tmp=ev.target.id.split(prefix.unsell);
@@ -66,22 +63,9 @@ function Market(props) {
       var dt = new Date(stamp);
       return dt.toLocaleString();
     },
-    passwordGroup:(map)=>{
-      var pass={};
-      for(let i=0;i<map.length;i++){
-        const row=map[i];
-        pass[row.name]='';
-      }
-      setPassword(pass);
-    },
-    getData:(ck)=>{
+    fresh:()=>{
       ankr.market((alist) => {
         if(alist.length===0) return false;
-        // if(alist.length===0) return setDom((<Row>
-        //   <Col lg={12} xs={12} className="text-center pt-4">
-        //     <h4>No selling anchors</h4>
-        //   </Col>
-        // </Row>));
         const arr=[];
         for(let i=0;i<alist.length;i++){
           arr.push(alist[i].name);
@@ -89,18 +73,14 @@ function Market(props) {
   
         ankr.multi(arr,(map)=>{
           setList(map);
-          self.passwordGroup(map);
-          return ck && ck();
         });
       });
     },
   };
 
   useEffect(() => {
-    self.getData(()=>{
-      dataReady=true;
-    });
-  },[dataReady]);
+    self.fresh();
+  },[]);
 
   return (<Container><Row>{list.map((item, index) => (
     <Col lg={4} xs={4} className="pt-4" key={index} >
@@ -135,7 +115,7 @@ function Market(props) {
       <Row>
         <Col lg={12} xs={12} className="pt-3">
           <small>Selet account to buy. Password: <Badge bg="info" id={prefix.password+item.name}>{password[item.name]}</Badge></small>
-          <Form.Select aria-label="Default select" id={prefix.select+item.name} onChange={(ev) => {self.changeAccount(ev)}}>
+          <Form.Select className='pt-1' aria-label="Default select" id={prefix.select+item.name} onChange={(ev) => {self.changeAccount(ev)}}>
             {Accounts.map((item,index) => (
                 <option value={index} key={index}>{item.encry.address}</option>
             ))}

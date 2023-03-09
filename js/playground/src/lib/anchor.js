@@ -426,7 +426,7 @@ const self = {
 				data.protocol=proto;
 				if (proto.type === "data" && proto.format === "JSON") data.raw = JSON.parse(data.raw);
 			} catch (error) {
-				console.log(error);
+				console.log(`Failed to parse JSON.`);
 			}
 		}
 		data.pre=parseInt(data.pre.replace(/,/gi, ''));

@@ -19,14 +19,14 @@ function Search(props) {
           setMore('');
           return setResult(`No such anchor : ${name}`);
         }
-        setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
+        setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}></Detail>));
         if(!res) return false;
-        self.list(name,res.block);
+        self.list(name,res.block,res.owner);
       });
     },
-    list:(name,cur)=>{
+    list:(name,cur,owner)=>{
       ankr.history(name,(list)=>{
-        setMore((<History list={list} block={cur} change={self.select} />));
+        setMore((<History list={list} block={cur} owner={owner} change={self.select} />));
       });
     },
     select:(ev)=>{
@@ -36,7 +36,7 @@ function Search(props) {
       //console.log(name);
       ankr.target(name,block,(res)=>{
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}/>));
-        self.list(name,block);
+        self.list(name,block,res.owner);
       });
     },
     onSearch:()=>{
