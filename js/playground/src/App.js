@@ -9,6 +9,7 @@ import Write from './components/write';
 import Market from './components/market';
 import Setting from './components/setting';
 import Summary from './components/summary';
+import Loading from './components/loading';
 
 import {anchorJS} from './lib/anchor';
 import {Servers} from './config/servers';
@@ -24,6 +25,7 @@ let linking = false;
 //https://www.react-bootstrap.cn/components/alerts
 
 function App() {
+
   let [view,setView]=useState('');
 
   //persist node storage.
@@ -57,7 +59,7 @@ function App() {
       }
     },
     router:(hash)=>{
-      console.log(hash);
+      //console.log(hash);
       if(hash!=="#home" && !anchorJS.ready()){
         return setTimeout(()=>{
           self.router(hash);
@@ -112,6 +114,10 @@ function App() {
   };
   
   useEffect( ()=> {
+    if(window.location.hash!=='' || window.location.hash!=='#home'){
+      setView((<Loading page={window.location.hash}></Loading>));
+    }
+
     window.addEventListener('hashchange', handleChangeEvent);
     self.loadSetting();
     self.router(window.location.hash);

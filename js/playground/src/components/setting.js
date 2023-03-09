@@ -9,7 +9,7 @@ import Keys from '../config/keys';
 
 function Setting(props) {
   const nodes=STORAGE.getCache(Keys.node);
-
+ 
   useEffect(() => {
 
   }, []);
@@ -22,7 +22,7 @@ function Setting(props) {
         <Col lg={12} xs={12} className="pt-4" ></Col>
         <Col lg={12} xs={12} className="pt-4" ></Col>
       </Row>
-      <Account anchoJS={props.anchorJS} node={nodes[0]}></Account>
+      <Account anchoJS={props.anchorJS}></Account>
     </Container>
   );
 }
