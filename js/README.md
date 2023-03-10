@@ -2,15 +2,15 @@
 
 ## Overview
 
-Anchor.js is a library to access Anchor pallet which supply the On-chain Linked List function. Playing on the Playgroud is the recommand way to know Anchor well. All functions in anchor.js  is used in the playground code.
+Anchor.js is a library to access **anchor node** which supply the On-chain Linked List function. Playing on the [Playgroud](https://playground.metanchor.net) is the recommand way to know **anchor** well. All methods in anchor.js are reflected in the playground.
 
 ## Data structure
 
-Anchor is a simple way to access substrate world, there are four main data structure which you need paying attention to.
+Anchor is a simple way to access blockchain world via [Substrate](https://github.com/paritytech/substrate), there are four main data structures which you need paying attention to.
 
 ### Anchor Location
 
-Coding with anchor, you need to locate the data on chain. There are two ways, almost the same, the most important part is anchor name. By the way, as the data is pubilc on-chain, anybody can access the anchor data without limitation.
+Coding with anchor, you need to locate the data on chain. There are two ways, almost the same, the most important part is anchor name. By the way, as the data is public on-chain, anybody can access the anchor data without limitation.
 
 ```Javascript
     //just anchor name. Anchor.js treated as the latest data of anchor
@@ -22,7 +22,7 @@ Coding with anchor, you need to locate the data on chain. There are two ways, al
 
 ### Anchor Data Object
 
-This object includes all details of a specific anchor. Anchor data object is combined both the storage details and teh market details.
+This object includes all details of a specific anchor. Anchor data object is combined both the storage details and the market details.
 
 ```Javascript
 {
@@ -30,13 +30,13 @@ This object includes all details of a specific anchor. Anchor data object is com
     "protocol":{},      //anchor protocol, JSON normally
     "raw":"",           //raw data
     "block":0,          //block number where data stored
-    "stamp":0,          //time stamp when the on-chain data written.
     "pre":0,            //block number where previous data stored
-    "signer":"",        //the signer ss58 address
+    "stamp":0,          //time stamp when the on-chain data written
     "empty":false,      //empty or not
+    "signer":"",        //the signer ss58 address
     "owner":"",         //the owner ss58 address
     "sell":false,       //anchor selling status
-    "cost":0,           //price of selling anchor
+    "cost":0,           //the cost to buy this selling anchor
     "target":"",        //the target buyer, if the same as owner, free to buy
 }
 ```
@@ -67,7 +67,7 @@ If there is any error, anchorJS will through error message on callback.
 
 There are three parts in anchor.js as follow.
 
-1. @polkadot/api, it is the dependence.
+1. Polkadot setting, base on @polkadot/api , such as websocket object and keyring object.
 2. Storage, write and view functions.
 3. Market, sell and buy functions.
 
@@ -85,7 +85,7 @@ Set the @polkadot/api websocket object, all access depends on it.
 
 #### setKeyring
 
-Set the @polkadot/api keyring class, it is used to verify the account.
+Set the @polkadot/api keyring object, it is used to verify the account.
 
 ```javascript
     // @param ks object  //polkadot Keyring class
@@ -105,7 +105,7 @@ Check wether the websocket linker is ready, then anchor.js can work properly.
 
 #### load
 
-Load pair from encry file which can verify account.
+Load pair from encrypted file which can verify account.
 
 ```javascript
     // @param encryJSON object      //polkadot encry data
@@ -143,7 +143,7 @@ Subscribe data on substrate node, when there is anchor data changed, will callba
 
 #### write
 
-Only way to write anchor data, skip the previous block number. Will search the latest block number, then request to set_anchor method.
+Only way to write anchor data. Method will search the latest block number as the previous block number, then request to set_anchor method of anchor node.
 
 ```javascript
     // @param   pair      object         //account verify pair
@@ -158,7 +158,7 @@ Only way to write anchor data, skip the previous block number. Will search the l
 
 #### search
 
-Search the target anchor name, return the latest data.
+Search an anchor name and return the latest data.
 
 ```javascript
     // @param   anchor      string      //anchor name
@@ -170,12 +170,12 @@ Search the target anchor name, return the latest data.
 
 #### owner
 
-Search the target anchor name, return the latest data.
+Check the ownership of anchor, return the owner ss58 address and latest block number.
 
 ```javascript
     // @param   anchor      string      //anchor name
-    // return callback( anchor object )
-    anchorJS.owner(anchor,function(object){
+    // return callback( owner, block_number )
+    anchorJS.owner(anchor,function(owner,block){
 
     });
 ```
@@ -195,7 +195,7 @@ Get the whole linked list of anchor.
 
 #### target
 
-Get the whole linked list of anchor.
+Get the target block number anchor data.
 
 ```javascript
     // @param   anchor      string      //anchor name
@@ -208,7 +208,7 @@ Get the whole linked list of anchor.
 
 #### multi
 
-Get multi anchor data from list. There are two ways to get anchor. One is just the name, such as "hello" .Another way is the name and target block, such as ["hello",123].
+Get multi anchor data from list. There are two ways to get anchor. One is just the name, such as "hello" .Another way is the name and block number, such as ["hello",123].
 You can use the mix list here, such as ["hello",["anchor_name",333],"world",["music",3345]] .
 
 ```javascript
@@ -234,7 +234,7 @@ The list of selling anchors. No page function yet.
 
 #### sell
 
-Set anchor to selling status. If set the target buyer, the anchor only can be sold to the buyer. If there is some wrong setting, you can recall this function to modify the status.
+Set anchor to selling status. If set the target buyer, the anchor only can be sold to the buyer. You can recall this function to correct the wrong selling status.
 
 ```javascript
     // @param   pair      object         //account verify pair

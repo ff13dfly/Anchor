@@ -1,8 +1,8 @@
 # Anchor, an On-chain Linked List storage pallet base on Substrate
 
-Anchor is an On-chain Linked List system base on [Substrate](). On another hand, Anchor can alse be treated as Name Service or On-chain Key-value Storage.
+Anchor is an On-chain Linked List system base on [Substrate](https://github.com/paritytech/substrate). On another hand, Anchor can alse be treated as Name Service or On-chain Key-value Storage.
 
-Anchor is an isolated Substrate pallet. It can provide flexible on-chain data structure and complex logic without upgrading the substrate node itself. That makes blockchain development easy for developper who do not know the blockchain well enough.
+Anchor is an isolated Substrate pallet. It can provide flexible on-chain data structure and complex logic without upgrading the substrate node itself. That makes blockchain development easy for developer who does not know the blockchain well enough, just remeber read and write methods.
 
 You can access the [Playground](https://playground.metanchor.net) to know it well. And, it is easy to test local by following introduction.
 
@@ -128,7 +128,7 @@ The 5 files which are needed to modify, is included in folder "deploy". The path
 
 ### Build from source code
 
-There is a shell file to create docker image, you can test it by one command.
+There is a shell file to create docker image, you can build the docker image by run the shell file. It will take more than 20 minutes, please get a cup of coffee.
 
 ```SHELL
     sh build.sh
@@ -136,7 +136,11 @@ There is a shell file to create docker image, you can test it by one command.
 
 ### Run from docker image
 
-Not yet. It is still a problem need to sovle myself.
+The docker image do not have a bash, so you just run by docker run to test.
+
+```SHELL
+    docker run -it --rm fuu/anchor --dev
+```
 
 ## Exposed Methods
 
@@ -180,7 +184,7 @@ Substrate/Polkadot supplies API to access the storage, you can get the lastest a
 
 ```Javascript
     //anchor.js code
-    anchorJS.owner(anchor,(object)=>{
+    anchorJS.owner(anchor,(address,block)=>{
         //your code here.
     })
 ```
