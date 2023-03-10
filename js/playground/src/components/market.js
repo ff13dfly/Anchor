@@ -24,6 +24,13 @@ function Market(props) {
     buy:(ev)=>{
       const anchor=ev.target.id;
       const acc=Accounts[!accs[anchor]?0:accs[anchor]];
+
+      if(!buying[anchor]){
+        process[anchor]='Password error';
+        setProcess(process);
+        return self.fresh();
+      }
+
       ankr.load(acc.encry,buying[anchor],(pair)=>{
         if(pair===false){
           process[anchor]='Password error';
@@ -130,7 +137,7 @@ function Market(props) {
       </Card>
       <Row>
         <Col lg={12} xs={12} className="pt-3">
-          <small>Selet account to buy. Password: <Badge bg="success" id={prefix.password+item.name}>{password[item.name]}</Badge></small>
+          <small>Selet account to buy. Password: <Badge bg="success" id={prefix.password+item.name}>{password[item.name]?password[item.name]:Accounts[0].password}</Badge></small>
           <Form.Select className='pt-1' aria-label="Default select" id={prefix.select+item.name} onChange={(ev) => {self.changeAccount(ev)}}>
             {Accounts.map((item,index) => (
                 <option value={index} key={index}>{item.encry.address}</option>

@@ -61,29 +61,40 @@ function Write(props) {
         return ck && ck(pair);
       });
     },
+    blank:()=>{
+      setTimeout(() => {
+        setInfo("");
+      }, 1500);
+    },
     onSave:()=>{
-      if(!accounts[account]) return console.log('Account error');
+      if(!password){
+        setInfo("Password error");
+        return self.blank();
+      }
+      if(!accounts[account]){
+        setInfo("Account error");
+        return self.blank();
+      } 
       setDisabled(true);
       self.getPair((pair)=>{
         if(pair===false){
           setInfo("Password error");
           setDisabled(false);
-          return false;
+          return self.blank();
         }
         
         ankr.write(pair,name,raw, protocol, (res)=>{
           if(res.error){
             setDisabled(false);
-            return setInfo(res.error);
+            setInfo(res.error);
+            return self.blank();
           }
 
           setInfo(res.message);
           if(res.step==="Finalized"){
             self.render();
             setDisabled(false);
-            setTimeout(() => {
-              setInfo("");
-            }, 1000);
+            return self.blank();
           }
         });
       });

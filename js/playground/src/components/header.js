@@ -1,10 +1,18 @@
-import { Container,Row, Col,Nav,Navbar } from 'react-bootstrap';
+import { Container,Nav,Navbar } from 'react-bootstrap';
 import { useEffect } from 'react';
 
 function Header(props) {
+  // let [active,setActive]=useState({
+  //   '#home':false,
+  //   '#write':false,
+  //   '#market':false,
+  //   '#setting':false,
+  //   "#document":false,
+  // });
+  // active[window.location.hash]=true;
 
   useEffect(() => {
-    
+
   },[]);
 
   return (

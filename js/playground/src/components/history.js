@@ -21,10 +21,17 @@ function History(props) {
               id={`${item.name}_${item.block}`} 
               key={index} 
               active={item.block===props.block?true:false} 
-              onClick={props.change}
+              onClick={(ev)=>{
+                props.change(ev);
+              }}
             >
-              {item.block.toLocaleString()} , pre : {item.pre.toLocaleString()} , signer:{self.shortenAddress(item.signer)}
-            </ListGroup.Item >
+              On:{item.block.toLocaleString()}; pre:{item.pre.toLocaleString()}; {self.shortenAddress(item.signer)}
+              {/* <Row onClick={(ev)=>{ev.nativeEvent.stopImmediatePropagation()}}>
+                <Col lg={3} xs={12} onClick={(ev)=>{ev.nativeEvent.stopImmediatePropagation()}}>On:{item.block.toLocaleString()}</Col>
+                <Col lg={3} xs={12} onClick={(ev)=>{ev.nativeEvent.stopImmediatePropagation()}}>Pre:{item.pre.toLocaleString()}</Col>
+                <Col lg={6} xs={12} onClick={(ev)=>{ev.nativeEvent.stopImmediatePropagation()}} className="text-end">{self.shortenAddress(item.signer)}</Col>
+              </Row> */}
+            </ListGroup.Item>
           ))}
         </ListGroup>
       </Col>

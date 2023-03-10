@@ -17,7 +17,8 @@ function Search(props) {
       ankr.search(name,(res)=>{
         if(res===false){
           setMore('');
-          return setResult(`No such anchor : ${name}`);
+          return setResult((<h5>No such anchor : {name} , click <a href="#write">here</a> to init it.</h5>));
+          //return setResult(`No such anchor : ${name} , click <a href="#write">here</a> to init it`);
         }
         setResult((<Detail data={res} anchorJS={props.anchorJS} fresh={self.fresh}></Detail>));
         if(!res) return false;
