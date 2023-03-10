@@ -18,7 +18,7 @@ function Summary(props) {
 				<Col lg={8} xs={12} className="pt-4" >
           <h4>Overview</h4>
           <p>
-            This playground is a test enviment for anchor node. It is a Polkadot/Substrate extend pallet, details here <a href="https://github.com/ff13dfly/Anchor">https://github.com/ff13dfly/Anchor</a>.
+            This playground is a test environment for anchor node. Anchor is a Polkadot/Substrate extend pallet, details here <a href="https://github.com/ff13dfly/Anchor">https://github.com/ff13dfly/Anchor</a>.
             Anchor pallet is an On-chain Linked List system, you can store data on chain easily this way.
           </p>
           <p>
