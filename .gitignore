@@ -12,7 +12,7 @@ rustfmt.toml
 /target/
 /docker/backup/
 /scripts/
-.vscode
+/.vscode/
 /frame/anchor/src/backup
 
 /frame/alliance
