@@ -33,9 +33,9 @@ LABEL description="Anchor pallet testing image base on Substrate" \
 	io.parity.image.documentation="https://github.com/ff13dfly/anchor/"
 
 COPY --from=builder /substrate/target/release/substrate /usr/local/bin/anchor_node
-COPY --from=builder /substrate/target/release/subkey /usr/local/bin
-COPY --from=builder /substrate/target/release/node-template /usr/local/bin
-COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
+#COPY --from=builder /substrate/target/release/subkey /usr/local/bin
+#COPY --from=builder /substrate/target/release/node-template /usr/local/bin
+#COPY --from=builder /substrate/target/release/chain-spec-builder /usr/local/bin
 
 ## setup substrate env
 RUN useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate
