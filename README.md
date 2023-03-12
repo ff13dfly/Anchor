@@ -16,6 +16,8 @@ Anchor pallet have tested for the [2022.12 version substrate](https://github.com
 
 After copy the "Anchor pallet" to Substrate, the following 5 files need minor modifications. You will find that it is petty easy to finish this base on the great job of Substrate.
 
+Remove the Cargo.lock, in case the needed library out of time.
+
 ### 1. Cargo.toml
 
 You will find there is a list called "members", paset code to the proper location, such as before "frame/alliance". Then no more to do to this file.

@@ -174,6 +174,7 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		/// set a new anchor or update an exist anchor
+		#[pallet::call_index(0)]
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_anchor((raw.len()).saturated_into())
 		)]
@@ -241,6 +242,7 @@ pub mod pallet {
 		}
 
 		/// Set anchor to sell status and added to sell list
+		#[pallet::call_index(1)]
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_sell()
 		)]
@@ -273,7 +275,8 @@ pub mod pallet {
 		}
 
 		/// buy an anchor on-sell.
- 		#[pallet::weight(
+		#[pallet::call_index(2)]
+		#[pallet::weight(
 			<T as pallet::Config >::WeightInfo::buy_anchor()
 		)]
 		pub fn buy_anchor(
@@ -332,6 +335,7 @@ pub mod pallet {
 		}
 
 		/// Revoke anchor from selling status
+		#[pallet::call_index(3)]
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::set_unsell()
 		)]
