@@ -2,7 +2,7 @@
 
 ## Anchor Pallet
 
-Anchor pallet is an extend pallet for Substrate, it is On-chian Linked List and Name Service and On-chain Key-value Storage. By anchor way, it is easy to storage data on chain and do join the blockchain world.
+Anchor pallet is an extend pallet for Substrate, it is On-chain Linked List and Name Service and On-chain Key-value Storage. By anchor way, it is easy to storage data on chain and do join the blockchain world.
 
 ## Anchor Builder Docker Image
 

@@ -1,7 +1,10 @@
 .DS_Store
 Cargo.lock
-shell.nix
+Cargo.toml
 rustfmt.toml
+shell.nix
+HEADER-APACHE2
+HEADER-GPL3
 /test-utils/
 /bin/
 /client/
@@ -13,6 +16,7 @@ rustfmt.toml
 /docker/backup/
 /scripts/
 /.vscode/
+/zombienet/
 /frame/anchor/src/backup
 
 /frame/alliance
@@ -47,8 +51,11 @@ rustfmt.toml
 /frame/lottery
 /frame/membership
 /frame/merkle-mountain-range
+/frame/message-queue
 /frame/multisig
 /frame/nicks
+/frame/nfts
+/frame/nis
 /frame/node-authorization
 /frame/nomination-pools
 /frame/offences
@@ -60,6 +67,7 @@ rustfmt.toml
 /frame/referenda
 /frame/remark
 /frame/root-offences
+/frame/root-testing
 /frame/scheduler
 /frame/scored-pool
 /frame/session
