@@ -6,6 +6,7 @@ import {Accounts} from '../config/accounts';
 
 function Detail(props) {
   const anchor = props.data.error ? {} : props.data;
+  //console.log(anchor);
   const ankr = props.anchorJS;
 
   let [URI, setURI] = useState(!anchor ? '#' : `https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer/query/${anchor.block}`);
@@ -83,11 +84,11 @@ function Detail(props) {
                 </tr>
                 <tr>
                   <td>Raw</td>
-                  <td>{anchor.raw}</td>
+                  <td>{typeof anchor.raw !== 'string'?JSON.stringify(anchor.raw):anchor.raw}</td>
                 </tr>
                 <tr>
                   <td>Protocol</td>
-                  <td>{JSON.stringify(anchor.protocol)}</td>
+                  <td>{typeof anchor.protocol !== 'string'?JSON.stringify(anchor.protocol):anchor.protocol}</td>
                 </tr>
                 <tr>
                   <td>Pre</td>
