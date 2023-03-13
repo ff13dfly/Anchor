@@ -75,15 +75,27 @@ It is popular and you will find a lot of resource to learn about it. Only one su
 After the enviroment is set up successful, the following commands are used to test and build anchor code.
 
 ```SHELL
-# unit test , change directory to frame/anchor first
-cargo test
+    # unit test , change directory to frame/anchor first
+    cargo test
 
-# build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
-cargo build --release
+    # build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
+    cargo build --release
 
-# clean the files, it is better to do it when switching task.
-cargo clean
+    # clean the files, it is better to do it when switching task.
+    cargo clean
 ```
+
+If you meet Rust version problem, try these ways.
+
+```SHELL
+    # update rustup itself.
+    rustup  self  update
+
+    # update rust tools
+    rustup upgrade
+    rustup  update  nightly
+```
+
 
 2. Clang version.
 In some system such as centos which I have tested, the clang version is too low, you need to update and set to new version manually.
@@ -146,7 +158,7 @@ The docker image do not have a bash, so you just run by docker run to test.
 
 ## Exposed Methods
 
-There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on [@polkadot/api]() and [anchor.js]().
+There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on **@polkadot/api** and **anchor.js**.
 
 ### 1. set_anchor, storage part
 

@@ -27,7 +27,7 @@ The unit test follow the substrate standard. Just change directory to frame/anch
 
 ### Compatibility
 
-* Compilied successful on [https://github.com/paritytech/substrate/releases/tag/monthly-2023-02](https://github.com/paritytech/substrate/releases/tag/monthly-2023-02)
+* Compiled successful on [https://github.com/paritytech/substrate/releases/tag/monthly-2023-02](https://github.com/paritytech/substrate/releases/tag/monthly-2023-02)
 
 ## Exposed Methods
 
