@@ -19,11 +19,13 @@ function Account(props) {
       return map;
     },
     freeCharge:()=>{
+      setDisabled(true);
       const linker=ankr.getLinker();
       const  fromAccount= linker.keyRing.addFromUri('//Charlie');
       const list=[];
       for(let i=0;i<Accounts.length;i++) list.push(Accounts[i].encry.address);
       self.toAccounts(fromAccount,list,()=>{
+        setDisabled(false);
         self.render();
       },linker.websocket);
     },
@@ -81,6 +83,7 @@ function Account(props) {
   let [balance,setBalance] = useState(self.getMap());
   let [icons,setIcons] = useState(self.getMap());
   let [info,setInfo] = useState('');
+  let [disabled,setDisabled]= useState(false);
 
   useEffect(() => {
     self.render();
@@ -91,7 +94,7 @@ function Account(props) {
       <Col lg={4} xs={12}><h6>Testing Accounts</h6></Col>
       <Col lg={6} xs={6} className="text-end">{info}</Col>
       <Col lg={2} xs={6} className="text-end">
-        <Button size="md" variant="primary" onClick={() => {self.freeCharge()}} >Free charge</Button>
+        <Button size="md" variant="primary" disabled={disabled} onClick={() => {self.freeCharge()}} >Free charge</Button>
       </Col>
       {/* <Col lg={4} xs={6}>
         <Form.Control size="md" type="text" placeholder="Passwor for new account..." onChange={(ev) => {}} />

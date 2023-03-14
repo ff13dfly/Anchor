@@ -46,6 +46,11 @@ function Search(props) {
     onChange:(ev)=>{
       setName(ev.target.value);
     },
+    onKeydown:(ev)=>{
+      if(ev.key==='Enter'){
+        self.fresh(name);
+      }
+    },
   };
 
   return (
@@ -55,10 +60,10 @@ function Search(props) {
           <small>You can search "hello" anchor to view the details.</small>
         </Col >
 				<Col lg={4} xs={8} className="text-end" >
-					<Form.Control size="lg" type="text" placeholder="Anchor name..." onChange={(ev) => { self.onChange(ev) }} />
+					<Form.Control size="lg" type="text" placeholder="Anchor name..." onChange={(ev) => { self.onChange(ev) }} onKeyDown={(ev)=>{self.onKeydown(ev)}} />
 				</Col>
 				<Col lg={2} xs={4} className="text-end" >
-					<Button size="lg" variant="primary" onClick={() => { self.onSearch() }} > Search </Button>
+					<Button size="lg" variant="primary" onClick={() => { self.onSearch() }}  > Search </Button>
 				</Col >
 
         <Col lg={7} xs={12} className="pt-2" >
