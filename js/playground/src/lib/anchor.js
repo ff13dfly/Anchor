@@ -14,7 +14,13 @@ const self = {
 	/***Params and setting***/
 	/************************/
 
-	//check the basic limitation of anchor
+	/** 
+	 * check the basic limitation of anchor
+	 * @param {string} key		//anchor name
+	 * @param {string} raw		//raw data to write to chain
+	 * @param {string} protocol	//protocol to write to chain
+	 * @param {string} address	//ss58 address	
+	*/
 	limited:(key,raw,protocol,address)=>{
         if(key!==undefined) return key.length>limits.key?true:false;
         if(protocol!==undefined) return protocol.length>limits.protocol?true:false;
@@ -23,38 +29,61 @@ const self = {
         return false;
     },
 
-	//set websocket link object.
+	/** 
+	 * set websocket link object.
+	 * @param {object} ws		//websocket link to anchor node
+	*/
 	setWebsocket: (ws) => {
 		//check the node support anchor
-		console.log()
 		if(!ws.query.anchor || !ws.tx.anchor) return false;
 		wsAPI = ws;
 		return true;
 	},
 
-	//set keyring object.
+	/** 
+	 * set keyring object.
+	 * @param {class} ks		//websocket keyring class
+	*/
 	setKeyring:(ks)=>{
 		keyRing=new ks({ type: 'sr25519' });
 		return true;
 	},
 
-	//check wether the websocket link is ok.
+	/** 
+	 * check wether the websocket link is ok.
+	*/
 	ready:()=>{
 		return wsAPI===null?false:true;
 	},
-
-	
 
 	/************************/
 	/***Polkadot functions***/
 	/************************/
 
+	/** 
+	 * stop subcribe of the anchor node.
+	 * @param {function}	[ck]	//callback function
+	*/
 	unlistening:(ck)=>{
 		if(unlistening!==null) unlistening();
 		return ck && ck();
 	},
 
-	// subcribe the newest block data
+	/** 
+	 * clean the subcribe of anchor network.
+	*/
+	clean: () => {
+		if (unlistening != null) {
+			unlistening();
+			unlistening = null;
+		}
+		return true;
+	},
+
+	/** 
+	 * subcribe the newest anchor data
+	 * @param {function}	[ck]	//callback function
+	*/
 	listening: (ck) => {
 		if (!self.ready()) return ck && ck(false);
 		self.clean();
@@ -84,13 +113,12 @@ const self = {
 		});
 		return self.unlistening;		//返回撤销listening的方法
 	},
-	clean: () => {
-		if (unlistening != null) {
-			unlistening();
-			unlistening = null;
-		}
-		return true;
-	},
+
+	/** 
+	 * Get the balance of target address.
+	 * @param {string}		address		//SS58 address 
+	 * @param {function}	ck			//callback function
+	*/
 	balance: (address, ck) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		if(self.limited(undefined,undefined,undefined,address)) return ck && ck(false);
@@ -108,9 +136,12 @@ const self = {
 		});
 	},
 
-	account: (password, ck )=>{
-
-	},
+	/** 
+	 * Load pair from encry file
+	 * @param {object}		encryJSON	//content of encry file (can get from Polkadot UI) 
+	 * @param {string}		password	//password for the encry file 
+	 * @param {function}	ck			//callback function
+	*/
 	load:(encryJSON,password,ck)=>{
 		if(!password) return ck && ck({error:"No password."});
 		const pair = keyRing.createFromJson(encryJSON);
@@ -125,6 +156,12 @@ const self = {
 	/************************/
 	/***Anchor data browse***/
 	/************************/
+
+	/** 
+	 * Get the anchor owner.
+	 * @param {string}		anchor	//anchor name
+	 * @param {function}	ck		//callback function
+	*/
 	owner:(anchor,ck)=>{
 		let unsub = null;
 		wsAPI.query.anchor.anchorOwner(anchor, (res) => {
@@ -137,9 +174,17 @@ const self = {
 			unsub = fun;
 		});
 	},
+
+	/** 
+	 * Get the latest data of anchor.
+	 * @param {string}		anchor	//anchor name
+	 * @param {function}	ck		//callback function
+	*/
 	latest: (anchor, ck) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
+		if (anchor.substr(0, 2) === '0x') anchor = self.decodeUTF8(anchor);
+
 		if(self.limited(anchor)) return ck && ck(false);
 
 		self.owner(anchor,(owner,block)=>{
@@ -147,6 +192,13 @@ const self = {
 			self.target(anchor,block,ck);
 		});
 	},
+
+	/** 
+	 * Get the target anchor on special block.
+	 * @param {string}		anchor	//anchor name
+	 * @param {number}		block	//target block number
+	 * @param {function}	ck		//callback function
+	*/
 	target:(anchor,block,ck)=>{
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -185,6 +237,13 @@ const self = {
 			});
 		});
 	},
+
+	/** 
+	 * Get the anchor history list.
+	 * @param {string}		anchor		//anchor name
+	 * @param {function}	ck			//callback function
+	 * @param {number}		[limit]		//search limit block number
+	*/
 	history: (anchor, ck, limit) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -203,8 +262,16 @@ const self = {
 			});
 		});
 	},
+
+	/** 
+	 * loop to get anchor linked list.
+	 * @param {string}		anchor	//anchor name
+	 * @param {number}		block	//target block number
+	 * @param {number}		[limit]	//search limit block number
+	 * @param {function}	ck		//callback function
+	 * @param {array}		[list]	//callback result array
+	*/
 	loop: (anchor, block, limit, ck, list) => {
-		//console.log(`开始获取${anchor}的历史，最新块的是${block},遍历到${limit}`);
 		limit = !limit ? 0 : limit;
 		if (!list) list = [];
 		wsAPI.rpc.chain.getBlockHash(block, (res)=>{
@@ -220,10 +287,19 @@ const self = {
 			});
 		});
 	},
+
 	//TODO: [[anchor,block],[anchor,block],...,[anchor,block]], the anchor target list
 	footprint:(anchor,ck)=>{
 
 	},
+
+	/** 
+	 * Get multi anchors from list.
+	 * @param {array}		list	//anchor list, [anchor,block] or "anchor"
+	 * @param {function}	ck		//callback function
+	 * @param {array}		[done]	//the multi list, the same as list
+	 * @param {object}		[map]	//the result map of anchors
+	*/
 	multi: (list,ck,done,map)=>{
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		if(list.length===0) return [];
@@ -246,6 +322,12 @@ const self = {
 			});
 		}
 	},
+
+	/** 
+	 * Group the anchors result, the same order as requested.
+	 * @param {array}		list	//the multi anchor list.
+	 * @param {object}		map		//the result map of anchors
+	*/
 	groupMulti:(list,map)=>{
 		const arr=[];
 		const format=self.format;
@@ -257,6 +339,12 @@ const self = {
 		return arr;
 	},
 
+	/** 
+	 * Decode data from target block hash
+	 * @param {string}		hash	//target block hash
+	 * @param {function}	ck		//callback function
+	 * @param {object}		[cfg]	//{anchor:""}, filter target anchor if cfg is sent
+	*/
 	specific:(hash,ck,cfg)=>{
 		if(cfg!==undefined && cfg.anchor!==undefined && self.limited(cfg.anchor)) return ck && ck(false);
 		wsAPI.rpc.chain.getBlock(hash).then((dt) => {
@@ -278,8 +366,6 @@ const self = {
 					}
 				}
 				if(data===null) return ck && ck(false);
-				//if(cfg.owner) data.owner=cfg.owner;
-
 				return ck && ck(self.decor(data));
 			});
 		});
@@ -289,6 +375,14 @@ const self = {
 	/***Anchor data to chain***/
 	/**************************/
 
+	/** 
+	 * Write data to chain
+	 * @param {object}			pair		//keyring pair
+	 * @param {string}			anchor		//anchor name
+	 * @param {string | json}	raw			//anchor raw data
+	 * @param {string | json}	protocol	//anchor protocol data 
+	 * @param {function}		ck			//callback function
+	*/
 	write: (pair, anchor, raw, protocol, ck) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		if (typeof protocol !== 'string') protocol = JSON.stringify(protocol);
@@ -314,6 +408,10 @@ const self = {
 	/************************/
 	
 	// TODO: need to page and step
+	/** 
+	 * Get list of anchors on sell
+	 * @param {function}	[ck]	//callback function
+	*/
 	market: (ck) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		wsAPI.query.anchor.sellList.entries().then((arr) => {
@@ -334,6 +432,15 @@ const self = {
 			return ck && ck(list);
 		});
 	},
+
+	/** 
+	 * Set anchor to selling status
+	 * @param {object}			pair		//keyring pair
+	 * @param {string}			anchor		//anchor name
+	 * @param {number}			price		//anchor selling price
+	 * @param {function}		ck			//callback function
+	 * @param {string}			[target]	//special SS58 address
+	*/
 	sell: (pair, anchor, price, ck , target) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -352,6 +459,13 @@ const self = {
 			
 		});
 	},
+
+	/** 
+	 * Revoke anchor to normal status
+	 * @param {object}			pair		//keyring pair
+	 * @param {string}			anchor		//anchor name
+	 * @param {function}		ck			//callback function
+	*/
 	unsell:(pair, anchor, ck) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -368,6 +482,13 @@ const self = {
 			}
 		});
 	},
+
+	/** 
+	 * Buy target anchor
+	 * @param {object}			pair		//keyring pair
+	 * @param {string}			anchor		//anchor name
+	 * @param {function}		ck			//callback function
+	*/
 	buy: (pair, anchor, ck) => {
 		if (!self.ready()) return ck && ck({error:"No websocke link."});
 		anchor = anchor.toLocaleLowerCase();
@@ -394,6 +515,11 @@ const self = {
 			});
 		});
 	},
+
+	/** 
+	 * Decode interact status of anchor node
+	 * @param {object}			obj		//polkadot status object
+	*/
 	process:(obj)=>{
 		const status={
 			step:'',
@@ -424,6 +550,11 @@ const self = {
 	/************************/
 	/***Anchor data format***/
 	/************************/
+	
+	/** 
+	 * Format the anchor data 
+	 * @param {object}	data	//anchor data from specific function
+	*/
 	decor:(data)=>{
 		if(data.key.substr(0, 2).toLowerCase() === '0x') data.key=self.decodeUTF8(data.key);
 		if(data.raw.substr(0, 2).toLowerCase() === '0x') data.raw = self.decodeUTF8(data.raw);
@@ -442,6 +573,13 @@ const self = {
 		if(data.block) data.block=parseInt(data.block.replace(/,/gi, ''));
 		return data;
 	},
+
+	/** 
+	 * Filter anchor from block raw data
+	 * @param {object}			exs			//Extrinsic raw data from @Polkadot/api
+	 * @param {string}			method		//target method to filter
+	 * @param {function}		status		//status result from self.status
+	*/
 	filter: (exs, method,status) => {
 		let arr = [];
 		//console.log(exs[0].toHuman());
@@ -452,7 +590,6 @@ const self = {
 			}
 			if(index===0 || status[index]!=="ExtrinsicSuccess") return false;
 			const dt = ex.toHuman();
-			//console.log(dt);
 			if (dt.method.method === method) {
 				const res = dt.method;
 				res.owner = dt.signer.Id;
@@ -462,7 +599,11 @@ const self = {
 		});
 		return arr;
 	},
-	
+
+	/** 
+	 * Get events from @Polkadot/api raw data
+	 * @param {array}			list			//Events raw data from @Polkadot/api
+	*/
 	status:(list)=>{
 		const evs=list.toHuman();
 		const map={};
@@ -473,9 +614,20 @@ const self = {
 		}
 		return map;
 	},
+
+	/** 
+	 * UTF8 decode
+	 * @param {string}	str		//Hex string need to convert
+	*/
 	decodeUTF8:(str) => {
 		return decodeURIComponent(str.slice(2).replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'));
 	},
+
+	/** 
+	 * Last format the anchor ojbect
+	 * @param {string}	anchor		//anchor name
+	 * @param {object}	obj			//anchor raw data
+	*/
 	format:(anchor,obj)=>{
 		return {
 			"name":!anchor?"":anchor,
