@@ -61,7 +61,7 @@ const self = {
 		wsAPI.rpc.chain.subscribeFinalizedHeads((lastHeader) => {
 			//console.log(lastHeader);
 			const hash = lastHeader.hash.toHex();
-			const block=lastHeader.number.toHuman();
+			const block=lastHeader.number.toJSON();
 			const list=[];
 			const format=self.format;
 
@@ -76,7 +76,7 @@ const self = {
 					dt.empty=false;
 					list.push(dt);
 				}
-				return ck && ck(list);
+				return ck && ck(list,block);
 			});
 
 		}).then((fun) => {
@@ -258,7 +258,7 @@ const self = {
 	},
 
 	specific:(hash,ck,cfg)=>{
-		if(self.limited(cfg.anchor)) return ck && ck(false);
+		if(cfg!==undefined && cfg.anchor!==undefined && self.limited(cfg.anchor)) return ck && ck(false);
 		wsAPI.rpc.chain.getBlock(hash).then((dt) => {
 			if (dt.block.extrinsics.length === 1) return ck && ck(false);
 
