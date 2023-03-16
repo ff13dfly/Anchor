@@ -1,5 +1,3 @@
-
-
 const Keys = {
     'node':'node_cache',
     'account':'account_cache',

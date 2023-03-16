@@ -63,6 +63,31 @@ If there is any error, anchorJS will through error message on callback.
 {error:"error message"}
 ```
 
+## Test
+
+Node.js is needed to test. Test will output the result on console screen.
+
+### Requirement
+
+* @polkadot/api
+
+```SHELL
+    # install the neccessay polkadot API library
+    yarn add @polkadot/api
+```
+
+### Storage Part
+
+```SHELL
+    node anchor_storage.js
+```
+
+### Market Part
+
+```SHELL
+    node anchor_market.js
+```
+
 ## Methods
 
 There are three parts in anchor.js as follow.
