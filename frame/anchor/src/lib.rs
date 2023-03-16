@@ -102,9 +102,6 @@ pub mod pallet {
 		///Pre number errror
 		PreAnchorFailed,
 
-		///Anchor sell value error.
-		CostValueLimited,
-
 		///Anchor exists already, can not be created.
 		AnchorExistsAlready,
 
@@ -200,18 +197,6 @@ pub mod pallet {
 
 			let data = <AnchorOwner<T>>::get(&nkey); 		//check anchor status
 			let current_block_number = <frame_system::Pallet<T>>::block_number();
-			
-			//1.2.confirm the cost < balance
-			//important! no need to do this, system will through 1010 error before here.
-
-
-			//let len:u128=raw.len().try_into().unwrap();
-			//let basic:u128=10000000000;
-			//let tx=len.saturating_mul(basic);
-			//ensure!(
-			//	T::Currency::free_balance(&sender) >= tx.saturated_into(),
-			//	Error::<T>::InsufficientBalance
-			//);
 
 			//2.check anchor to determine add or update
 			if data.is_none() {
@@ -233,9 +218,6 @@ pub mod pallet {
 					d.1 = current_block_number;
 					Ok(())
 				})?;
-
-				//<AnchorOwner<T>>::remove(&nkey);
-				//<AnchorOwner<T>>::insert(nkey, (&sender,current_block_number));
 			}
 
 			Ok(())
@@ -256,8 +238,7 @@ pub mod pallet {
 			let target = T::Lookup::lookup(target)?;
 
 			//1.param check		
-			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
-			ensure!(price > 0 || price == 0, Error::<T>::CostValueLimited); 	//1.2.check cost, >0
+			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 	//1.1.check key length, <40
 
 			//1.1.lowercase fix
 			let mut nkey:Vec<u8>;
@@ -345,15 +326,16 @@ pub mod pallet {
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			
-			//1.param check		
-			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 			//1.1.check key length, <40
+			//1.param check
+			//1.1.check key length, <40
+			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
 
-			//1.1.lowercase check
+			//1.2.lowercase check
 			let mut nkey:Vec<u8>;
 			nkey=key.clone().as_mut_slice().to_vec();
 			nkey.make_ascii_lowercase();
 
-			//1.2.check sell list
+			//1.3.check sell list
 			<SellList<T>>::get(&key).ok_or(Error::<T>::AnchorNotInSellList)?;
 
 			//2.check owner
