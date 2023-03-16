@@ -14,9 +14,20 @@ Anchor pallet have tested for the [2022.12 version substrate](https://github.com
 
 * Download the [Anchor pallet](https://github.com/ff13dfly/Anchor) code.
 
-After copy the "Anchor pallet" to Substrate, the following 5 files need minor modifications. You will find that it is petty easy to finish this base on the great job of Substrate.
+After copy the Anchor pallet from "frame/anchor" to Substrate "frame" folder, the following 5 files need minor modifications. You will find that it is petty easy to finish this base on the great job of Substrate.
 
 Remove the Cargo.lock, in case the needed library out of time.
+
+```SHELL
+    # get the substrate source code via github
+    git clone https://github.com/paritytech/substrate
+
+    # get the anchor pallet source code via github
+    git clone https://github.com/ff13dfly/Anchor
+
+    # copy anchor pallet to substrate frame folder
+    cp -r Anchor/frame/anchor substrate/frame
+```
 
 ### 1. Cargo.toml
 
@@ -121,7 +132,7 @@ Anchor pallet need to read the block hash, new versions of Substrate will drop t
 ```SHELL
 # --state-pruning archive
 # without this parameter, the hash of block can not been read.
-target/substrate --dev --state-pruning archive
+target/release/substrate --dev --state-pruning archive
 ```
 
 5. Browser Substrate
