@@ -141,7 +141,7 @@ const self={
 //!important If it runs once, the target account do have enough balance.
 //!important To avoid this situation, please restart the substrate node.
 
-const anchor=`trade_${self.randomData(3)}`;     //target anchor, can be checked from Polkadot UI
+const anchor=`trade_anchor`;     //target anchor, can be checked from Polkadot UI
 const list=[
     transfer_from_bob_to_pair_0,        //1.
     transfer_from_bob_to_pair_1,        //2.

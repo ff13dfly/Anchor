@@ -494,13 +494,13 @@ const self = {
 
 		self.owner(anchor,(owner)=>{
 			if(owner===pair.address) return ck && ck({error:"Your own anchor"});
+			let unlist=null;
 			wsAPI.query.anchor.sellList(anchor, (dt) => {
+				unlist();
 				if (dt.value.isEmpty) return ck && ck({error:`'${anchor}' is not on sell`});
-				//console.log(dt.toJSON());
 				const res=dt.toJSON();
 				const cost=res[1]*1000000000000;
 				self.balance(pair.address,(amount)=>{
-					//console.log(amount);
 					if(amount.free<cost) return ck && ck({error:'Low balance'});
 					try {
 						wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (res) => {
@@ -510,7 +510,10 @@ const self = {
 						return ck && ck({error:error});
 					}
 				});
+			}).then((fun) => {
+				unlist = fun;
 			});
+
 		});
 	},
 
