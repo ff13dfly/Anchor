@@ -103,7 +103,7 @@ pub mod pallet {
 		PreAnchorFailed,
 
 		///Anchor sell value error.
-		CostValueLimited,
+		PriceValueLimited,
 
 		///Anchor exists already, can not be created.
 		AnchorExistsAlready,
@@ -242,6 +242,7 @@ pub mod pallet {
 
 			//1.param check		
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited); 	//1.1.check key length, <40
+			ensure!(price > 0, Error::<T>::PriceValueLimited); 
 
 			//1.1.lowercase fix
 			let mut nkey:Vec<u8>;
@@ -269,7 +270,6 @@ pub mod pallet {
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 			ensure!(key.len() < 40, Error::<T>::KeyMaxLimited);
-			ensure!(price > 0, Error::<T>::CostValueLimited); 
 
 			//lowercase check
 			let mut nkey:Vec<u8>;

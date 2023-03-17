@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-pushd .
+#pushd .
 
 # The following line ensure we run from the project root
 PROJECT_ROOT=`git rev-parse --show-toplevel`
@@ -21,4 +21,4 @@ time docker build -f ./docker/anchor_builder.Dockerfile -t ${GITUSER}/${GITREPO}
 echo "Image is ready"
 docker images | grep ${GITREPO}
 
-popd
+#popd
