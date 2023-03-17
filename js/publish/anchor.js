@@ -302,7 +302,7 @@ const self = {
 		if(!done) done=[];
 		if(!map) map={};
 
-		const row=list.pop();
+		const row=list.shift();
 		done.push(row);
 		if (typeof (row) == 'string') {
 			self.latest(row,(data)=>{

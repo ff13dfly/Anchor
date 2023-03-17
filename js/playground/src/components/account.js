@@ -50,7 +50,7 @@ function Account(props) {
     },
     random:function(min, max){
       return Math.round(Math.random() * (max - min)) + min;
-  },
+    },
     getList:(map)=>{
       let list=[];
       for(let address in map) list.push(address);

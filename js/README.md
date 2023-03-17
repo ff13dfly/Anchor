@@ -55,6 +55,30 @@ Simple market information about anchor. Normally, it is used to list the on-sell
 }
 ```
 
+### Status Object
+
+The status of writting to chain, the step should be one of ["Ready","InBlock","Finalized"].
+
+```Javascript
+{   
+  step: 'Ready',                            // step of writting
+  message: 'Ready to interact with node.'   // details about the process
+}
+```
+
+### Nonce Object
+
+This is the human-read object from Polkadot API.
+
+```Javascript
+    {
+        free: 0, 
+        reserved: 0, 
+        miscFrozen: 0, 
+        feeFrozen: 0
+    }
+```
+
 ### Error
 
 If there is any error, anchorJS will through error message on callback.
