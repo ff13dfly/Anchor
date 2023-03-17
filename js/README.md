@@ -62,8 +62,8 @@ Need update if Polkadot/Substrate change the data structure.
 
 ```Javascript
 {   
-  step: 'Ready',                            // step of writting
-  message: 'Ready to interact with node.'   // details about the process
+  step: '',     // step of writting
+  message: ''   // details about the process
 }
 ```
 
@@ -91,7 +91,7 @@ If there is any error, anchorJS will through error message on callback.
 
 ## Test
 
-Node.js is needed to test. Test will output the result on console screen. When write to the node, test will wait the "Finalized" status done, that may take a bit long time to test.
+Node.js is needed to test. Test will output the result on console screen. When write to the node, test will wait the "Finalized" status done, that may take a bit long time to test. There will be an overview at the end of all tests.
 
 ### Requirement
 
