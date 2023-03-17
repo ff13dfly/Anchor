@@ -100,11 +100,11 @@ If you meet Rust version problem, try these ways.
 
 ```SHELL
     # update rustup itself.
-    rustup  self  update
+    rustup self update
 
     # update rust tools
     rustup upgrade
-    rustup  update  nightly
+    rustup update nightly
 ```
 
 
@@ -164,7 +164,7 @@ There is a shell file to create docker image, you can build the docker image by 
 The docker image do not have a bash, so you just run by docker run to test.
 
 ```SHELL
-    docker run -it --rm fuu/anchor --dev
+    docker run -it --rm fuu/anchor --dev --state-pruning archive
 ```
 
 ## Exposed Methods

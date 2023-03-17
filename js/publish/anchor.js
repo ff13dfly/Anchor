@@ -387,15 +387,17 @@ const self = {
 
 		self.owner(anchor,(owner,block)=>{
 			if(owner!==false &&  owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
-
-			const pre = owner===false?0:block;
-			try {
-				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
-					return ck && ck(self.process(res));
-				});
-			} catch (error) {
-				return ck && ck({error:error});
-			}
+			self.balance(pair.address,(amount)=>{
+				if(amount.free<100*1000000000000) return ck && ck({error:'Not enough balance'});
+				const pre = owner===false?0:block;
+				try {
+					wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
+						return ck && ck(self.process(res));
+					});
+				} catch (error) {
+					return ck && ck({error:error});
+				}
+			});
 		});
 	},
 	
@@ -637,7 +639,7 @@ const self = {
 			"owner":(obj && obj.owner)?obj.owner:"",
 			"sell":(obj && obj.sell)?obj.sell:false,
 			"cost":(obj && obj.cost)?obj.cost:0,
-			"target":(obj && obj.target)?obj.target:null,
+			"target":(obj && obj.target)?obj.target:"",
 		};
 	},
 };
