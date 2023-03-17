@@ -388,7 +388,7 @@ const self = {
 		self.owner(anchor,(owner,block)=>{
 			if(owner!==false &&  owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
 			self.balance(pair.address,(amount)=>{
-				if(amount.free<100*1000000000000) return ck && ck({error:'Not enough balance'});
+				if(amount.free<100*1000000000000) return ck && ck({error:'Low balance'});
 				const pre = owner===false?0:block;
 				try {
 					wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
@@ -501,7 +501,7 @@ const self = {
 				const cost=res[1]*1000000000000;
 				self.balance(pair.address,(amount)=>{
 					//console.log(amount);
-					if(amount.free<cost) return ck && ck({error:'Not enough balance'});
+					if(amount.free<cost) return ck && ck({error:'Low balance'});
 					try {
 						wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (res) => {
 							return ck && ck(self.process(res));
