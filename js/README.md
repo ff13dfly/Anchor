@@ -58,6 +58,7 @@ Simple market information about anchor. Normally, it is used to list the on-sell
 ### Status Object
 
 The status of writting to chain, the step should be one of ["Ready","InBlock","Finalized"].
+Need update if Polkadot/Substrate change the data structure.
 
 ```Javascript
 {   
@@ -66,9 +67,10 @@ The status of writting to chain, the step should be one of ["Ready","InBlock","F
 }
 ```
 
-### Nonce Object
+### Balance Object
 
 This is the human-read object from Polkadot API.
+Need update if Polkadot/Substrate change the data structure.
 
 ```Javascript
     {
@@ -89,13 +91,17 @@ If there is any error, anchorJS will through error message on callback.
 
 ## Test
 
-Node.js is needed to test. Test will output the result on console screen.
+Node.js is needed to test. Test will output the result on console screen. When write to the node, test will wait the "Finalized" status done, that may take a bit long time to test.
 
 ### Requirement
 
 * @polkadot/api
 
 ```SHELL
+    # Switch to the test folder. 
+    # Please check the position if you can not run test
+    cd js/test
+
     # install the neccessay polkadot API library
     yarn add @polkadot/api
 ```
@@ -103,13 +109,38 @@ Node.js is needed to test. Test will output the result on console screen.
 ### Storage Part
 
 ```SHELL
+    # Switch to the test folder. 
+    # Please check the position if you can not run test
+    cd js/test
+
+    # test the storage part of anchorJS
+    # [search,latest,target,history,multi,owner]
+    # local node may take more than 60s to finish.
     node anchor_storage.js
 ```
 
 ### Market Part
 
 ```SHELL
+    # Switch to the test folder. 
+    # Please check the position if you can not run test
+    cd js/test
+
+    # test the storage part of anchorJS
+    # [market,sell,unsell,buy]
     node anchor_market.js
+```
+
+### Chain Part
+
+```SHELL
+    # Switch to the test folder. 
+    # Please check the position if you can not run test
+    cd js/test
+
+    # test the chain part of anchorJS, subscribe mainly.
+    # [subcribe,balance,ready,load,set,setKeyring]
+    node anchor_chain.js
 ```
 
 ## Methods

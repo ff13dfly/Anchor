@@ -13,6 +13,7 @@ const config={
 let websocket=null;
 const cache={};
 const pairs=[];
+
 const accounts=[
     {
         "encry": {
@@ -36,12 +37,14 @@ const accounts=[
 
 let test_start=0;
 let test_end=0;
+const funs={};
 const self={
     run:(list,count)=>{
         if(list.length===0){
             test_end=self.stamp();
             console.log(`\nStart from ${test_start}, end at ${test_end}, total cost : ${((test_end-test_start)*0.001).toFixed(3)} s.`);
-            console.log(`********************End of test********************`);
+            self.report();
+            console.log(`\n********************End of test********************`);
             return true;
         } 
         const fun=list.shift();
@@ -51,6 +54,17 @@ const self={
                 self.run(list,count);
             },1500);
         });
+    },
+    report:()=>{
+        console.log(`\nTested Function Overview.`);
+        for(let fun in funs){
+            console.log(`${fun}:`);
+            const list=funs[fun];
+            for(let i=0;i<list.length;i++){
+                const row=list[i];
+                console.log(`    ${row[0]} : ${row[1]}`);
+            }
+        }
     },
     prework:(ck)=>{
         console.log('Ready to prepare the env for testing ...');
@@ -67,6 +81,10 @@ const self={
             pairs.push(res);
             return self.initAccounts(accs,ck);
         });
+    },
+    pushFun:(name,test,intro)=>{
+        if(!funs[name]) funs[name]=[];
+        funs[name].push([test,intro===undefined?'':intro]);
     },
     setKV:(k,v)=>{
         cache[k]=v;
@@ -146,6 +164,7 @@ function test_empty_anchor(index,ck){
     console.log(config.color,`[${index}] ${start}  Search empty anchor "${anchor}"`);
     console.log(`Test function : anchorJS.search`);
     console.log(`Except result : false \n`);
+    self.pushFun('anchorJS.search',`test_${index}`,'Empty anchor test');
 
     anchorJS.search(anchor,(res)=>{
         console.log(`Result:`);
@@ -161,6 +180,7 @@ function test_low_balance_to_write(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${anchor}" without enough units`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : {"error":"Low balance"}\n`);
+    self.pushFun('anchorJS.write',`test_${index}`,'Low balance test.');
 
     const raw=JSON.stringify({title:"this is a test",content:"hello world"});
     const protocol=JSON.stringify({type:"data"});
@@ -179,7 +199,9 @@ function transfer_from_alice_to_pair_0(index,ck){
     const start=self.stamp();
     console.log(config.color,`[${index}] ${start} transfer units from test account Alice`);
     console.log(`Test function : anchorJS.balance`);
-    console.log(`Except result : Balance Object\n`);
+    console.log(`Except result : Balance Object\nhttps://github.com/ff13dfly/Anchor/tree/main/js#balance-object\n`);
+    self.pushFun('anchorJS.balance',`test_${index}`,'Balance check after transfer');
+    
     const ks = new Keyring({ type: 'sr25519' });
     const from= ks.addFromUri('//Alice');
     const amount=1919;
@@ -188,10 +210,9 @@ function transfer_from_alice_to_pair_0(index,ck){
     websocket.tx.balances.transfer(pair.address, amount*1000000000000).signAndSend(from,(res)=>{
         const status=res.status.toHuman();
         if(status.InBlock){
-            anchorJS.balance(pair.address,(nonce)=>{
-                //console.log(`Balance check via anchorJS, result: ${nonce.free}`);
+            anchorJS.balance(pair.address,(balance)=>{
                 console.log(`Result:`);
-                console.log(nonce);
+                console.log(balance);
                 const end=self.stamp();
                 console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
                 return ck && ck();
@@ -205,8 +226,9 @@ function test_anchor_write(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${anchor}" again`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    self.pushFun('anchorJS.write',`test_${index}`);
 
-    const raw=JSON.stringify({title:"this is a test",content:"hello world"});
+    const raw=JSON.stringify({title:"this is a test",content:self.randomData(34)});
     const protocol=JSON.stringify({type:"data"});
     const pair=self.getPair(0);
     console.log(`Acccount address : ${pair.address}`);
@@ -226,6 +248,7 @@ function test_anchor_search(index,ck){
     console.log(config.color,`[${index}] ${start}  Search anchor "${anchor}" again`);
     console.log(`Test function : anchorJS.search`);
     console.log(`Except result : Anchor Data Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-data-object\n`);
+    self.pushFun('anchorJS.search',`test_${index}`);
 
     anchorJS.search(anchor,(res)=>{
         console.log(`Result:`);
@@ -242,6 +265,7 @@ function test_anchor_owner(index,ck){
     const pair=self.getPair(0);
     console.log(`Test function : anchorJS.owner`);
     console.log(`Except result : ${pair.address}\n`);
+    self.pushFun('anchorJS.owner',`test_${index}`);
 
     anchorJS.owner(anchor,(res)=>{
         console.log(`Result:`);
@@ -256,7 +280,9 @@ function transfer_from_alice_to_pair_1(index,ck){
     const start=self.stamp();
     console.log(config.color,`[${index}] ${start} transfer units from test account Alice`);
     console.log(`Test function : anchorJS.balance`);
-    console.log(`Except result : Balance Object\n`);
+    console.log(`Except result : Balance Object\nhttps://github.com/ff13dfly/Anchor/tree/main/js#balance-object\n`);
+    self.pushFun('anchorJS.balance',`test_${index}`);
+    
     const ks = new Keyring({ type: 'sr25519' });
     const from= ks.addFromUri('//Alice');
     const amount=2688;
@@ -265,10 +291,9 @@ function transfer_from_alice_to_pair_1(index,ck){
     websocket.tx.balances.transfer(pair.address, amount*1000000000000).signAndSend(from,(res)=>{
         const status=res.status.toHuman();
         if(status.InBlock){
-            anchorJS.balance(pair.address,(nonce)=>{
-                //console.log(`Balance check via anchorJS, result: ${nonce.free}`);
+            anchorJS.balance(pair.address,(balance)=>{
                 console.log(`Result:`);
-                console.log(nonce);
+                console.log(balance);
                 const end=self.stamp();
                 console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
                 return ck && ck();
@@ -282,6 +307,7 @@ function test_not_owner_to_write(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${anchor}" by who is not the owner.`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : {"error":"Not the owner of ${anchor}"}\n`);
+    self.pushFun('anchorJS.write',`test_${index}`);
 
     const raw=JSON.stringify({title:"Can I ?",content:"hello world"});
     const protocol=JSON.stringify({type:"data"});
@@ -305,6 +331,8 @@ function test_error_params_to_write(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${anchor}" with length limit exceeded.`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : {"error":"Params error"}\n`);
+    self.pushFun('anchorJS.write',`test_${index}`);
+    
     const fun=self.randomData;
     const pair=self.getPair(1);
 
@@ -345,6 +373,7 @@ function test_anchor_write_again(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${anchor}", prepare for history test.`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    self.pushFun('anchorJS.write',`test_${index}`);
 
     const raw=JSON.stringify({title:"this is a test",content:"hello world"});
     const protocol=JSON.stringify({type:"data"});
@@ -366,6 +395,7 @@ function test_anchor_write_more(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${more}", prepare for multi test.`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    self.pushFun('anchorJS.write',`test_${index}`);
 
     const raw=JSON.stringify({title:"this is a test",content:"hello world"});
     const protocol=JSON.stringify({type:"data"});
@@ -387,6 +417,7 @@ function test_anchor_history(index,ck){
     console.log(config.color,`[${index}] ${start}  Get anchor "${anchor}" history list.`);
     console.log(`Test function : anchorJS.history`);
     console.log(`Except result : Array of Anchor Data Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-data-object\n`);
+    self.pushFun('anchorJS.history',`test_${index}`);
 
     anchorJS.history(anchor,(res)=>{
         console.log(`Result:`);
@@ -411,6 +442,8 @@ function test_anchor_target_and_latest(index,ck){
     console.log(config.color,`[${index}] ${start}  Get target anchor "${anchor}" data.`);
     console.log(`Test function : anchorJS.target`);
     console.log(`Except result : Anchor Data Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-data-object\n`);
+    self.pushFun('anchorJS.target',`test_${index}`);
+    self.pushFun('anchorJS.latest',`test_${index}`);
 
     const his=self.getKV(anchor);
     anchorJS.target(anchor,his[0],(res)=>{
@@ -431,13 +464,14 @@ function test_anchor_target_and_latest(index,ck){
 
 function test_anchor_multi(index,ck){
     const start=self.stamp();
-    console.log(config.color,`[${index}] ${start}  Get multi anchor "${anchor}" data.`);
+    console.log(config.color,`[${index}] ${start}  Get multi anchor data.`);
     console.log(`Test function : anchorJS.multi`);
     console.log(`Except result : Array of Anchor Data Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-data-object\n`);
+    self.pushFun('anchorJS.multi',`test_${index}`);
 
     const his=self.getKV(anchor);
     const list=[anchor,[anchor,his[0]],more];
-    console.log(`Anchor list : ${JSON.stringify(list)} \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-location`);
+    console.log(`Anchor list : ${JSON.stringify(list)} \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-location\n`);
     anchorJS.multi(list,(res)=>{
         console.log(`Result:`);
         console.log(res);
@@ -452,8 +486,10 @@ function test_anchor_UTF8_supports(index,ck){
     console.log(config.color,`[${index}] ${start} Write data to anchor "${utf8_a}", UTF8 support.`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    self.pushFun('anchorJS.write',`test_${index}`);
+    self.pushFun('anchorJS.search',`test_${index}`);
 
-    const raw=JSON.stringify({title:"this is a test",content:"hello world"});
+    const raw=JSON.stringify({title:self.randomData(12),content:self.randomData(45)});
     const protocol=JSON.stringify({type:"data"});
     const pair=self.getPair(1);
     console.log(`Acccount address : ${pair.address}`);
@@ -462,7 +498,7 @@ function test_anchor_UTF8_supports(index,ck){
         console.log(res);
         if(res.step==="Finalized"){
             anchorJS.search(utf8_a,(data)=>{
-                console.log(`${utf8_a} data:`);
+                console.log(`\n\nChecking anchor "${utf8_a}" data:`);
                 console.log(data);
                 const end=self.stamp();
                 console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);

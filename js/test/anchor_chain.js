@@ -36,14 +36,12 @@ const accounts=[
 
 let test_start=0;
 let test_end=0;
-const funs={};
 const self={
     run:(list,count)=>{
         if(list.length===0){
             test_end=self.stamp();
             console.log(`\nStart from ${test_start}, end at ${test_end}, total cost : ${((test_end-test_start)*0.001).toFixed(3)} s.`);
-            self.report();
-            console.log(`\n********************End of test********************`);
+            console.log(`********************End of test********************`);
             return true;
         } 
         const fun=list.shift();
@@ -53,17 +51,6 @@ const self={
                 self.run(list,count);
             },1500);
         });
-    },
-    report:()=>{
-        console.log(`\nTested Function Overview.`);
-        for(let fun in funs){
-            console.log(`${fun}:`);
-            const list=funs[fun];
-            for(let i=0;i<list.length;i++){
-                const row=list[i];
-                console.log(`    ${row[0]} : ${row[1]}`);
-            }
-        }
     },
     prework:(ck)=>{
         console.log('Ready to prepare the env for testing ...');
@@ -80,10 +67,6 @@ const self={
             pairs.push(res);
             return self.initAccounts(accs,ck);
         });
-    },
-    pushFun:(name,test,intro)=>{
-        if(!funs[name]) funs[name]=[];
-        funs[name].push([test,intro===undefined?'':intro]);
     },
     setKV:(k,v)=>{
         cache[k]=v;
@@ -143,7 +126,6 @@ function test_01(index,ck){
     console.log(config.color,`[${index}] ${start}  Search empty anchor "${anchor}"`);
     console.log(`Test function : anchorJS.search`);
     console.log(`Except result : false \n`);
-    self.pushFun('anchorJS.search',`test_${index}`,'Summary of test');
 
     anchorJS.search(anchor,(res)=>{
         console.log(`Result:`);
