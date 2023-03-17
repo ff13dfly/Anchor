@@ -128,6 +128,7 @@ Node.js is needed to test. Test will output the result on console screen. When w
 
     # test the storage part of anchorJS
     # [market,sell,unsell,buy]
+    # local node may take more than 120s to finish.
     node anchor_market.js
 ```
 

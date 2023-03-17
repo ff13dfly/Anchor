@@ -500,6 +500,8 @@ const self = {
 				if (dt.value.isEmpty) return ck && ck({error:`'${anchor}' is not on sell`});
 				const res=dt.toJSON();
 				const cost=res[1]*1000000000000;
+				if(res[0]!==res[2] && res[2]!==pair.address) return ck && ck({error:"Not target account"});
+				
 				self.balance(pair.address,(amount)=>{
 					if(amount.free<cost) return ck && ck({error:'Low balance'});
 					try {

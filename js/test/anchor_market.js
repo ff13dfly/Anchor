@@ -155,11 +155,13 @@ const list=[
     transfer_from_bob_to_pair_2,        //10.
     test_anchor_buy,                    //11.
     test_anchor_sell_to_target_account, //12.
-    test_anchor_unsell_by_not_owner,
-    test_anchor_buy_by_not_target,
-    test_anchor_buy_by_target,
-    test_anchor_update_by_not_owner,
-    test_anchor_update_by_owner
+    test_anchor_unsell_by_not_owner,    //13.
+    test_anchor_buy_owner_self,         //14.
+    test_anchor_buy_by_not_target,      //15.
+    test_anchor_buy_by_target,          //16.
+    test_anchor_update_by_not_owner,    //17.
+    test_anchor_update_by_owner,        //18.
+    test_anchor_unsell,                 //19.
 ];
 self.auto(list);
 
@@ -172,8 +174,7 @@ function transfer_from_bob_to_pair_0(index,ck){
     console.log(config.color,`[${index}] ${start} transfer units from test account Bob`);
     console.log(`Test function : anchorJS.balance`);
     console.log(`Except result : Balance Object\nhttps://github.com/ff13dfly/Anchor/tree/main/js#balance-object\n`);
-    //self.pushFun('tx.balances.transfer',`test_${index}`);
-    self.pushFun('anchorJS.balance',`test_${index}`);
+    //self.pushFun('anchorJS.balance',`test_${index}`);
     
     const ks = new Keyring({ type: 'sr25519' });
     const from= ks.addFromUri('//Bob');
@@ -199,8 +200,7 @@ function transfer_from_bob_to_pair_1(index,ck){
     console.log(config.color,`[${index}] ${start} transfer units from test account Bob`);
     console.log(`Test function : anchorJS.balance`);
     console.log(`Except result : Balance Object\nhttps://github.com/ff13dfly/Anchor/tree/main/js#balance-object\n`);
-    //self.pushFun('tx.balances.transfer',`test_${index}`);
-    self.pushFun('anchorJS.balance',`test_${index}`);
+    //self.pushFun('anchorJS.balance',`test_${index}`);
     
     const ks = new Keyring({ type: 'sr25519' });
     const from= ks.addFromUri('//Bob');
@@ -226,7 +226,7 @@ function test_anchor_init(index,ck){
     console.log(config.color,`[${index}] ${start} init anchor "${anchor}"`);
     console.log(`Test function : anchorJS.write`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
-    self.pushFun('anchorJS.write',`test_${index}`);
+    //self.pushFun('anchorJS.write',`test_${index}`);
 
     const raw=JSON.stringify({title:"this is a test for market",content:self.randomData(34)});
     const protocol=JSON.stringify({type:"data"});
@@ -246,9 +246,9 @@ function test_anchor_init(index,ck){
 function test_anchor_buy_not_on_sell(index,ck){
     const start=self.stamp();
     console.log(config.color,`[${index}] ${start} Set anchor "${anchor}" to selling status by wrong account`);
-    console.log(`Test function : anchorJS.sell`);
+    console.log(`Test function : anchorJS.buy`);
     console.log(`Except result : {"error":"${anchor} is not on sell"}\n`);
-    self.pushFun('anchorJS.buy',`test_${index}`,'buy unselling anchor.');
+    self.pushFun('anchorJS.buy',`test_${index}`,'buy error : unselling anchor.');
 
     const pair=self.getPair(1);
     anchorJS.buy(pair,anchor,(res)=>{
@@ -266,7 +266,7 @@ function test_anchor_sell_by_not_owner(index,ck){
     console.log(config.color,`[${index}] ${start} Set anchor "${anchor}" to selling status by wrong account`);
     console.log(`Test function : anchorJS.sell`);
     console.log(`Except result : {"error":"Not the owner of ${anchor}"}\n`);
-    self.pushFun('anchorJS.sell',`test_${index}`,'set selling by wrong owner');
+    self.pushFun('anchorJS.sell',`test_${index}`,'sell error : not the owner.');
 
     anchorJS.owner(anchor,(owner)=>{
         
@@ -290,7 +290,7 @@ function test_anchor_sell_free(index,ck){
     console.log(config.color,`[${index}] ${start} Set anchor "${anchor}" to selling status`);
     console.log(`Test function : anchorJS.sell`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
-    self.pushFun('anchorJS.sell',`test_${index}`,'set selling normally.');
+    self.pushFun('anchorJS.sell',`test_${index}`,'sell successful.');
 
     anchorJS.owner(anchor,(owner)=>{
         const pair=self.getPair(0);
@@ -314,7 +314,7 @@ function test_anchor_market(index,ck){
     console.log(config.color,`[${index}] ${start} Get selling anchors.`);
     console.log(`Test function : anchorJS.sell`);
     console.log(`Except result : Array of Market Object\n`);
-    self.pushFun('anchorJS.market',`test_${index}`);
+    self.pushFun('anchorJS.market',`test_${index}`,'market list successful.');
 
     anchorJS.market((list)=>{
         console.log(`[${index}] Result:`);
@@ -330,7 +330,7 @@ function test_anchor_sell_update(index,ck){
     console.log(config.color,`[${index}] ${start} update anchor "${anchor}" selling status`);
     console.log(`Test function : anchorJS.sell`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
-    self.pushFun('anchorJS.sell',`test_${index}`,'update selling status.');
+    self.pushFun('anchorJS.sell',`test_${index}`,'sell update successful.');
 
     anchorJS.search(anchor,(data)=>{
         const pair=self.getPair(0);
@@ -339,7 +339,7 @@ function test_anchor_sell_update(index,ck){
         console.log(`Update price : ${price}`);
 
         anchorJS.sell(pair,anchor,price,(res)=>{
-            console.log(`Result:`);
+            console.log(`[${index}] Result:`);
             console.log(res);
             if(res.step==="Finalized"){
                 const end=self.stamp();
@@ -355,7 +355,7 @@ function test_anchor_buy_with_low_balance(index,ck){
     console.log(config.color,`[${index}] ${start} buy anchor "${anchor}" with low balance`);
     console.log(`Test function : anchorJS.buy`);
     console.log(`Except result : {"error":"Low balance"}\n`);
-    self.pushFun('anchorJS.buy',`test_${index}`,'low balance.');
+    self.pushFun('anchorJS.buy',`test_${index}`,'buy error : low balance.');
 
     const pair=self.getPair(2);
     anchorJS.buy(pair,anchor,(res)=>{
@@ -373,7 +373,7 @@ function transfer_from_bob_to_pair_2(index,ck){
     console.log(config.color,`[${index}] ${start} transfer units from test account Bob`);
     console.log(`Test function : anchorJS.balance`);
     console.log(`Except result : Balance Object\nhttps://github.com/ff13dfly/Anchor/tree/main/js#balance-object\n`);
-    self.pushFun('tx.balances.transfer',`test_${index}`);
+    //self.pushFun('tx.balances.transfer',`test_${index}`);
     
     const ks = new Keyring({ type: 'sr25519' });
     const from= ks.addFromUri('//Bob');
@@ -396,10 +396,10 @@ function transfer_from_bob_to_pair_2(index,ck){
 
 function test_anchor_buy(index,ck){
     const start=self.stamp();
-    console.log(config.color,`[${index}] ${start} buy anchor "${anchor}" with low balance`);
+    console.log(config.color,`[${index}] ${start} buy anchor "${anchor}" successful.`);
     console.log(`Test function : anchorJS.buy`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
-    self.pushFun('anchorJS.buy',`test_${index}`);
+    self.pushFun('anchorJS.buy',`test_${index}`,'buy successful.');
 
     const pair=self.getPair(2);
     anchorJS.buy(pair,anchor,(res)=>{
@@ -419,7 +419,7 @@ function test_anchor_sell_to_target_account(index,ck){
     console.log(config.color,`[${index}] ${start} sell anchor "${anchor}" to target account`);
     console.log(`Test function : anchorJS.sell`);
     console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
-    self.pushFun('anchorJS.sell',`test_${index}`,'sell to target account.');
+    self.pushFun('anchorJS.sell',`test_${index}`,'sell to target account successful.');
 
     const pair=self.getPair(2);
     const price=89;
@@ -441,7 +441,7 @@ function test_anchor_unsell_by_not_owner(index,ck){
     console.log(config.color,`[${index}] ${start} unsell anchor "${anchor}" by wrong account.`);
     console.log(`Test function : anchorJS.unsell`);
     console.log(`Except result : {"error":"Not the owner of ${anchor}"}`);
-    self.pushFun('anchorJS.unsell',`test_${index}`,'unsell by not owner.');
+    self.pushFun('anchorJS.unsell',`test_${index}`,'unsell error : not the owner.');
 
     anchorJS.owner(anchor,(owner)=>{
         const pair=self.getPair(0);
@@ -459,18 +459,137 @@ function test_anchor_unsell_by_not_owner(index,ck){
     });
 }
 
+function test_anchor_buy_owner_self(index,ck){
+    const start=self.stamp();
+    console.log(config.color,`[${index}] ${start} buy your own anchor.`);
+    console.log(`Test function : anchorJS.unsell`);
+    console.log(`Except result : {"error":"Your own anchor"}`);
+    self.pushFun('anchorJS.buy',`test_${index}`,'buy error : your own anchor.');
+
+    const pair=self.getPair(2);
+    anchorJS.buy(pair,anchor,(res)=>{
+        console.log(`[${index}] Result:`);
+        console.log(res);
+
+        const end=self.stamp();
+        console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
+        return ck && ck();
+    });
+}
+
 function test_anchor_buy_by_not_target(index,ck){
-    return ck && ck();
+    const start=self.stamp();
+    console.log(config.color,`[${index}] ${start} buy anchor "${anchor}" not the target account.`);
+    console.log(`Test function : anchorJS.unsell`);
+    console.log(`Except result : {"error":"Not target account"}`);
+    self.pushFun('anchorJS.buy',`test_${index}`,'buy error : not target account.');
+
+    const pair=self.getPair(0);
+    anchorJS.buy(pair,anchor,(res)=>{
+        console.log(`[${index}] Result:`);
+        console.log(res);
+
+        const end=self.stamp();
+        console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
+        return ck && ck();
+    });
 }
 
 function test_anchor_buy_by_target(index,ck){
-    return ck && ck();
+    const start=self.stamp();
+    console.log(config.color,`[${index}] ${start} buy anchor "${anchor}" by target account successful.`);
+    console.log(`Test function : anchorJS.unsell`);
+    console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    self.pushFun('anchorJS.buy',`test_${index}`,'buy by target account successful.');
+
+    const pair=self.getPair(1);
+    anchorJS.buy(pair,anchor,(res)=>{
+        console.log(`[${index}] Result:`);
+        console.log(res);
+
+        if(res.step==="Finalized"){
+            const end=self.stamp();
+            console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
+            return ck && ck();
+        }
+    });
 }
 
 function test_anchor_update_by_not_owner(index,ck){
-    return ck && ck();
+    const start=self.stamp(); 
+    console.log(config.color,`[${index}] ${start} update anchor "${anchor}" by wrong owner.`);
+    console.log(`Test function : anchorJS.write`);
+    console.log(`Except result :{"error":"Not the owner of ${anchor}"}`);
+    //self.pushFun('anchorJS.write',`test_${index}`);
+
+    anchorJS.owner(anchor,(owner)=>{
+        const raw=JSON.stringify({title:"owner changed.",content:self.randomData(22)});
+        const protocol=JSON.stringify({type:"data"});
+        const pair=self.getPair(2);
+        console.log(`Owner address : ${owner}`);
+        console.log(`Operation address : ${pair.address}`)
+        anchorJS.write(pair,anchor,raw,protocol,(res)=>{
+            console.log(`[${index}] Result:`);
+            console.log(res);
+
+            const end=self.stamp();
+            console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
+            return ck && ck();
+        });
+    });
 }
 
 function test_anchor_update_by_owner(index,ck){
-    return ck && ck();
+    const start=self.stamp(); 
+    console.log(config.color,`[${index}] ${start} update anchor "${anchor}" successful.`);
+    console.log(`Test function : anchorJS.write`);
+    console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    //self.pushFun('anchorJS.write',`test_${index}`);
+
+    anchorJS.owner(anchor,(owner)=>{
+        const raw=JSON.stringify({title:"owner changed.",content:self.randomData(22)});
+        const protocol=JSON.stringify({type:"data"});
+        const pair=self.getPair(1);
+        console.log(`Owner address : ${owner}`);
+        console.log(`Operation address : ${pair.address}`)
+        anchorJS.write(pair,anchor,raw,protocol,(res)=>{
+            console.log(`[${index}] Result:`);
+            console.log(res);
+            if(res.step==="Finalized"){
+                const end=self.stamp();
+                console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
+                return ck && ck();
+            }
+        });
+    });
+}
+
+function test_anchor_unsell(index,ck){
+    const start=self.stamp(); 
+    console.log(config.color,`[${index}] ${start} sell/unsell anchor "${anchor}" successful.`);
+    console.log(`Test function : anchorJS.unsell & anchorJS.sell`);
+    console.log(`Except result : Status Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#status-object\n`);
+    self.pushFun('anchorJS.unsell',`test_${index}`,'unsell successful.');
+    self.pushFun('anchorJS.sell',`test_${index}`,'sell successful.');
+
+    const pair=self.getPair(1);
+    const price = 399;
+    anchorJS.sell(pair,anchor,price,(res)=>{
+        console.log(`[${index}] Result:`);
+        console.log(res);
+
+        if(res.step==="Finalized"){
+            anchorJS.unsell(pair,anchor,(status)=>{
+
+                console.log(`[${index}] Result:`);
+                console.log(status);
+
+                if(status.step==="Finalized"){
+                    const end=self.stamp();
+                    console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
+                    return ck && ck();
+                }
+            });
+        }
+    });
 }
