@@ -36,4 +36,4 @@ Your best guess to get started is to pass the `--help flag`. Here are a few exam
 
 - The build need substrate code as base, if not work, it may be the update of substrate. Please contact me, I will try and fix the bug.
 
-- The image do not include bash in it, so do not try to get it. The ENTRYPOINT is "/usr/local/bin/anchor_node", just run the image and append the parameters. For example, you want to load as dev simulator, try this command `docker run -it --rm fuu/anchor --dev`
+- The image do not include bash in it, so do not try to get it. The ENTRYPOINT is "/usr/local/bin/anchor_node", just run the image and append the parameters. For example, you want to load as dev simulator, try this command `docker run --network host -it --rm fuu/anchor --dev --state-pruning archive`

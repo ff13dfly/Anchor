@@ -81,63 +81,62 @@ anchor:Default::default(),
 
 ### Issues about Rust & Substrate
 
-1. Rust language.
+1. **Rust language**
 It is popular and you will find a lot of resource to learn about it. Only one suggestion myself, be patient instead of being crazy.
 After the enviroment is set up successful, the following commands are used to test and build anchor code.
 
-```SHELL
-    # unit test , change directory to frame/anchor first
-    cargo test
+    ```SHELL
+        # unit test , change directory to frame/anchor first
+        cargo test
 
-    # build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
-    cargo build --release
+        # build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
+        cargo build --release
 
-    # clean the files, it is better to do it when switching task.
-    cargo clean
-```
+        # clean the files, it is better to do it when switching task.
+        cargo clean
+    ```
 
-If you meet Rust version problem, try these ways.
+    If you meet Rust version problem, try these ways.
 
-```SHELL
-    # update rustup itself.
-    rustup self update
+    ```SHELL
+        # update rustup itself.
+        rustup self update
 
-    # update rust tools
-    rustup upgrade
-    rustup update nightly
-```
+        # update rust tools
+        rustup upgrade
+        rustup update nightly
+    ```
 
-
-2. Clang version.
+2. **Clang version**
 In some system such as centos which I have tested, the clang version is too low, you need to update and set to new version manually.
 
-```SHELL
-# set clang version to target one
-scl enable devtoolset-7 bash
-```
+    ```SHELL
+    # set clang version to target one
+    scl enable devtoolset-7 bash
+    ```
 
-3. Protobuf
+3. **Protobuf**
 It is a new problem, this helps to reduce the size of substrate bin nearly 40%, but in mac, it is not installed.
 
-```SHELL
-brew install automake
-brew install libtool
-brew install protobuf
-protoc --version
-```
+    ```SHELL
+    brew install automake
+    brew install libtool
+    brew install protobuf
+    protoc --version
+    ```
 
-4. Run anchor binrary  
+4. **Run anchor binrary**  
 Anchor pallet need to read the block hash, new versions of Substrate will drop the map to save memory. To avoid this, you need to add the parameters when start anchor node.
 
-```SHELL
-# --state-pruning archive
-# without this parameter, the hash of block can not been read.
-target/release/substrate --dev --state-pruning archive
-```
+    ```SHELL
+    # --state-pruning archive
+    # without this parameter, the hash of block can not been read.
+    target/release/substrate --dev --state-pruning archive
+    ```
 
-5. Browser Substrate
+5. **Substrate Browser**
 
-Polkadot explorer works pretty good, you can run local by downloading here. Or, just trying the web application here.
+Polkadot explorer works pretty good, you can run local by checking [polkadot-js](https://github.com/polkadot-js/) here. Or, just trying the [web application](https://polkadot.js.org/apps/) directly.
 
 ## Docker testing
 
@@ -145,11 +144,11 @@ Polkadot explorer works pretty good, you can run local by downloading here. Or, 
 
 The 5 files which are needed to modify, is included in folder "deploy". The path is included in filename, connect by "_".
 
-* bin_node_cli_src_chain_spec.rs
-* bin_node_runtime_Cargo.toml
-* bin_node_runtime_src_lib.rs
-* bin_node_testing_src_genesis.rs
-* Cargo.toml
+* `bin_node_cli_src_chain_spec.rs`
+* `bin_node_runtime_Cargo.toml`
+* `bin_node_runtime_src_lib.rs`
+* `bin_node_testing_src_genesis.rs`
+* `Cargo.toml`
 
 ### Build from source code
 
@@ -161,10 +160,11 @@ There is a shell file to create docker image, you can build the docker image by 
 
 ### Run from docker image
 
-The docker image do not have a bash, so you just run by docker run to test.
+The docker image do not have a bash, so you just need docker to run test.
 
 ```SHELL
-    docker run -it --rm fuu/anchor --dev --state-pruning archive
+    #!important, the "--network host" do not effect on Mac
+    docker run --network host -it --rm fuu/anchor --dev --state-pruning archive
 ```
 
 ## Exposed Methods
@@ -191,9 +191,9 @@ To make it simple, there is just one single call to set anchor data.
 
 Limitation of the parameters.
 
-* Key : Vec<u8> , 40 bytes max
-* Raw : Vec<u8> , 4MB max
-* Protocol : Vec<u8>  , 256 bytes max
+* Key : `Vec<u8>` , 40 bytes max
+* Raw : `Vec<u8>` , 4MB max
+* Protocol : `Vec<u8>`  , 256 bytes max
 * Pre : block_number
 
 Substrate/Polkadot supplies API to access the storage, you can get the lastest anchor information as follow way.
@@ -275,20 +275,20 @@ Buy the anchor. The ownership will change and the history data will not change.
 
 1. how to delete an exsist anchor ?
 
-> No, you can not delete even you are the owner of the anchor.
+    > No, you can not delete even you are the owner of the anchor.
 
 2. How to remove the anchor data ?
 
-> No, you can not delete an exsist anchor.
+    > No, you can not delete an exsist anchor.
 
 3. Can I update anchor when it is on selling ?
 
-> Yes, you can.
+    > Yes, you can.
 
 4. Is UTF8 supported by Anchor ?
 
-> Yes, but UTF8 characters will cost more bytes.
+    > Yes, but UTF8 characters will cost more bytes.
 
 5. What does the "protocol" feild mean ?
 
-> It is a 256 bytes string to define your own protocol on chain.
+    > It is a 256 bytes string to define your own protocol on chain.
