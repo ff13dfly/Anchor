@@ -167,7 +167,7 @@ function test_empty_anchor(index,ck){
     self.pushFun('anchorJS.search',`test_${index}`,'Empty anchor test');
 
     anchorJS.search(anchor,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         const end=self.stamp();
         console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -187,7 +187,7 @@ function test_low_balance_to_write(index,ck){
     const pair=self.getPair(0);
     console.log(`Acccount address : ${pair.address}`);
     anchorJS.write(pair,anchor,raw,protocol,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         const end=self.stamp();
         console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -211,7 +211,7 @@ function transfer_from_alice_to_pair_0(index,ck){
         const status=res.status.toHuman();
         if(status.InBlock){
             anchorJS.balance(pair.address,(balance)=>{
-                console.log(`Result:`);
+                console.log(`[${index}] Result:`);
                 console.log(balance);
                 const end=self.stamp();
                 console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -233,7 +233,7 @@ function test_anchor_write(index,ck){
     const pair=self.getPair(0);
     console.log(`Acccount address : ${pair.address}`);
     anchorJS.write(pair,anchor,raw,protocol,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         if(res.step==="Finalized"){
             const end=self.stamp();
@@ -251,7 +251,7 @@ function test_anchor_search(index,ck){
     self.pushFun('anchorJS.search',`test_${index}`);
 
     anchorJS.search(anchor,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         const end=self.stamp();
         console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -268,7 +268,7 @@ function test_anchor_owner(index,ck){
     self.pushFun('anchorJS.owner',`test_${index}`);
 
     anchorJS.owner(anchor,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         const end=self.stamp();
         console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -292,7 +292,7 @@ function transfer_from_alice_to_pair_1(index,ck){
         const status=res.status.toHuman();
         if(status.InBlock){
             anchorJS.balance(pair.address,(balance)=>{
-                console.log(`Result:`);
+                console.log(`[${index}] Result:`);
                 console.log(balance);
                 const end=self.stamp();
                 console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -317,7 +317,7 @@ function test_not_owner_to_write(index,ck){
     anchorJS.owner(anchor,(owner)=>{
         console.log(`Owner address : ${owner}`);
         anchorJS.write(pair,anchor,raw,protocol,(res)=>{
-            console.log(`Result:`);
+            console.log(`[${index}] Result:`);
             console.log(res);
             const end=self.stamp();
             console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -342,7 +342,7 @@ function test_error_params_to_write(index,ck){
     const protocol_01=fun(200);
     console.log(`Anchor name limitation. Anchor: ${anchor_01.length}, raw: ${raw_01.length}, protocol: ${protocol_01.length}`);
     anchorJS.write(pair,anchor_01,raw_01,protocol_01,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
 
         const anchor_02=fun(29);
@@ -350,7 +350,7 @@ function test_error_params_to_write(index,ck){
         const protocol_02=fun(100);
         console.log(`Raw limitation. Anchor: ${anchor_02.length}, raw: ${raw_02.length}, protocol: ${protocol_02.length}`);
         anchorJS.write(pair,anchor_01,raw_01,protocol_01,(res)=>{
-            console.log(`Result:`);
+            console.log(`[${index}] Result:`);
             console.log(res);
 
             const anchor_03=fun(22);
@@ -358,7 +358,7 @@ function test_error_params_to_write(index,ck){
             const protocol_03=fun(257);
             console.log(`Protocol limitation. Anchor: ${anchor_03.length}, raw: ${raw_03.length}, protocol: ${protocol_03.length}`);
             anchorJS.write(pair,anchor_01,raw_01,protocol_01,(res)=>{
-                console.log(`Result:`);
+                console.log(`[${index}] Result:`);
                 console.log(res);
                 const end=self.stamp();
                 console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -380,7 +380,7 @@ function test_anchor_write_again(index,ck){
     const pair=self.getPair(0);
     console.log(`Acccount address : ${pair.address}`);
     anchorJS.write(pair,anchor,raw,protocol,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         if(res.step==="Finalized"){
             const end=self.stamp();
@@ -402,7 +402,7 @@ function test_anchor_write_more(index,ck){
     const pair=self.getPair(1);
     console.log(`Acccount address : ${pair.address}`);
     anchorJS.write(pair,more,raw,protocol,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         if(res.step==="Finalized"){
             const end=self.stamp();
@@ -420,7 +420,7 @@ function test_anchor_history(index,ck){
     self.pushFun('anchorJS.history',`test_${index}`);
 
     anchorJS.history(anchor,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
 
         //Get the list blocknumbers for next test.
@@ -447,13 +447,13 @@ function test_anchor_target_and_latest(index,ck){
 
     const his=self.getKV(anchor);
     anchorJS.target(anchor,his[0],(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
 
         console.log(`Test function : anchorJS.latest`);
         console.log(`Except result : Anchor Data Object \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-data-object\n`);
         anchorJS.latest(anchor,(latest)=>{
-            console.log(`Result:`);
+            console.log(`[${index}] Result:`);
             console.log(latest);
             const end=self.stamp();
             console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -473,7 +473,7 @@ function test_anchor_multi(index,ck){
     const list=[anchor,[anchor,his[0]],more];
     console.log(`Anchor list : ${JSON.stringify(list)} \nhttps://github.com/ff13dfly/Anchor/tree/main/js#anchor-location\n`);
     anchorJS.multi(list,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         const end=self.stamp();
         console.log(config.color,`[${index}] ${end}, cost: ${end-start} ms \n ------------------------------`);
@@ -494,7 +494,7 @@ function test_anchor_UTF8_supports(index,ck){
     const pair=self.getPair(1);
     console.log(`Acccount address : ${pair.address}`);
     anchorJS.write(pair,utf8_a,raw,protocol,(res)=>{
-        console.log(`Result:`);
+        console.log(`[${index}] Result:`);
         console.log(res);
         if(res.step==="Finalized"){
             anchorJS.search(utf8_a,(data)=>{
