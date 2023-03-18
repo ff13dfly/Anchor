@@ -100,7 +100,6 @@ const self = {
 					if(row.key.substr(0, 2).toLowerCase() === '0x') row.key=self.decodeUTF8(row.key);
 					row.signer=ex.owner;
 					row.block=block;
-
 					const dt=format(row.key,self.decor(row));
 					dt.empty=false;
 					list.push(dt);
@@ -139,13 +138,17 @@ const self = {
 	 * @param {function}	ck			//callback function
 	*/
 	load:(encryJSON,password,ck)=>{
-		if(!password) return ck && ck({error:"No password."});
+		if(!password) return ck && ck({error:"Invalid password."});
+		if(!encryJSON.address || !encryJSON.encoded) return ck && ck({error:"Invalid encry data."});
+        if(encryJSON.address.length!==48)  return ck && ck({error:"Invalid address."});
+        if(encryJSON.encoded.length!==268)  return ck && ck({error:"Invalid encoded data."});
 		const pair = keyRing.createFromJson(encryJSON);
 		try {
 			pair.decodePkcs8(password);
 			return ck && ck(pair);
 		} catch (error) {
-			return ck && ck(false);
+			//console.log(error);
+			return ck && ck({error:"Wrong password."});
 		}
 	},
 
@@ -349,7 +352,7 @@ const self = {
 			wsAPI.query.system.events.at(hash,(evs)=>{
 				const exs = self.filter(dt, 'setAnchor',self.status(evs));
 				if(exs.length===0) return ck && ck(false);
-				if(cfg.anchor===undefined) return ck && ck(exs);
+				if(cfg===undefined || cfg.anchor===undefined) return ck && ck(exs);
 
 				let data=null;
 				for(let i=0;i<exs.length;i++){
@@ -573,7 +576,7 @@ const self = {
 		data.pre=parseInt(data.pre.replace(/,/gi, ''));
 		
 		//remove the thound seperetor
-		if(data.block) data.block=parseInt(data.block.replace(/,/gi, ''));
+		if(data.block && typeof(data.block)==='string') data.block=parseInt(data.block.replace(/,/gi, ''));
 		return data;
 	},
 
