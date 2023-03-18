@@ -19,7 +19,7 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 
 	fn set_anchor(x: u32, ) -> Weight {
 		Weight::from_parts(10_000, 12000)
-			.saturating_add(Weight::from_ref_time(1_000_000_u64).saturating_mul(x as u64))
+			.saturating_add(Weight::from_parts(10_000, 10000).saturating_mul(x as u64))
 	}
 
 	fn set_sell() -> Weight {
@@ -42,7 +42,7 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 impl WeightInfo for () {
 	fn set_anchor(x: u32, ) -> Weight {
 		Weight::from_parts(10_000, 12000)
-			.saturating_add(Weight::from_ref_time(1_000_000_000_u64).saturating_mul(x as u64))
+			.saturating_add(Weight::from_parts(10_000, 10000).saturating_mul(x as u64))
 	}
 
 	fn set_sell() -> Weight {
