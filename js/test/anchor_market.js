@@ -40,7 +40,7 @@ const accounts=[
           "meta":{"name":"market_c"}
         },
         "password": "5FHKm_123456",
-      },
+    },
 ];
 
 let test_start=0;
