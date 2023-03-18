@@ -100,7 +100,6 @@ const self = {
 					if(row.key.substr(0, 2).toLowerCase() === '0x') row.key=self.decodeUTF8(row.key);
 					row.signer=ex.owner;
 					row.block=block;
-
 					const dt=format(row.key,self.decor(row));
 					dt.empty=false;
 					list.push(dt);
@@ -125,11 +124,7 @@ const self = {
 		let unsub=null;
 		wsAPI.query.system.account(address, (res) => {
 			if(unsub!=null) unsub();
-			//console.log(res);
 			const data=res.toJSON().data;
-
-			//parseFloat(res.data.free.toBn()*0.000000000001).toLocaleString()
-			//console.log(data);
 			return ck && ck(data);
 		}).then((fun)=>{
 			unsub=fun;
@@ -143,13 +138,17 @@ const self = {
 	 * @param {function}	ck			//callback function
 	*/
 	load:(encryJSON,password,ck)=>{
-		if(!password) return ck && ck({error:"No password."});
+		if(!password) return ck && ck({error:"Invalid password."});
+		if(!encryJSON.address || !encryJSON.encoded) return ck && ck({error:"Invalid encry data."});
+        if(encryJSON.address.length!==48)  return ck && ck({error:"Invalid address."});
+        if(encryJSON.encoded.length!==268)  return ck && ck({error:"Invalid encoded data."});
 		const pair = keyRing.createFromJson(encryJSON);
 		try {
 			pair.decodePkcs8(password);
 			return ck && ck(pair);
 		} catch (error) {
-			return ck && ck(false);
+			//console.log(error);
+			return ck && ck({error:"Wrong password."});
 		}
 	},
 
@@ -306,7 +305,7 @@ const self = {
 		if(!done) done=[];
 		if(!map) map={};
 
-		const row=list.pop();
+		const row=list.shift();
 		done.push(row);
 		if (typeof (row) == 'string') {
 			self.latest(row,(data)=>{
@@ -353,7 +352,7 @@ const self = {
 			wsAPI.query.system.events.at(hash,(evs)=>{
 				const exs = self.filter(dt, 'setAnchor',self.status(evs));
 				if(exs.length===0) return ck && ck(false);
-				if(cfg.anchor===undefined) return ck && ck(exs);
+				if(cfg===undefined || cfg.anchor===undefined) return ck && ck(exs);
 
 				let data=null;
 				for(let i=0;i<exs.length;i++){
@@ -391,15 +390,17 @@ const self = {
 
 		self.owner(anchor,(owner,block)=>{
 			if(owner!==false &&  owner!==pair.address) return ck && ck({error:`Not the owner of ${anchor}`});
-
-			const pre = owner===false?0:block;
-			try {
-				wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
-					return ck && ck(self.process(res));
-				});
-			} catch (error) {
-				return ck && ck({error:error});
-			}
+			self.balance(pair.address,(amount)=>{
+				if(amount.free<100*1000000000000) return ck && ck({error:'Low balance'});
+				const pre = owner===false?0:block;
+				try {
+					wsAPI.tx.anchor.setAnchor(anchor, raw, protocol, pre).signAndSend(pair, (res) => {
+						return ck && ck(self.process(res));
+					});
+				} catch (error) {
+					return ck && ck({error:error});
+				}
+			});
 		});
 	},
 	
@@ -496,14 +497,16 @@ const self = {
 
 		self.owner(anchor,(owner)=>{
 			if(owner===pair.address) return ck && ck({error:"Your own anchor"});
+			let unlist=null;
 			wsAPI.query.anchor.sellList(anchor, (dt) => {
+				unlist();
 				if (dt.value.isEmpty) return ck && ck({error:`'${anchor}' is not on sell`});
-				//console.log(dt.toJSON());
 				const res=dt.toJSON();
 				const cost=res[1]*1000000000000;
+				if(res[0]!==res[2] && res[2]!==pair.address) return ck && ck({error:"Not target account"});
+				
 				self.balance(pair.address,(amount)=>{
-					//console.log(amount);
-					if(amount.free<cost) return ck && ck({error:'Not enough balance'});
+					if(amount.free<cost) return ck && ck({error:'Low balance'});
 					try {
 						wsAPI.tx.anchor.buyAnchor(anchor).signAndSend(pair, (res) => {
 							return ck && ck(self.process(res));
@@ -512,7 +515,10 @@ const self = {
 						return ck && ck({error:error});
 					}
 				});
+			}).then((fun) => {
+				unlist = fun;
 			});
+
 		});
 	},
 
@@ -570,7 +576,7 @@ const self = {
 		data.pre=parseInt(data.pre.replace(/,/gi, ''));
 		
 		//remove the thound seperetor
-		if(data.block) data.block=parseInt(data.block.replace(/,/gi, ''));
+		if(data.block && typeof(data.block)==='string') data.block=parseInt(data.block.replace(/,/gi, ''));
 		return data;
 	},
 
@@ -641,7 +647,7 @@ const self = {
 			"owner":(obj && obj.owner)?obj.owner:"",
 			"sell":(obj && obj.sell)?obj.sell:false,
 			"cost":(obj && obj.cost)?obj.cost:0,
-			"target":(obj && obj.target)?obj.target:null,
+			"target":(obj && obj.target)?obj.target:"",
 		};
 	},
 };
