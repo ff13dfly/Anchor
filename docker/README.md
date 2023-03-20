@@ -63,3 +63,5 @@ Your best guess to get started is to pass the `--help flag`. Here are a few exam
 - The image do not include bash in it, so any try to login and run the bash will fail.
 
 - If you are newer to docker, please check the install details here [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). Easy way is here [https://docs.docker.com/engine/install/centos/#install-using-the-convenience-script](https://docs.docker.com/engine/install/centos/#install-using-the-convenience-script), and magic single command here `curl -fsSL https://get.docker.com/ | sh`.
+
+- If you are building the image via virtual machine, please pay attention to the harddisk limitation. The exhaustion of harddisk will cause compilation failure.

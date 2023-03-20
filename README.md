@@ -150,16 +150,6 @@ Polkadot explorer works pretty good, you can run local by checking [polkadot-js]
 
 ## Docker testing
 
-### Intergration files
-
-The 5 files which are needed to modify, is included in folder "deploy". The path is included in filename, connect by "_".
-
-* `bin_node_cli_src_chain_spec.rs`
-* `bin_node_runtime_Cargo.toml`
-* `bin_node_runtime_src_lib.rs`
-* `bin_node_testing_src_genesis.rs`
-* `Cargo.toml`
-
 ### Build from source code
 
 There is a shell file to create docker image, you can build the docker image by run the shell file. It will take more than 30 minutes, please get a cup of coffee.
@@ -169,6 +159,18 @@ There is a shell file to create docker image, you can build the docker image by 
     cd docker
     sh anchor_build.sh
 ```
+
+### Intergration files
+
+There are 5 files different from substrate raw source code as [Integration to Substrate](https://github.com/ff13dfly/Anchor#integration-to-substrate) metioned. The modified files are included in folder `docker/deploy`. The path is included in filename, connect by "_".
+
+* `bin_node_cli_src_chain_spec.rs`
+* `bin_node_runtime_Cargo.toml`
+* `bin_node_runtime_src_lib.rs`
+* `bin_node_testing_src_genesis.rs`
+* `Cargo.toml`
+
+When building the docker image, these files will be copied to target folder. You can check details in [docker/anchor_builder.Dockerfile](https://github.com/ff13dfly/Anchor/blob/main/docker/anchor_builder.Dockerfile).
 
 ### Run from docker image
 
