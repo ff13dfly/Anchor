@@ -9,16 +9,16 @@ To get the undivided source code for anchor node, you need follow the manual [ht
 After that, swtich to combined code directory, you can build an image from `anchor_builder.Dockerfile`.If you are a docker export, pleas try freely. There is also a shell to help, you can try as follow.
 
 ```SHELL
-    # please go back to the dirctory where you save the combined source code first.
-    # then change to the docker folder
+    # Please go back to the dirctory where you save the combined source code first.
+    # Then change to the docker folder
     cd docker
 
     # need to compile a binrary from substrate source code with anchor pallet.
     # it will take a bit long time to do this, nearly 30 mins.
     sh anchor_build.sh
 
-    # after build successful, you can try the run shell
-    # if everything is Ok, you can find the substrate output on console.
+    # After build successful, you can try the run shell
+    # If everything is Ok, you can find the substrate output on console.
     # Great! The image is ready. 
     sh anchor_run.sh --dev --state-pruning archive
 ```
@@ -30,7 +30,7 @@ You can run the built image by command as follow `docker run -it --rm fuu/anchor
 You can try this to expose all ports.
 
 ```SHELL
-    # expose all ports, but not work on MacOS.
+    # Expose all ports, but not work on MacOS.
     docker run --network host -it --rm fuu/anchor --dev --state-pruning archive
 ```
 
@@ -61,3 +61,5 @@ Your best guess to get started is to pass the `--help flag`. Here are a few exam
 - The build need substrate code as base, if not work, it may be the update of substrate. Please contact me, I will try to fix the bug.
 
 - The image do not include bash in it, so any try to login and run the bash will fail.
+
+- If you are newer to docker, please check the install details here [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). Easy way is here [https://docs.docker.com/engine/install/centos/#install-using-the-convenience-script](https://docs.docker.com/engine/install/centos/#install-using-the-convenience-script), and magic single command here `curl -fsSL https://get.docker.com/ | sh`.

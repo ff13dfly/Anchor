@@ -19,19 +19,22 @@ After copy the Anchor pallet from "frame/anchor" to Substrate "frame" folder, th
 Remove the Cargo.lock, in case the needed library out of time.
 
 ```SHELL
-    # get the substrate source code via github
+    # Get the substrate source code via github
     git clone https://github.com/paritytech/substrate
 
-    # get the anchor pallet source code via github
+    # Get the anchor pallet source code via github
     git clone https://github.com/ff13dfly/Anchor
 
-    # copy anchor pallet to substrate frame folder
+    # Copy anchor pallet to substrate frame folder
     cp -r Anchor/frame/anchor substrate/frame
 
-    # copy the docker files for anchor, when build docker image, you need these files.
+    # Copy the docker files for anchor, when build docker image, you need these files.
     cp Anchor/docker/anchor_build.sh substrate/docker/
     cp Anchor/docker/anchor_run.sh substrate/docker/
     cp Anchor/docker/anchor_builder.Dockerfile substrate/docker/
+
+    # Go to combined code directory
+    cd substrate
 ```
 
 ### 1. Cargo.toml
@@ -91,23 +94,23 @@ It is popular and you will find a lot of resource to learn about it. Only one su
 After the enviroment is set up successful, the following commands are used to test and build anchor code.
 
     ```SHELL
-        # unit test , change directory to frame/anchor first
+        # Unit test , change directory to frame/anchor first
         cargo test
 
-        # build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
+        # Build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
         cargo build --release
 
-        # clean the files, it is better to do it when switching task.
+        # Clean the files, it is better to do it when switching task.
         cargo clean
     ```
 
     If you meet Rust version problem, try these ways.
 
     ```SHELL
-        # update rustup itself.
+        # Update rustup itself.
         rustup self update
 
-        # update rust tools
+        # Update rust tools
         rustup upgrade
         rustup update nightly
     ```
@@ -116,7 +119,7 @@ After the enviroment is set up successful, the following commands are used to te
 In some system such as centos which I have tested, the clang version is too low, you need to update and set to new version manually.
 
     ```SHELL
-    # set clang version to target one
+    # Set clang version to target one
     scl enable devtoolset-7 bash
     ```
 
@@ -124,7 +127,7 @@ In some system such as centos which I have tested, the clang version is too low,
 It is a new problem, this helps to reduce the size of substrate bin nearly 40%, but in MacOS, it is not installed.
 
     ```SHELL
-    # install protobuf to support substrate compile
+    # Install protobuf to support substrate compile
     brew install automake
     brew install libtool
     brew install protobuf
@@ -136,8 +139,8 @@ Anchor pallet need to read the block hash, new versions of Substrate will drop t
 
     ```SHELL
     # --state-pruning archive
-    # without this parameter, the hash of block can not been read.
-    # run release binrary to test, after `cargo build --release`
+    # Without this parameter, the hash of block can not been read.
+    # Run release binrary to test, after `cargo build --release`
     target/release/substrate --dev --state-pruning archive
     ```
 
@@ -162,7 +165,7 @@ The 5 files which are needed to modify, is included in folder "deploy". The path
 There is a shell file to create docker image, you can build the docker image by run the shell file. It will take more than 30 minutes, please get a cup of coffee.
 
 ```SHELL
-    # please go back to the dirctory where you save the combined source code first.
+    # Please go back to the dirctory where you save the combined source code first.
     cd docker
     sh anchor_build.sh
 ```
@@ -172,7 +175,7 @@ There is a shell file to create docker image, you can build the docker image by 
 The docker image do not have a bash, so you just need docker to run test. Details here [https://github.com/ff13dfly/Anchor/tree/main/docker/README.md](https://github.com/ff13dfly/Anchor/tree/main/docker/README.md).
 
 ```SHELL
-    # after build successful, you can try the run shell
+    # After build successful, you can try the run shell
     # If everything is Ok, you can find the substrate output on console.
     sh anchor_run.sh --dev --state-pruning archive
 ```
@@ -190,14 +193,14 @@ To make it simple, there is just one single call to set anchor data.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.setAnchor(anchor, raw, protocol, previous_block).signAndSend(pair, (res) => {
-        //your code here.
+        //Your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.write(pair, anchor, raw, protocol, (status) => {
-        //your code here.
+        //Your code here.
     });
 ```
 
@@ -213,7 +216,7 @@ Substrate/Polkadot supplies API to access the storage, you can get the lastest a
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.query.anchor.anchorOwner(anchor, (res) =>{
-        //your code here.
+        //Your code here.
     }).then((unsub) => {
 
     });
@@ -222,7 +225,7 @@ Substrate/Polkadot supplies API to access the storage, you can get the lastest a
 ```Javascript
     //anchor.js code
     anchorJS.owner(anchor,(address,block)=>{
-        //your code here.
+        //Your code here.
     })
 ```
 
@@ -236,14 +239,14 @@ Set the anchor to selling status.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.sellAnchor(anchor,price,target).signAndSend(pair,(res) => {
-        //your code here.
+        //Your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.sell(pair,anchor,price,(status)=>{
-        //your code here.
+        //Your code here.
     } ,target)
 ```
 
@@ -254,14 +257,14 @@ Revoke the anchor selling status.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.unsellAnchor(anchor).signAndSend(pair,(res) => {
-        //your code here.
+        //Your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.unsell(pair,anchor,(status)=>{
-        //your code here.
+        //Your code here.
     })
 ```
 
@@ -272,14 +275,14 @@ Buy the anchor. The ownership will change and the history data will not change.
 ```Javascript
     //@polkadot/api code
     polkadotWebsocket.tx.anchor.buyAnchor(anchor).signAndSend(pair,(res) => {
-        //your code here.
+        //Your code here.
     });
 ```
 
 ```Javascript
     //anchor.js code
     anchorJS.buy(pair,anchor,(status)=>{
-        //your code here.
+        //Your code here.
     })
 ```
 
