@@ -27,6 +27,11 @@ Remove the Cargo.lock, in case the needed library out of time.
 
     # copy anchor pallet to substrate frame folder
     cp -r Anchor/frame/anchor substrate/frame
+
+    # copy the docker files for anchor, when build docker image, you need these files.
+    cp Anchor/docker/anchor_build.sh substrate/docker/
+    cp Anchor/docker/anchor_run.sh substrate/docker/
+    cp Anchor/docker/anchor_builder.Dockerfile substrate/docker/
 ```
 
 ### 1. Cargo.toml
@@ -116,9 +121,10 @@ In some system such as centos which I have tested, the clang version is too low,
     ```
 
 3. **Protobuf**
-It is a new problem, this helps to reduce the size of substrate bin nearly 40%, but in mac, it is not installed.
+It is a new problem, this helps to reduce the size of substrate bin nearly 40%, but in MacOS, it is not installed.
 
     ```SHELL
+    # install protobuf to support substrate compile
     brew install automake
     brew install libtool
     brew install protobuf
@@ -131,6 +137,7 @@ Anchor pallet need to read the block hash, new versions of Substrate will drop t
     ```SHELL
     # --state-pruning archive
     # without this parameter, the hash of block can not been read.
+    # run release binrary to test, after `cargo build --release`
     target/release/substrate --dev --state-pruning archive
     ```
 
@@ -152,24 +159,29 @@ The 5 files which are needed to modify, is included in folder "deploy". The path
 
 ### Build from source code
 
-There is a shell file to create docker image, you can build the docker image by run the shell file. It will take more than 20 minutes, please get a cup of coffee.
+There is a shell file to create docker image, you can build the docker image by run the shell file. It will take more than 30 minutes, please get a cup of coffee.
 
 ```SHELL
-    sh build.sh
+    # please go back to the dirctory where you save the combined source code first.
+    cd docker
+    sh anchor_build.sh
 ```
 
 ### Run from docker image
 
-The docker image do not have a bash, so you just need docker to run test.
+The docker image do not have a bash, so you just need docker to run test. Details here [https://github.com/ff13dfly/Anchor/tree/main/docker/README.md](https://github.com/ff13dfly/Anchor/tree/main/docker/README.md).
 
 ```SHELL
-    #!important, the "--network host" do not effect on Mac
-    docker run --network host -it --rm fuu/anchor --dev --state-pruning archive
+    # after build successful, you can try the run shell
+    # If everything is Ok, you can find the substrate output on console.
+    sh anchor_run.sh --dev --state-pruning archive
 ```
+
+After the successful running, still challenges, you can check the [details](https://github.com/ff13dfly/Anchor/tree/main/docker/README.md), hope it helps.
 
 ## Exposed Methods
 
-There are four exposed API calls, and they can be treaded as two part , set and trade. Will supply the demo code base on **@polkadot/api** and **anchor.js**.
+There are four exposed API calls in Anchor Pallet, and they can be treaded as two part , storage and market. Will supply the demo code base on **@polkadot/api** and **anchor.js**.
 
 ### 1. set_anchor, storage part
 

@@ -1,13 +1,37 @@
-# Anchor Pallet Docker Image
+# Anchor Node Docker Image
 
-## Anchor Pallet
+## Anchor Node, Substrate Node with Anchor Pallet
 
 Anchor pallet is an extend pallet for Substrate, it is On-chain Linked List and Name Service and On-chain Key-value Storage. By anchor way, it is easy to storage data on chain and do join the blockchain world.
 
-Swtich to docker directory and run the command as follow.
+To get the undivided source code for anchor node, you need follow the manual [https://github.com/ff13dfly/Anchor#integration-to-substrate](https://github.com/ff13dfly/Anchor#integration-to-substrate). It means to combine **anchor pallet** code to **substrate**.
+
+After that, swtich to combined code directory, you can build an image from `anchor_builder.Dockerfile`.If you are a docker export, pleas try freely. There is also a shell to help, you can try as follow.
 
 ```SHELL
-    sh build.sh
+    # please go back to the dirctory where you save the combined source code first.
+    # then change to the docker folder
+    cd docker
+
+    # need to compile a binrary from substrate source code with anchor pallet.
+    # it will take a bit long time to do this, nearly 30 mins.
+    sh anchor_build.sh
+
+    # after build successful, you can try the run shell
+    # if everything is Ok, you can find the substrate output on console.
+    # Great! The image is ready. 
+    sh anchor_run.sh --dev --state-pruning archive
+```
+
+## Port Expose Problem
+
+You can run the built image by command as follow `docker run -it --rm fuu/anchor --dev`, the you can find the substrate output on console. But when you try to connect to this node, you will fail, the reason is **Port Expose**, and it is a bit complex.
+
+You can try this to expose all ports.
+
+```SHELL
+    # expose all ports, but not work on MacOS.
+    docker run --network host -it --rm fuu/anchor --dev --state-pruning archive
 ```
 
 ## Anchor Builder Docker Image
@@ -27,13 +51,13 @@ The image can be used by passing the selected binary followed by the appropriate
 
 Your best guess to get started is to pass the `--help flag`. Here are a few examples:
 
-- `docker run --rm -it fuu/anchor anchor_node --version`
+- `docker run -it --rm fuu/anchor anchor_node --version`
 - `docker run -it --rm fuu/anchor --dev`
 
 ### Issues
 
-- This anchor image is build from the "anchor_builder.Dockerfile", it will take more than 15 minutes to do it.
+- This anchor image is build from the `anchor_builder.Dockerfile`, it will take more than 30 minutes to do it.
 
-- The build need substrate code as base, if not work, it may be the update of substrate. Please contact me, I will try and fix the bug.
+- The build need substrate code as base, if not work, it may be the update of substrate. Please contact me, I will try to fix the bug.
 
-- The image do not include bash in it, so do not try to get it. The ENTRYPOINT is "/usr/local/bin/anchor_node", just run the image and append the parameters. For example, you want to load as dev simulator, try this command `docker run --network host -it --rm fuu/anchor --dev --state-pruning archive`
+- The image do not include bash in it, so any try to login and run the bash will fail.
