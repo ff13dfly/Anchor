@@ -38,8 +38,6 @@
         
         # Copy anchor pallet to substrate frame folder, combine the code
         git clone https://github.com/ff13dfly/Anchor
-        cp -r Anchor/frame/anchor substrate/frame
-
         cp Anchor/docker/anchor_builder.Dockerfile substrate/docker/
 
         # build docker image
@@ -77,12 +75,12 @@
         git clone https://github.com/ff13dfly/Anchor
         cp -r Anchor/frame/anchor substrate/frame
 
-        # Copy the intergrate files for anchor.
+        # Copy the intergrate files for anchor. Need you type `y` to confirm
         cp -rf Anchor/docker/deploy/202302/_Cargo.toml substrate/Cargo.toml
         cp -rf Anchor/docker/deploy/202302/bin_node_cli_src_chain_spec.rs substrate/bin/node/cli/src/chain_spec.rs
         cp -rf Anchor/docker/deploy/202302/bin_node_runtime_Cargo.toml substrate/bin/node/runtime/Cargo.toml
         cp -rf Anchor/docker/deploy/202302/bin_node_runtime_src_lib.rs substrate/bin/node/runtime/src/lib.rs
-        cp -rf Anchor/docker/deploy/202302/bin_node_testing_src_genesis.rs substratebin/node/testing/src/genesis.rs
+        cp -rf Anchor/docker/deploy/202302/bin_node_testing_src_genesis.rs substrate/bin/node/testing/src/genesis.rs
 
         # Go to combined code directory
         cd substrate
@@ -102,7 +100,8 @@
          # Unit test , change directory to frame/anchor first
         cargo test
 
-        # Build substrate, it will take a bit long time more than 15 minutes depending on your hardware.
+        # Build substrate
+        # it will take a bit long time more than 15 minutes depending on your hardware.
         cargo build --release
 
         # Clean the files, it is better to do it when switching task.

@@ -17,8 +17,6 @@
         
         # Copy anchor pallet to substrate frame folder, combine the code
         git clone https://github.com/ff13dfly/Anchor
-        cp -r Anchor/frame/anchor substrate/frame
-
         cp Anchor/docker/anchor_builder.Dockerfile substrate/docker/
 
         # build docker image
