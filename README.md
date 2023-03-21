@@ -78,7 +78,7 @@
         cp -r Anchor/frame/anchor substrate/frame
 
         # Copy the intergrate files for anchor.
-        cp -rf Anchor/docker/deploy/202302/Cargo.toml substrate/Cargo.toml
+        cp -rf Anchor/docker/deploy/202302/_Cargo.toml substrate/Cargo.toml
         cp -rf Anchor/docker/deploy/202302/bin_node_cli_src_chain_spec.rs substrate/bin/node/cli/src/chain_spec.rs
         cp -rf Anchor/docker/deploy/202302/bin_node_runtime_Cargo.toml substrate/bin/node/runtime/Cargo.toml
         cp -rf Anchor/docker/deploy/202302/bin_node_runtime_src_lib.rs substrate/bin/node/runtime/src/lib.rs

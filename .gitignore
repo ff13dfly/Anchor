@@ -1,4 +1,5 @@
 .DS_Store
+
 Cargo.lock
 Cargo.toml
 rustfmt.toml
@@ -13,7 +14,6 @@ HEADER-GPL3
 /simnet_tests/
 /utils/
 /target/
-/docker/backup/
 /scripts/
 /.vscode/
 /zombienet/

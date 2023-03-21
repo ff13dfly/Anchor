@@ -7,7 +7,7 @@ COPY . /substrate
 ## Combine Anchor pallet code to substrate
 RUN ls -alh\
 	&& git clone https://github.com/ff13dfly/Anchor\
-	&& cp -rf Anchor/docker/deploy/202302/Cargo.toml Cargo.toml \
+	&& cp -rf Anchor/docker/deploy/202302/_Cargo.toml Cargo.toml \
 	&& cp -rf Anchor/docker/deploy/202302/bin_node_cli_src_chain_spec.rs bin/node/cli/src/chain_spec.rs\ 
 	&& cp -rf Anchor/docker/deploy/202302/bin_node_runtime_Cargo.toml bin/node/runtime/Cargo.toml\
 	&& cp -rf Anchor/docker/deploy/202302/bin_node_runtime_src_lib.rs bin/node/runtime/src/lib.rs\
