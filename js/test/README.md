@@ -8,6 +8,8 @@ Node.js is needed to test. Test will output the result on console screen. When w
 
 ### Requirement
 
+* Node.js
+
 * @polkadot/api
 
 ```SHELL

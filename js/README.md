@@ -93,6 +93,8 @@ If there is any error, anchorJS will through error message on callback.
 
 Node.js is needed to test. Test will output the result on console screen. When write to the node, test will wait the "Finalized" status done, that may take a bit long time to test. There will be an overview at the end of all tests.
 
+More details, please check [https://github.com/ff13dfly/Anchor/tree/main/js/test](https://github.com/ff13dfly/Anchor/tree/main/js/test).
+
 ### Requirement
 
 * @polkadot/api
