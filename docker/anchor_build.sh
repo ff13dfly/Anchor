@@ -6,7 +6,6 @@
     cp -r substrate-monthly-2023-02/* substrate/
     
     # Copy anchor pallet to substrate frame folder, combine the code
-    git clone https://github.com/ff13dfly/Anchor
     cp Anchor/docker/anchor_builder.Dockerfile substrate/docker/
     cp -r Anchor/frame/anchor substrate/frame
 

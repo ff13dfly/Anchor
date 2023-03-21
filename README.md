@@ -33,10 +33,10 @@
         cd temp
 
         # Get the shell file.
-        wget https://github.com/ff13dfly/Anchor/blob/main/docker/anchor_build.sh
+        git clone https://github.com/ff13dfly/Anchor
         
         # run the shell, take more than 30 mins to build
-        sh anchor_build.sh
+        sh Anchor/docker/anchor_build.sh
     ```
 
 #### Run Docker Image
