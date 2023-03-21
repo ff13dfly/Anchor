@@ -15,11 +15,17 @@ Node.js is needed to test. Test will output the result on console screen. When w
     yarn add @polkadot/api
 ```
 
+* Anchor node
+
+```SHELL
+    # switch to the substrate folder, then start the anchor node first
+   target/release/substrate --dev --state-pruning archive
+```
+
 ### Storage Part
 
 ```SHELL
-    # test the storage part of anchorJS
-    # [search,latest,target,history,multi,owner]
+    # test the storage part of anchorJS, [search,latest,target,history,multi,owner]
     # local node may take more than 60s to finish.
     node anchor_storage.js
 ```
@@ -27,8 +33,7 @@ Node.js is needed to test. Test will output the result on console screen. When w
 ### Market Part
 
 ```SHELL
-    # test the storage part of anchorJS
-    # [market,sell,unsell,buy]
+    # test the storage part of anchorJS, [market,sell,unsell,buy]
     # local node may take more than 120s to finish.
     node anchor_market.js
 ```
@@ -36,8 +41,8 @@ Node.js is needed to test. Test will output the result on console screen. When w
 ### Chain Part
 
 ```SHELL
-    # test the chain part of anchorJS, subscribe mainly.
-    # [subcribe,balance,ready,load,set,setKeyring]
+    # test the chain part of anchorJS, subscribe mainly, [subcribe,balance,ready,load,set,setKeyring]
+    # local node may take more than 30s to finish.
     node anchor_chain.js
 ```
 

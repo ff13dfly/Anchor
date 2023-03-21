@@ -7,8 +7,7 @@ const {anchorJS} = require('../publish/anchor.js');
 /********************************************/
 const config={
     color:'\x1b[36m%s\x1b[0m',
-    endpoint:"ws://172.16.54.4:9944",
-    //endpoint:"ws://127.0.0.1:9944"
+    endpoint:"ws://127.0.0.1:9944"
 };
 
 let websocket=null;
