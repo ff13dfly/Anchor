@@ -7,21 +7,15 @@
 * Follow the shell to build docker image of Anchor node.
 
     ```SHELL
-        # Download the target substrate source code
-        # The latest substrate may have new feature, the follow one is tested.
-        wget https://github.com/paritytech/substrate/archive/refs/tags/monthly-2023-02.tar.gz
-        tar -zxvf monthly-2023-02.tar.gz
+        # create a temp folder
+        mkdir temp
+        cd temp
 
-        mkdir substrate
-        cp -r substrate-monthly-2023-02/* substrate/
+        # Get the shell file.
+        wget https://github.com/ff13dfly/Anchor/blob/main/docker/anchor_build.sh
         
-        # Copy anchor pallet to substrate frame folder, combine the code
-        git clone https://github.com/ff13dfly/Anchor
-        cp Anchor/docker/anchor_builder.Dockerfile substrate/docker/
-
-        # build docker image
-        cd substrate
-        docker build -f docker/anchor_builder.Dockerfile -t fuu/anchor:latest .
+        # run the shell, take more than 30 mins to build
+        sh anchor_build.sh
 
         # after successful build try to run, you can get the output of substrate node
         docker run -it --rm fuu/anchor --dev
