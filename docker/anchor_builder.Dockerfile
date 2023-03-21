@@ -7,13 +7,13 @@ COPY . /substrate
 ## Combine Anchor pallet code to substrate
 RUN ls -alh\
 	&& git clone https://github.com/ff13dfly/Anchor\
-	&& cp -rf Anchor/docker/deploy/Cargo.toml Cargo.toml \
-	&& cp -rf Anchor/docker/deploy/bin_node_cli_src_chain_spec.rs bin/node/cli/src/chain_spec.rs\ 
-	&& cp -rf Anchor/docker/deploy/bin_node_runtime_Cargo.toml bin/node/runtime/Cargo.toml\
-	&& cp -rf Anchor/docker/deploy/bin_node_runtime_src_lib.rs bin/node/runtime/src/lib.rs\
-	&& cp -rf Anchor/docker/deploy/bin_node_testing_src_genesis.rs bin/node/testing/src/genesis.rs\
+	&& cp -rf Anchor/docker/deploy/202302/Cargo.toml Cargo.toml \
+	&& cp -rf Anchor/docker/deploy/202302/bin_node_cli_src_chain_spec.rs bin/node/cli/src/chain_spec.rs\ 
+	&& cp -rf Anchor/docker/deploy/202302/bin_node_runtime_Cargo.toml bin/node/runtime/Cargo.toml\
+	&& cp -rf Anchor/docker/deploy/202302/bin_node_runtime_src_lib.rs bin/node/runtime/src/lib.rs\
+	&& cp -rf Anchor/docker/deploy/202302/bin_node_testing_src_genesis.rs bin/node/testing/src/genesis.rs\
 	&& cp -rf Anchor/frame/anchor/* frame\
-	&& cargo build --locked --release
+	&& cargo build --release
 
 ## This is the 2nd stage: a very small image where we copy the Anchor Substrate binary."
 FROM docker.io/library/ubuntu:20.04
