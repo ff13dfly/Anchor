@@ -55,7 +55,7 @@
 
 * Anchor pallet have tested for the [2023.02 version substrate](https://github.com/paritytech/substrate/releases/tag/monthly-2023-02).Remove the Cargo.lock, in case the needed library out of time.
 
-* Follow the shell, you can compile the souce code successful if your system is 
+* Follow the shell, you can compile the souce code successful.
 
     ```SHELL
         # Get the substrate source code via github, latest tested is 2023-02 pre-release
