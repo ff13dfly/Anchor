@@ -4,19 +4,26 @@ import { useState,useRef } from 'react';
 import Selling from './selling';
 import {Accounts} from '../config/accounts';
 
+import STORAGE from '../lib/storage';
+import Keys from '../config/keys';
+
 function Detail(props) {
   const anchor = props.data.error ? {} : props.data;
   //console.log(anchor);
   const ankr = props.anchorJS;
 
-  let [URI, setURI] = useState(!anchor ? '#' : `https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer/query/${anchor.block}`);
+
+  //let [URI, setURI] = useState(!anchor ? '#' : `https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer/query/${anchor.block}`);
   let [password,setPassword]=useState(0);
   let [process,setProcess]=useState('');
   let [disabled,setDisabled]= useState(false);
 
   const refPassword = useRef(null);
 
-  const self = {
+  const nodes=STORAGE.getCache(Keys.node);
+  const URI=`https://polkadot.js.org/apps/?rpc=${nodes[0]}#/explorer/query/${anchor.block}`;
+
+  const self = {  
     format: (stamp) => {
       var dt = new Date(stamp);
       return dt.toLocaleString();
