@@ -6,6 +6,8 @@ rustfmt.toml
 shell.nix
 HEADER-APACHE2
 HEADER-GPL3
+LICENSE-GPL3
+substrate.md
 /test-utils/
 /bin/
 /client/
@@ -45,9 +47,11 @@ HEADER-GPL3
 /frame/fast-unstake
 /frame/gilt
 /frame/grandpa
+/frame/glutton
 /frame/identity
 /frame/im-online
 /frame/indices
+/frame/insecure-randomness-collective-flip
 /frame/lottery
 /frame/membership
 /frame/merkle-mountain-range

@@ -53,28 +53,28 @@
 
 ### Integration Shell
 
-* Anchor pallet have tested for the [2023.02 version substrate](https://github.com/paritytech/substrate/releases/tag/monthly-2023-02).Remove the Cargo.lock, in case the needed library out of time.
+* Anchor pallet have tested for the [2023.03 version substrate](https://github.com/paritytech/substrate/releases/tag/monthly-2023-03).Remove the Cargo.lock, in case the needed library out of time.
 
 * Follow the shell, you can compile the souce code successful.
 
     ```SHELL
         # Get the substrate source code via github, latest tested is 2023-02 pre-release
-        wget https://github.com/paritytech/substrate/archive/refs/tags/monthly-2023-02.tar.gz
-        tar -zxvf monthly-2023-02.tar.gz
+        wget https://github.com/paritytech/substrate/archive/refs/tags/monthly-2023-03.tar.gz
+        tar -zxvf monthly-2023-03.tar.gz
 
         mkdir substrate
-        cp -r substrate-monthly-2023-02/* substrate/
+        cp -r substrate-monthly-2023-03/* substrate/
 
         # Get the anchor pallet source code and copy to substrate frame folder
         git clone https://github.com/ff13dfly/Anchor
         cp -r Anchor/frame/anchor substrate/frame
 
         # Copy the intergrate files for anchor. Need you type `y` to confirm
-        cp -rf Anchor/docker/deploy/202302/_Cargo.toml substrate/Cargo.toml
-        cp -rf Anchor/docker/deploy/202302/bin_node_cli_src_chain_spec.rs substrate/bin/node/cli/src/chain_spec.rs
-        cp -rf Anchor/docker/deploy/202302/bin_node_runtime_Cargo.toml substrate/bin/node/runtime/Cargo.toml
-        cp -rf Anchor/docker/deploy/202302/bin_node_runtime_src_lib.rs substrate/bin/node/runtime/src/lib.rs
-        cp -rf Anchor/docker/deploy/202302/bin_node_testing_src_genesis.rs substrate/bin/node/testing/src/genesis.rs
+        cp -rf Anchor/docker/deploy/202303/_Cargo.toml substrate/Cargo.toml
+        cp -rf Anchor/docker/deploy/202303/bin_node_cli_src_chain_spec.rs substrate/bin/node/cli/src/chain_spec.rs
+        cp -rf Anchor/docker/deploy/202303/bin_node_runtime_Cargo.toml substrate/bin/node/runtime/Cargo.toml
+        cp -rf Anchor/docker/deploy/202303/bin_node_runtime_src_lib.rs substrate/bin/node/runtime/src/lib.rs
+        cp -rf Anchor/docker/deploy/202303/bin_node_testing_src_genesis.rs substrate/bin/node/testing/src/genesis.rs
 
         # Go to combined code directory
         cd substrate
@@ -329,3 +329,16 @@
 5. What does the "protocol" feild mean ?
 
     > It is a 256 bytes string to define your own protocol on chain.
+
+### Update To New Substrate
+
+* Copy the files to folder `docker/deploy/{year}{month}`, modify the files by following the integration guard. After that, copy and overwrite by these commands.
+
+    ```SHELL
+        #change to substrate folder root
+        cp -rf docker/deploy/202303/_Cargo.toml Cargo.toml
+        cp -rf docker/deploy/202303/bin_node_cli_src_chain_spec.rs bin/node/cli/src/chain_spec.rs
+        cp -rf docker/deploy/202303/bin_node_runtime_Cargo.toml bin/node/runtime/Cargo.toml
+        cp -rf docker/deploy/202303/bin_node_runtime_src_lib.rs bin/node/runtime/src/lib.rs
+        cp -rf docker/deploy/202303/bin_node_testing_src_genesis.rs  bin/node/testing/src/genesis.rs
+    ```
