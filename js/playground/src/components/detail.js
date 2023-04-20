@@ -31,6 +31,16 @@ function Detail(props) {
     changePassword:(ev)=>{
       setPassword(ev.target.value);
     },
+    decorRaw:(raw)=>{
+      const str=typeof raw !== 'string'?JSON.stringify(raw):raw;
+      if(str.length<150) return str;
+      const res=self.shorten(str,60);
+      return `(${str.length} Bytes):${res}`;
+    },
+    shorten: (str, n) => {
+      if (n === undefined) n = 10;
+      return str.substr(0, n) + '......';
+    },
     unsell:()=>{
       //console.log('here,password:'+password);
       const owner=anchor.owner;
@@ -91,7 +101,7 @@ function Detail(props) {
                 </tr>
                 <tr>
                   <td>Raw</td>
-                  <td>{typeof anchor.raw !== 'string'?JSON.stringify(anchor.raw):anchor.raw}</td>
+                  <td>{self.decorRaw(anchor.raw)}</td>
                 </tr>
                 <tr>
                   <td>Protocol</td>

@@ -81,6 +81,24 @@ const self = {
 	},
 
 	/** 
+	 * get the current block number
+	*/
+	block:(ck) => {
+		if (!self.ready()) return ck && ck(false);
+		let unblock=null;
+		wsAPI.rpc.chain.subscribeFinalizedHeads((lastHeader) => {
+			const hash = lastHeader.hash.toHex();
+			const block=lastHeader.number.toJSON();
+			if(unblock!==null) unblock();
+			if(ck){
+				ck(block,hash);
+			} 
+		}).then((fun) => {
+			unblock = fun;
+		});
+	},
+
+	/** 
 	 * subcribe the newest anchor data
 	 * @param {function}	[ck]	//callback function
 	*/
@@ -657,6 +675,7 @@ exports.anchorJS={
 	setKeyring:self.setKeyring,	//set Keyring to get pair
 	ready:self.ready,			//check the ws is ready
 	subcribe:self.listening,	//subcribe the latest block which including anchor data
+	block:self.block,
 	load:self.load,				//load encry json to create pair	
 	balance:self.balance,		//get the balance details of account
 
