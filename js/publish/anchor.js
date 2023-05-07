@@ -670,27 +670,51 @@ const self = {
 	},
 };
 
-exports.anchorJS={
-	set:self.setWebsocket,		//cache the linker promise object
-	setKeyring:self.setKeyring,	//set Keyring to get pair
-	ready:self.ready,			//check the ws is ready
-	subcribe:self.listening,	//subcribe the latest block which including anchor data
-	block:self.block,
-	load:self.load,				//load encry json to create pair	
-	balance:self.balance,		//get the balance details of account
+// exports.anchorJS={
+// 	set:self.setWebsocket,		//cache the linker promise object
+// 	setKeyring:self.setKeyring,	//set Keyring to get pair
+// 	ready:self.ready,			//check the ws is ready
+// 	subcribe:self.listening,	//subcribe the latest block which including anchor data
+// 	block:self.block,
+// 	load:self.load,				//load encry json to create pair	
+// 	balance:self.balance,		//get the balance details of account
 
-	search:self.latest,			//search anchor name
-	latest:self.latest,			//get the latest data of anchor
-	target:self.target,			//view target anchor data
-	history:self.history,		//history of anchor data
-	multi:self.multi,			//get target data for a list of anchors
-	//footprint:self.footprint,
-	owner:self.owner,			//get the owner of anchor
+// 	search:self.latest,			//search anchor name
+// 	latest:self.latest,			//get the latest data of anchor
+// 	target:self.target,			//view target anchor data
+// 	history:self.history,		//history of anchor data
+// 	multi:self.multi,			//get target data for a list of anchors
+// 	//footprint:self.footprint,
+// 	owner:self.owner,			//get the owner of anchor
 
-	write:self.write,			//init or update an anchor
+// 	write:self.write,			//init or update an anchor
 
-	market:self.market,			//get the list of selling anchors
-	sell:self.sell,				//set anchor to selling status
-	unsell:self.unsell,			//revoke anchor from selling status
-	buy:self.buy,				//buy selling anchor
-};
+// 	market:self.market,			//get the list of selling anchors
+// 	sell:self.sell,				//set anchor to selling status
+// 	unsell:self.unsell,			//revoke anchor from selling status
+// 	buy:self.buy,				//buy selling anchor
+// };
+
+//!important, The minify lib file can be used in html file by script tag
+//!important, when using esbuild to minify this as lib for avoiding the anchorJS=anchorJS.anchorJS，
+//!important, need to exports like this. Esbuild command like this
+//!important, yarn add esbuild
+//!important, ../playground/node_modules/.bin/esbuild anchor.js --bundle --minify --outfile=anchor.min.js --global-name=anchorJS
+
+exports.set=self.setWebsocket;
+exports.setKeyring=self.setKeyring;
+exports.ready=self.ready;
+exports.subcribe=self.listening;
+exports.block=self.block;
+exports.load=self.load;
+exports.balance=self.balance;
+exports.search=self.latest;
+exports.latest=self.latest;
+exports.target=self.target;
+exports.history=self.history;
+exports.multi=self.multi;
+exports.write=self.write;
+exports.market=self.market;
+exports.sell=self.sell;
+exports.unsell=self.unsell;
+exports.buy=self.buy;
