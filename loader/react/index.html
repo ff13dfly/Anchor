@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <meta name="description" content="Anchor Network Loader for React Launcher."/>
+        <title>Anchor Network, Your Web3.0</title>
+        <style>
+            #info{
+                text-align:center;
+                font-size: 30px;
+                padding: 20px 0px 0px 0px;
+                color:#444444
+            }
+            #footer{
+                color:#444444;
+                background: #FFFFFF;
+                width: 100%;
+                position: fixed;
+                left:0px;
+                bottom: 0px;
+                height: 20px;
+                line-height: 20px;
+                font-size: 12px;
+                padding: 0px 15px 0px 15px;
+                z-index: 999;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+            #footer p{color:#888888}
+            #target{font-weight: 800;color: #000000;font-size: 30px;}
+        </style>
+        <script src="lib/polkadot.min.js"></script>
+        <script src="lib/anchor.min.js"></script>
+        <script src="lib/easy.min.js"></script>
+    </head>
+    <body >
+        <noscript>You need to enable JavaScript to run this Loader.</noscript>
+        <div id="root"></div>
+        <div id="info">Loading [ <span id="target"></span> ] from Anchor Network ... </div>
+        <div id="footer">
+            <span id="more"></span> Anchor Network Loader v1.0.0 copyright 2023 by Fuu
+        </div>
+    </body>
+    <script src="loader.min.js"></script>
+</html>
