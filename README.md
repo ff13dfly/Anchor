@@ -342,3 +342,5 @@
         cp -rf docker/deploy/202303/bin_node_runtime_src_lib.rs bin/node/runtime/src/lib.rs
         cp -rf docker/deploy/202303/bin_node_testing_src_genesis.rs  bin/node/testing/src/genesis.rs
     ```
+
+* `len_fee` modification, the file is `frame/transaction-payment/src/lib.rs`, please search `let len_fee = Self::length_to_fee(len)`, the modify this line to `let len_fee = Self::length_to_fee(len/100);`.
