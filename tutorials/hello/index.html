@@ -1,0 +1,28 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <style></style>
+        <script src="polkadot.min.js"></script>
+        <script src="anchor.min.js"></script>
+                <script src="jquery.min.js"></script>
+                <script>
+                    $(function(){
+                        //需要修改的内容
+                        var seed="{{seed}}";
+                        var data="{{data}}";
+                        var name="{{name}}";
+
+                        //基本参数
+                        var server="wss://dev.metanchor.net";
+
+                        //1.连接到Substate的节点
+                        var provider = new WsProvider(node);
+
+                    });
+                </script>
+            </head>
+            <body>
+                <h2></h2>
+                <h4></h4>
+            </body>
+        </html>
